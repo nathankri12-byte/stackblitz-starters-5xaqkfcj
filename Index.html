@@ -1,0 +1,1975 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FITNESS AI PRO</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background:
+                radial-gradient(circle at 20% 0%, rgba(16,185,129,.13), transparent 30%),
+                radial-gradient(circle at 100% 20%, rgba(59,130,246,.10), transparent 30%),
+                #070b10;
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .glass {
+            background: rgba(15, 23, 32, .72);
+            border: 1px solid rgba(255,255,255,.07);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+
+        .card {
+            background: rgba(15, 23, 32, .82);
+            border: 1px solid rgba(255,255,255,.07);
+            border-radius: 22px;
+        }
+
+        .nav-item {
+            transition: .2s ease;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,.06);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(
+                90deg,
+                rgba(16,185,129,.20),
+                rgba(16,185,129,.06)
+            );
+            color: #34d399;
+            border-left: 3px solid #10b981;
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, #34d399, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .glow {
+            box-shadow:
+                0 0 40px rgba(16,185,129,.08),
+                inset 0 1px rgba(255,255,255,.03);
+        }
+
+        input,
+        select,
+        textarea {
+            background: #0b1118 !important;
+            border: 1px solid rgba(255,255,255,.09) !important;
+            color: white !important;
+            border-radius: 13px;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: rgba(16,185,129,.7) !important;
+            box-shadow: 0 0 0 3px rgba(16,185,129,.08);
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #10b981, #34d399);
+        }
+
+        ::-webkit-scrollbar {
+            width: 7px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #070b10;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #26323e;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 900px) {
+            #sidebar {
+                transform: translateX(-100%);
+                transition: transform .25s ease;
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+            }
+
+            #sidebar-overlay {
+                display: none;
+            }
+
+            #sidebar-overlay.show {
+                display: block;
+            }
+
+            #main-content {
+                margin-left: 0 !important;
+            }
+        }
+
+        @media (min-width: 901px) {
+            #mobile-header {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- MOBILE HEADER -->
+<header id="mobile-header"
+        class="fixed top-0 left-0 right-0 z-40 glass px-4 py-3 flex items-center justify-between">
+
+    <button onclick="toggleSidebar()"
+            class="w-10 h-10 rounded-xl bg-white/5">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <div class="font-black tracking-tight">
+        FITNESS <span class="gradient-text">AI PRO</span>
+    </div>
+
+    <div class="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center">
+        <i class="fa-solid fa-user text-emerald-400"></i>
+    </div>
+</header>
+
+<!-- OVERLAY -->
+<div id="sidebar-overlay"
+     onclick="toggleSidebar()"
+     class="fixed inset-0 bg-black/60 z-40"></div>
+
+<!-- SIDEBAR -->
+<aside id="sidebar"
+       class="fixed top-0 left-0 bottom-0 w-72 glass z-50 p-5 flex flex-col">
+
+    <div class="flex items-center gap-3 px-3 mb-10">
+        <div class="w-11 h-11 rounded-2xl bg-emerald-500/15 flex items-center justify-center">
+            <i class="fa-solid fa-bolt text-emerald-400 text-xl"></i>
+        </div>
+
+        <div>
+            <div class="font-black text-lg">
+                FITNESS <span class="gradient-text">AI PRO</span>
+            </div>
+            <div class="text-xs text-slate-500">
+                Your AI Fitness Companion
+            </div>
+        </div>
+    </div>
+
+    <div class="text-xs uppercase tracking-widest text-slate-600 px-3 mb-3">
+        Hauptmenü
+    </div>
+
+    <nav class="space-y-1">
+
+        <button class="nav-item active w-full text-left px-4 py-3 rounded-xl"
+                data-page="dashboard"
+                onclick="navigateApp('dashboard')">
+            <i class="fa-solid fa-house w-6"></i>
+            Dashboard
+        </button>
+
+        <button class="nav-item w-full text-left px-4 py-3 rounded-xl"
+                data-page="training"
+                onclick="navigateApp('training')">
+            <i class="fa-solid fa-dumbbell w-6"></i>
+            Training
+        </button>
+
+        <button class="nav-item w-full text-left px-4 py-3 rounded-xl"
+                data-page="nutrition"
+                onclick="navigateApp('nutrition')">
+            <i class="fa-solid fa-utensils w-6"></i>
+            Ernährung
+        </button>
+
+        <button class="nav-item w-full text-left px-4 py-3 rounded-xl"
+                data-page="progress"
+                onclick="navigateApp('progress')">
+            <i class="fa-solid fa-chart-line w-6"></i>
+            Fortschritt
+        </button>
+
+        <button class="nav-item w-full text-left px-4 py-3 rounded-xl"
+                data-page="shopping"
+                onclick="navigateApp('shopping')">
+            <i class="fa-solid fa-cart-shopping w-6"></i>
+            Einkaufsliste
+        </button>
+
+        <button class="nav-item w-full text-left px-4 py-3 rounded-xl"
+                data-page="coach"
+                onclick="navigateApp('coach')">
+            <i class="fa-solid fa-robot w-6"></i>
+            AI Coach
+        </button>
+
+        <button class="nav-item w-full text-left px-4 py-3 rounded-xl"
+                data-page="feedback"
+                onclick="navigateApp('feedback')">
+            <i class="fa-solid fa-comment-dots w-6"></i>
+            Feedback
+        </button>
+    </nav>
+
+    <div class="mt-auto space-y-1">
+
+        <button class="nav-item w-full text-left px-4 py-3 rounded-xl"
+                data-page="settings"
+                onclick="navigateApp('settings')">
+            <i class="fa-solid fa-gear w-6"></i>
+            Einstellungen
+        </button>
+
+        <div class="mt-4 p-4 rounded-2xl bg-white/[.03] border border-white/[.05]">
+            <div class="text-xs text-slate-500 mb-1">
+                Profil
+            </div>
+
+            <div id="sidebar-profile"
+                 class="font-semibold truncate">
+                Gast
+            </div>
+
+            <div id="connection-status"
+                 class="text-xs text-emerald-400 mt-1">
+                ● Lokal gespeichert
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- MAIN -->
+<main id="main-content"
+      class="min-h-screen ml-72 px-5 md:px-8 py-8">
+
+    <div class="max-w-7xl mx-auto">
+
+        <!-- ================= DASHBOARD ================= -->
+        <section id="page-dashboard" class="page active">
+
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-5 mb-8">
+
+                <div>
+                    <div class="text-sm text-emerald-400 font-semibold mb-2">
+                        DEIN FITNESS HUB
+                    </div>
+
+                    <h1 class="text-3xl md:text-4xl font-black">
+                        Willkommen zurück,
+                        <span id="dashboard-name" class="gradient-text">
+                            Athlet
+                        </span> 👋
+                    </h1>
+
+                    <p class="text-slate-400 mt-2">
+                        Dein heutiger Überblick auf einen Blick.
+                    </p>
+                </div>
+
+                <button onclick="navigateApp('settings')"
+                        class="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 transition">
+                    <i class="fa-solid fa-user mr-2"></i>
+                    Profil bearbeiten
+                </button>
+            </div>
+
+            <!-- STATS -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+                <div class="card glow p-5">
+                    <div class="text-slate-500 text-sm">
+                        Gewicht
+                    </div>
+                    <div class="text-2xl font-black mt-2">
+                        <span id="stat-weight">–</span>
+                        <span class="text-sm text-slate-500">kg</span>
+                    </div>
+                </div>
+
+                <div class="card glow p-5">
+                    <div class="text-slate-500 text-sm">
+                        Größe
+                    </div>
+                    <div class="text-2xl font-black mt-2">
+                        <span id="stat-height">–</span>
+                        <span class="text-sm text-slate-500">cm</span>
+                    </div>
+                </div>
+
+                <div class="card glow p-5">
+                    <div class="text-slate-500 text-sm">
+                        Tageskalorien
+                    </div>
+                    <div class="text-2xl font-black mt-2">
+                        <span id="stat-calories">–</span>
+                        <span class="text-sm text-slate-500">kcal</span>
+                    </div>
+                </div>
+
+                <div class="card glow p-5">
+                    <div class="text-slate-500 text-sm">
+                        Protein
+                    </div>
+                    <div class="text-2xl font-black mt-2">
+                        <span id="stat-protein">–</span>
+                        <span class="text-sm text-slate-500">g</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- DASHBOARD GRID -->
+            <div class="grid lg:grid-cols-3 gap-6">
+
+                <div class="lg:col-span-2 card p-6">
+
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 class="text-xl font-bold">
+                                Heutiges Training
+                            </h2>
+                            <p class="text-sm text-slate-500">
+                                Dein aktueller Trainingsplan
+                            </p>
+                        </div>
+
+                        <button onclick="navigateApp('training')"
+                                class="text-sm text-emerald-400">
+                            Alle anzeigen →
+                        </button>
+                    </div>
+
+                    <div id="dashboard-workout"
+                         class="space-y-3">
+
+                        <div class="p-5 rounded-2xl bg-white/[.03] text-slate-500 text-center">
+                            Noch kein Trainingsplan vorhanden.
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="card p-6">
+
+                    <div class="flex justify-between items-center mb-5">
+                        <div>
+                            <h2 class="font-bold text-lg">
+                                Ernährung
+                            </h2>
+                            <p class="text-xs text-slate-500">
+                                Tagesziel
+                            </p>
+                        </div>
+
+                        <i class="fa-solid fa-fire text-orange-400"></i>
+                    </div>
+
+                    <div class="space-y-4">
+
+                        <div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span>Kalorien</span>
+                                <span id="nutrition-calories">–</span>
+                            </div>
+
+                            <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                                <div class="progress-bar h-full rounded-full"
+                                     style="width: 65%">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span>Protein</span>
+                                <span id="nutrition-protein">–</span>
+                            </div>
+
+                            <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                                <div class="progress-bar h-full rounded-full"
+                                     style="width: 75%">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="navigateApp('nutrition')"
+                                class="w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 transition text-sm">
+                            Ernährungsplan öffnen
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUICK ACTIONS -->
+            <div class="mt-6">
+                <h2 class="text-xl font-bold mb-4">
+                    Schnellzugriff
+                </h2>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+                    <button onclick="navigateApp('training')"
+                            class="card p-5 text-left hover:border-emerald-500/30 transition">
+                        <i class="fa-solid fa-dumbbell text-emerald-400 text-xl mb-3"></i>
+                        <div class="font-bold">Training</div>
+                        <div class="text-xs text-slate-500 mt-1">
+                            Workout starten
+                        </div>
+                    </button>
+
+                    <button onclick="navigateApp('coach')"
+                            class="card p-5 text-left hover:border-emerald-500/30 transition">
+                        <i class="fa-solid fa-robot text-blue-400 text-xl mb-3"></i>
+                        <div class="font-bold">AI Coach</div>
+                        <div class="text-xs text-slate-500 mt-1">
+                            Frage die KI
+                        </div>
+                    </button>
+
+                    <button onclick="navigateApp('progress')"
+                            class="card p-5 text-left hover:border-emerald-500/30 transition">
+                        <i class="fa-solid fa-chart-line text-purple-400 text-xl mb-3"></i>
+                        <div class="font-bold">Fortschritt</div>
+                        <div class="text-xs text-slate-500 mt-1">
+                            Entwicklung ansehen
+                        </div>
+                    </button>
+
+                    <button onclick="navigateApp('shopping')"
+                            class="card p-5 text-left hover:border-emerald-500/30 transition">
+                        <i class="fa-solid fa-cart-shopping text-orange-400 text-xl mb-3"></i>
+                        <div class="font-bold">Einkaufen</div>
+                        <div class="text-xs text-slate-500 mt-1">
+                            Einkaufsliste
+                        </div>
+                    </button>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TRAINING ================= -->
+        <section id="page-training" class="page">
+
+            <div class="mb-8">
+                <div class="text-sm text-emerald-400 font-semibold mb-2">
+                    TRAINING
+                </div>
+
+                <h1 class="text-3xl font-black">
+                    Dein Workout
+                </h1>
+
+                <p class="text-slate-400 mt-2">
+                    Heute zählt jede Wiederholung.
+                </p>
+            </div>
+
+            <div class="card p-6">
+
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 id="training-title"
+                            class="text-2xl font-black">
+                            Noch kein Plan
+                        </h2>
+
+                        <p class="text-slate-500">
+                            Markiere Übungen als erledigt.
+                        </p>
+                    </div>
+
+                    <div class="text-emerald-400 font-bold">
+                        <span id="workout-progress">0</span>%
+                    </div>
+                </div>
+
+                <div id="training-list"
+                     class="space-y-3">
+
+                    <div class="text-center text-slate-500 py-10">
+                        Erstelle zuerst deinen persönlichen Plan.
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= NUTRITION ================= -->
+        <section id="page-nutrition" class="page">
+
+            <div class="mb-8">
+                <div class="text-sm text-emerald-400 font-semibold mb-2">
+                    ERNÄHRUNG
+                </div>
+
+                <h1 class="text-3xl font-black">
+                    Dein Ernährungsplan
+                </h1>
+
+                <p class="text-slate-400 mt-2">
+                    Einfach, verständlich und passend zu deinem Ziel.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-5">
+
+                <div class="card p-6">
+                    <div class="text-emerald-400 mb-4">
+                        <i class="fa-solid fa-sun text-xl"></i>
+                    </div>
+
+                    <h2 class="font-bold text-xl mb-2">
+                        Frühstück
+                    </h2>
+
+                    <p id="meal-breakfast"
+                       class="text-slate-400">
+                        Noch kein Plan vorhanden.
+                    </p>
+                </div>
+
+                <div class="card p-6">
+                    <div class="text-orange-400 mb-4">
+                        <i class="fa-solid fa-bowl-food text-xl"></i>
+                    </div>
+
+                    <h2 class="font-bold text-xl mb-2">
+                        Mittagessen
+                    </h2>
+
+                    <p id="meal-lunch"
+                       class="text-slate-400">
+                        Noch kein Plan vorhanden.
+                    </p>
+                </div>
+
+                <div class="card p-6">
+                    <div class="text-blue-400 mb-4">
+                        <i class="fa-solid fa-moon text-xl"></i>
+                    </div>
+
+                    <h2 class="font-bold text-xl mb-2">
+                        Abendessen
+                    </h2>
+
+                    <p id="meal-dinner"
+                       class="text-slate-400">
+                        Noch kein Plan vorhanden.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="card p-6 mt-6">
+
+                <h2 class="font-bold text-xl mb-5">
+                    Makros
+                </h2>
+
+                <div class="grid grid-cols-3 gap-4 text-center">
+
+                    <div>
+                        <div class="text-2xl font-black"
+                             id="macro-protein">
+                            –
+                        </div>
+                        <div class="text-xs text-slate-500">
+                            Protein
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="text-2xl font-black"
+                             id="macro-carbs">
+                            –
+                        </div>
+                        <div class="text-xs text-slate-500">
+                            Kohlenhydrate
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="text-2xl font-black"
+                             id="macro-fats">
+                            –
+                        </div>
+                        <div class="text-xs text-slate-500">
+                            Fett
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PROGRESS ================= -->
+        <section id="page-progress" class="page">
+
+            <div class="mb-8">
+                <div class="text-sm text-emerald-400 font-semibold mb-2">
+                    FORTSCHRITT
+                </div>
+
+                <h1 class="text-3xl font-black">
+                    Deine Entwicklung
+                </h1>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+
+                <div class="card p-6">
+                    <h2 class="font-bold text-xl mb-5">
+                        Gewicht
+                    </h2>
+
+                    <div class="text-4xl font-black mb-2">
+                        <span id="progress-weight">–</span>
+                        <span class="text-lg text-slate-500">kg</span>
+                    </div>
+
+                    <p class="text-slate-500 text-sm">
+                        Aktuelles Gewicht
+                    </p>
+                </div>
+
+                <div class="card p-6">
+                    <h2 class="font-bold text-xl mb-5">
+                        Ziel
+                    </h2>
+
+                    <div id="progress-goal"
+                         class="text-2xl font-black">
+                        –
+                    </div>
+
+                    <p class="text-slate-500 text-sm mt-2">
+                        Dein aktuelles Fitnessziel
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="card p-6 mt-6">
+                <h2 class="font-bold text-xl mb-5">
+                    Gewicht hinzufügen
+                </h2>
+
+                <div class="flex flex-col sm:flex-row gap-3">
+
+                    <input id="new-weight"
+                           type="number"
+                           step="0.1"
+                           placeholder="z. B. 70.5"
+                           class="flex-1 px-4 py-3">
+
+                    <button onclick="addWeight()"
+                            class="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold">
+                        Speichern
+                    </button>
+
+                </div>
+
+                <div id="weight-history"
+                     class="mt-6 space-y-2">
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SHOPPING ================= -->
+        <section id="page-shopping" class="page">
+
+            <div class="mb-8">
+                <div class="text-sm text-emerald-400 font-semibold mb-2">
+                    EINKAUF
+                </div>
+
+                <h1 class="text-3xl font-black">
+                    Einkaufsliste
+                </h1>
+
+                <p class="text-slate-400 mt-2">
+                    Aus deinem Ernährungsplan erstellt.
+                </p>
+            </div>
+
+            <div class="card p-6">
+
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="font-bold text-xl">
+                        Lebensmittel
+                    </h2>
+
+                    <button onclick="generateShoppingList()"
+                            class="text-sm text-emerald-400">
+                        Aktualisieren
+                    </button>
+                </div>
+
+                <div id="shopping-list"
+                     class="space-y-3">
+
+                    <div class="text-slate-500 text-center py-8">
+                        Noch keine Einkaufsliste vorhanden.
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= AI COACH ================= -->
+        <section id="page-coach" class="page">
+
+            <div class="mb-8">
+                <div class="text-sm text-emerald-400 font-semibold mb-2">
+                    ARTIFICIAL INTELLIGENCE
+                </div>
+
+                <h1 class="text-3xl font-black">
+                    AI Coach 🤖
+                </h1>
+
+                <p class="text-slate-400 mt-2">
+                    Frag deinen persönlichen Fitness-Assistenten.
+                </p>
+            </div>
+
+            <div class="card p-6">
+
+                <div id="coach-messages"
+                     class="min-h-[300px] max-h-[500px] overflow-y-auto space-y-4 mb-5">
+
+                    <div class="flex gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-emerald-500/15 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-robot text-emerald-400"></i>
+                        </div>
+
+                        <div class="bg-white/[.04] rounded-2xl px-4 py-3 text-slate-300">
+                            Hey! Ich bin dein AI Coach. Was möchtest du wissen?
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="flex gap-3">
+
+                    <input id="coach-input"
+                           type="text"
+                           placeholder="z. B. Wie kann ich mein Training verbessern?"
+                           class="flex-1 px-4 py-3"
+                           onkeydown="if(event.key==='Enter') sendCoachMessage()">
+
+                    <button onclick="sendCoachMessage()"
+                            class="w-12 h-12 rounded-xl bg-emerald-500 text-black font-bold">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= FEEDBACK ================= -->
+        <section id="page-feedback" class="page">
+
+            <div class="mb-8">
+                <div class="text-sm text-emerald-400 font-semibold mb-2">
+                    FEEDBACK
+                </div>
+
+                <h1 class="text-3xl font-black">
+                    Deine Meinung zählt
+                </h1>
+
+                <p class="text-slate-400 mt-2">
+                    Hilf uns, FITNESS AI PRO besser zu machen.
+                </p>
+            </div>
+
+            <div class="card p-6 max-w-2xl">
+
+                <label class="block text-sm text-slate-400 mb-2">
+                    Wie gefällt dir die App?
+                </label>
+
+                <select id="feedback-rating"
+                        class="w-full px-4 py-3 mb-5">
+                    <option value="5">⭐⭐⭐⭐⭐ Sehr gut</option>
+                    <option value="4">⭐⭐⭐⭐ Gut</option>
+                    <option value="3">⭐⭐⭐ Okay</option>
+                    <option value="2">⭐⭐ Nicht so gut</option>
+                    <option value="1">⭐ Schlecht</option>
+                </select>
+
+                <label class="block text-sm text-slate-400 mb-2">
+                    Kategorie
+                </label>
+
+                <szuoption>feedback</option>
+                    <option>Ernährung</option>
+                    <option>AI Coach</option>
+                    <option>Technischer Fehler</option>
+                    <option>Feature-Wunsch</option>
+                    <option>Sonstiges</option>
+                </select>
+
+                <label class="block text-sm text-slate-400 mb-2">
+                    Nachricht
+                </label>
+
+                <textarea id="feedback-message"
+                          rows="6"
+                          placeholder="Was können wir verbessern?"
+                          class="w-full px-4 py-3 mb-5"></textarea>
+
+                <button onclick="sendFeedback()"
+                        class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold">
+                    Feedback senden
+                </button>
+
+                <p id="feedback-status"
+                   class="text-sm text-center mt-4"></p>
+
+            </div>
+        </section>
+
+        <!-- ================= SETTINGS ================= -->
+        <section id="page-settings" class="page">
+
+            <div class="mb-8">
+                <div class="text-sm text-emerald-400 font-semibold mb-2">
+                    EINSTELLUNGEN
+                </div>
+
+                <h1 class="text-3xl font-black">
+                    Einstellungen
+                </h1>
+            </div>
+
+            <div class="space-y-6">
+
+                <!-- PROFILE -->
+                <div class="card p-6">
+
+                    <h2 class="text-xl font-bold mb-5">
+                        <i class="fa-solid fa-user text-emerald-400 mr-2"></i>
+                        Profil
+                    </h2>
+
+                    <div class="grid md:grid-cols-2 gap-4">
+
+                        <div>
+                            <label class="text-sm text-slate-400">
+                                Name
+                            </label>
+                            <input id="profile-name"
+                                   class="w-full px-4 py-3 mt-2"
+                                   placeholder="Dein Name">
+                        </div>
+
+                        <div>
+                            <label class="text-sm text-slate-400">
+                                Alter
+                            </label>
+                            <input id="profile-age"
+                                   type="number"
+                                   class="w-full px-4 py-3 mt-2">
+                        </div>
+
+                        <div>
+                            <label class="text-sm text-slate-400">
+                                Gewicht (kg)
+                            </label>
+                            <input id="profile-weight"
+                                   type="number"
+                                   step="0.1"
+                                   class="w-full px-4 py-3 mt-2">
+                        </div>
+
+                        <div>
+                            <label class="text-sm text-slate-400">
+                                Größe (cm)
+                            </label>
+                            <input id="profile-height"
+                                   type="number"
+                                   class="w-full px-4 py-3 mt-2">
+                        </div>
+
+                        <div>
+                            <label class="text-sm text-slate-400">
+                                Ziel
+                            </label>
+
+                            <select id="profile-goal"
+                                    class="w-full px-4 py-3 mt-2">
+
+                                <option>Muskelaufbau</option>
+                                <option>Abnehmen</option>
+                                <option>Fitness verbessern</option>
+                                <option>Ausdauer</option>
+                                <option>Kraft</option>
+                                <option>Gesund bleiben</option>
+
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="text-sm text-slate-400">
+                                Ernährung
+                            </label>
+
+                            <select id="profile-diet"
+                                    class="w-full px-4 py-3 mt-2">
+
+                                <option>Allesesser</option>
+                                <option>Vegetarisch</option>
+                                <option>Vegan</option>
+                                <option>Flexitarisch</option>
+
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <button onclick="saveProfile()"
+                            class="mt-5 px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold">
+                        Profil speichern
+                    </button>
+
+                </div>
+
+                <!-- AI -->
+                <div class="card p-6">
+
+                    <h2 class="text-xl font-bold mb-2">
+                        <i class="fa-solid fa-brain text-blue-400 mr-2"></i>
+                        KI & API
+                    </h2>
+
+                    <p class="text-sm text-slate-500 mb-5">
+                        Für die Entwicklungsphase kannst du hier deinen Gemini API Key hinterlegen.
+                    </p>
+
+                    <label class="text-sm text-slate-400">
+                        Gemini API Key
+                    </label>
+
+                    <input id="api-key"
+                           type="password"
+                           placeholder="AIza..."
+                           class="w-full px-4 py-3 mt-2">
+
+                    <button onclick="saveApiKey()"
+                            class="mt-4 px-6 py-3 rounded-xl bg-blue-500 hover:bg-blue-400 text-white font-bold">
+                        API Key speichern
+                    </button>
+
+                    <p id="api-status"
+                       class="text-sm text-slate-500 mt-3">
+                        Noch kein API Key gespeichert.
+                    </p>
+
+                    <div class="mt-5 p-4 rounded-xl bg-yellow-500/5 border border-yellow-500/10 text-xs text-yellow-300">
+                        Für die fertige App werden wir den Gemini-Key später auf einen sicheren Backend-/Edge-Function-Server verschieben.
+                    </div>
+
+                </div>
+
+                <!-- DATA -->
+                <div class="card p-6">
+
+                    <h2 class="text-xl font-bold mb-4">
+                        <i class="fa-solid fa-database text-purple-400 mr-2"></i>
+                        Daten
+                    </h2>
+
+                    <p class="text-slate-500 text-sm mb-5">
+                        Deine Daten werden lokal gespeichert. Sobald wir die Authentifizierung vollständig einbauen, werden sie zusätzlich mit Supabase synchronisiert.
+                    </p>
+
+                    <button onclick="clearLocalData()"
+                            class="px-5 py-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20">
+                        Lokale Daten löschen
+                    </button>
+
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+</main>
+
+<!-- LOADING MODAL -->
+<div id="loading-modal"
+     class="hidden fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm items-center justify-center p-5">
+
+    <div class="card p-8 text-center max-w-sm w-full">
+
+        <div class="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-5">
+            <i class="fa-solid fa-brain text-emerald-400 text-2xl animate-pulse"></i>
+        </div>
+
+        <h2 class="font-bold text-xl">
+            FITNESS AI arbeitet...
+        </h2>
+
+        <p class="text-slate-500 text-sm mt-2">
+            Dein persönlicher Plan wird erstellt.
+        </p>
+
+    </div>
+</div>
+
+<script>
+/* =========================================================
+   SUPABASE
+   ========================================================= */
+
+const SUPABASE_URL = "https://qnouktkkbrwcdzgaqthi.supabase.co/rest/v1/";
+const SUPABASE_KEY = "sb_publishable_sdHv-8wTkJ5s9WQQp88A8Q_ZyNKHm5t";
+
+let supabaseClient = null;
+
+try {
+    if (
+        SUPABASE_URL &&
+        SUPABASE_KEY &&
+        !SUPABASE_URL.includes("DEINE_") &&
+        !SUPABASE_KEY.includes("DEIN_")
+    ) {
+        supabaseClient = window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
+        );
+    }
+} catch (error) {
+    console.error("Supabase konnte nicht gestartet werden:", error);
+}
+
+
+/* =========================================================
+   STORAGE
+   ========================================================= */
+
+const STORAGE_KEYS = {
+    profile: "fitness_ai_profile",
+    plan: "fitness_ai_plan",
+    exercises: "fitness_ai_exercises",
+    apiKey: "fitness_ai_gemini_key",
+    weights: "fitness_ai_weights"
+};
+
+function saveLocal(key, value) {
+    localStorage.setItem(
+        key,
+        JSON.stringify(value)
+    );
+}
+
+function loadLocal(key, fallback = null) {
+    try {
+        const value = localStorage.getItem(key);
+        return value ? JSON.parse(value) : fallback;
+    } catch {
+        return fallback;
+    }
+}
+
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+let currentPage = "dashboard";
+
+function navigateApp(page) {
+
+    document.querySelectorAll(".page").forEach(section => {
+        section.classList.remove("active");
+    });
+
+    const target = document.getElementById("page-" + page);
+
+    if (target) {
+        target.classList.add("active");
+    }
+
+    document.querySelectorAll(".nav-item").forEach(item => {
+        item.classList.remove("active");
+
+        if (item.dataset.page === page) {
+            item.classList.add("active");
+        }
+    });
+
+    currentPage = page;
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+    closeSidebar();
+
+    if (page === "progress") {
+        renderWeightHistory();
+    }
+
+    if (page === "shopping") {
+        generateShoppingList();
+    }
+}
+
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+function toggleSidebar() {
+
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("sidebar-overlay");
+
+    sidebar.classList.toggle("open");
+    overlay.classList.toggle("show");
+}
+
+function closeSidebar() {
+
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("sidebar-overlay");
+
+    sidebar.classList.remove("open");
+    overlay.classList.remove("show");
+}
+
+
+/* =========================================================
+   PROFILE
+   ========================================================= */
+
+function getProfile() {
+    return loadLocal(STORAGE_KEYS.profile, {});
+}
+
+function saveProfile() {
+
+    const profile = {
+        name: document.getElementById("profile-name").value.trim(),
+        age: Number(document.getElementById("profile-age").value),
+        weight: Number(document.getElementById("profile-weight").value),
+        height: Number(document.getElementById("profile-height").value),
+        goal: document.getElementById("profile-goal").value,
+        diet: document.getElementById("profile-diet").value
+    };
+
+    saveLocal(STORAGE_KEYS.profile, profile);
+
+    updateUIFromProfile();
+
+    syncProfileToSupabase(profile);
+
+    alert("Profil gespeichert.");
+}
+
+function restoreProfile() {
+
+    const profile = getProfile();
+
+    if (!profile) return;
+
+    document.getElementById("profile-name").value = profile.name || "";
+    document.getElementById("profile-age").value = profile.age || "";
+    document.getElementById("profile-weight").value = profile.weight || "";
+    document.getElementById("profile-height").value = profile.height || "";
+    document.getElementById("profile-goal").value = profile.goal || "Muskelaufbau";
+    document.getElementById("profile-diet").value = profile.diet || "Allesesser";
+
+    updateUIFromProfile();
+}
+
+function updateUIFromProfile() {
+
+    const profile = getProfile();
+
+    const name = profile.name || "Athlet";
+
+    document.getElementById("dashboard-name").textContent = name;
+    document.getElementById("sidebar-profile").textContent = name;
+
+    document.getElementById("stat-weight").textContent =
+        profile.weight || "–";
+
+    document.getElementById("stat-height").textContent =
+        profile.height || "–";
+
+    document.getElementById("progress-weight").textContent =
+        profile.weight || "–";
+
+    document.getElementById("progress-goal").textContent =
+        profile.goal || "–";
+}
+
+
+/* =========================================================
+   SUPABASE PROFILE
+   ========================================================= */
+
+async function syncProfileToSupabase(profile) {
+
+    if (!supabaseClient) {
+        return;
+    }
+
+    try {
+
+        const {
+            data: { user }
+        } = await supabaseClient.auth.getUser();
+
+        if (!user) {
+            return;
+        }
+
+        const { error } = await supabaseClient
+            .from("profiles")
+            .upsert({
+                id: user.id,
+                name: profile.name,
+                age: profile.age,
+                weight: profile.weight,
+                height: profile.height,
+                goal: profile.goal,
+                diet: profile.diet
+            });
+
+        if (error) {
+            console.error("Supabase Profilfehler:", error);
+        }
+
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+
+/* =========================================================
+   GEMINI API
+   ========================================================= */
+
+function getApiKey() {
+    return localStorage.getItem(STORAGE_KEYS.apiKey) || "";
+}
+
+function saveApiKey() {
+
+    const key = document
+        .getElementById("api-key")
+        .value
+        .trim();
+
+    if (!key) {
+        alert("Bitte einen API Key eingeben.");
+        return;
+    }
+
+    localStorage.setItem(
+        STORAGE_KEYS.apiKey,
+        key
+    );
+
+    restoreApiKeyStatus();
+
+    alert("Gemini API Key gespeichert.");
+}
+
+function restoreApiKeyStatus() {
+
+    const key = getApiKey();
+
+    const status =
+        document.getElementById("api-status");
+
+    if (!status) return;
+
+    if (key) {
+        status.textContent =
+            "● Gemini API Key gespeichert";
+        status.className =
+            "text-sm text-emerald-400 mt-3";
+    } else {
+        status.textContent =
+            "Noch kein API Key gespeichert.";
+    }
+}
+
+
+/* =========================================================
+   PLAN
+   ========================================================= */
+
+function getPlan() {
+    return loadLocal(STORAGE_KEYS.plan, null);
+}
+
+function applyPlan(plan) {
+
+    if (!plan) return;
+
+    saveLocal(
+        STORAGE_KEYS.plan,
+        plan
+    );
+
+    document.getElementById("training-title").textContent =
+        plan.workoutTitle || "Dein Workout";
+
+    document.getElementById("stat-calories").textContent =
+        plan.calories || "–";
+
+    document.getElementById("stat-protein").textContent =
+        plan.protein || "–";
+
+    document.getElementById("nutrition-calories").textContent =
+        plan.calories ? plan.calories + " kcal" : "–";
+
+    document.getElementById("nutrition-protein").textContent =
+        plan.protein ? plan.protein + " g" : "–";
+
+    document.getElementById("macro-protein").textContent =
+        plan.protein ? plan.protein + " g" : "–";
+
+    document.getElementById("macro-carbs").textContent =
+        plan.carbs ? plan.carbs + " g" : "–";
+
+    document.getElementById("macro-fats").textContent =
+        plan.fats ? plan.fats + " g" : "–";
+
+    document.getElementById("meal-breakfast").textContent =
+        plan.breakfast || "–";
+
+    document.getElementById("meal-lunch").textContent =
+        plan.lunch || "–";
+
+    document.getElementById("meal-dinner").textContent =
+        plan.dinner || "–";
+
+    renderWorkout(plan);
+}
+
+
+/* =========================================================
+   WORKOUT
+   ========================================================= */
+
+function renderWorkout(plan) {
+
+    const list =
+        document.getElementById("training-list");
+
+    const dashboard =
+        document.getElementById("dashboard-workout");
+
+    list.innerHTML = "";
+    dashboard.innerHTML = "";
+
+    const exercises =
+        Array.isArray(plan.workout)
+            ? plan.workout
+            : [];
+
+    if (!exercises.length) {
+
+        list.innerHTML =
+            `<div class="text-center text-slate-500 py-10">
+                Keine Übungen vorhanden.
+            </div>`;
+
+        dashboard.innerHTML =
+            `<div class="p-5 rounded-2xl bg-white/[.03] text-slate-500 text-center">
+                Keine Übungen vorhanden.
+            </div>`;
+
+        return;
+    }
+
+    const savedStates =
+        loadLocal(
+            STORAGE_KEYS.exercises,
+            {}
+        );
+
+    exercises.forEach((exercise, index) => {
+
+        const key = String(index);
+
+        const checked =
+            savedStates[key] === true;
+
+        const title =
+            typeof exercise === "string"
+                ? exercise
+                : exercise.name || `Übung ${index + 1}`;
+
+        const details =
+            typeof exercise === "object"
+                ? `${exercise.sets || ""} ${exercise.reps || ""}`.trim()
+                : "";
+
+        const html = `
+            <label class="flex items-center gap-4 p-4 rounded-2xl bg-white/[.03] hover:bg-white/[.05] cursor-pointer transition">
+                <input
+                    type="checkbox"
+                    class="w-5 h-5 accent-emerald-500"
+                    ${checked ? "checked" : ""}
+                    onchange="toggleExercise(${index}, this.checked)"
+                >
+
+                <div class="flex-1">
+                    <div class="font-semibold">
+                        ${escapeHtml(title)}
+                    </div>
+
+                    ${
+                        details
+                        ? `<div class="text-xs text-slate-500 mt-1">
+                                ${escapeHtml(details)}
+                           </div>`
+                        : ""
+                    }
+                </div>
+
+                <i class="fa-solid fa-chevron-right text-slate-700"></i>
+            </label>
+        `;
+
+        list.insertAdjacentHTML(
+            "beforeend",
+            html
+        );
+
+        if (index < 4) {
+            dashboard.insertAdjacentHTML(
+                "beforeend",
+                html
+            );
+        }
+    });
+
+    updateWorkoutProgress();
+}
+
+function toggleExercise(index, checked) {
+
+    const states =
+        loadLocal(
+            STORAGE_KEYS.exercises,
+            {}
+        );
+
+    states[String(index)] = checked;
+
+    saveLocal(
+        STORAGE_KEYS.exercises,
+        states
+    );
+
+    updateWorkoutProgress();
+}
+
+function updateWorkoutProgress() {
+
+    const plan = getPlan();
+
+    if (!plan || !Array.isArray(plan.workout)) {
+        return;
+    }
+
+    const states =
+        loadLocal(
+            STORAGE_KEYS.exercises,
+            {}
+        );
+
+    const total = plan.workout.length;
+
+    const done =
+        Object.values(states)
+            .filter(Boolean)
+            .length;
+
+    const percentage =
+        total
+            ? Math.round((done / total) * 100)
+            : 0;
+
+    document.getElementById("workout-progress")
+        .textContent = percentage;
+}
+
+
+/* =========================================================
+   WEIGHT HISTORY
+   ========================================================= */
+
+function addWeight() {
+
+    const input =
+        document.getElementById("new-weight");
+
+    const value =
+        Number(input.value);
+
+    if (!value) {
+        return;
+    }
+
+    const history =
+        loadLocal(
+            STORAGE_KEYS.weights,
+            []
+        );
+
+    history.push({
+        weight: value,
+        date: new Date().toLocaleDateString("de-DE")
+    });
+
+    saveLocal(
+        STORAGE_KEYS.weights,
+        history
+    );
+
+    input.value = "";
+
+    renderWeightHistory();
+}
+
+function renderWeightHistory() {
+
+    const container =
+        document.getElementById("weight-history");
+
+    const history =
+        loadLocal(
+            STORAGE_KEYS.weights,
+            []
+        );
+
+    if (!history.length) {
+
+        container.innerHTML =
+            `<div class="text-slate-500 text-sm">
+                Noch keine Gewichtseinträge.
+            </div>`;
+
+        return;
+    }
+
+    container.innerHTML =
+        history
+            .slice()
+            .reverse()
+            .map(item => `
+                <div class="flex justify-between items-center p-3 rounded-xl bg-white/[.03]">
+                    <span>${item.date}</span>
+                    <span class="font-bold">${item.weight} kg</span>
+                </div>
+            `)
+            .join("");
+}
+
+
+/* =========================================================
+   SHOPPING LIST
+   ========================================================= */
+
+function generateShoppingList() {
+
+    const container =
+        document.getElementById("shopping-list");
+
+    const plan = getPlan();
+
+    if (!plan) {
+        return;
+    }
+
+    const text = [
+        plan.breakfast || "",
+        plan.lunch || "",
+        plan.dinner || ""
+    ]
+        .join(" ")
+        .toLowerCase();
+
+    const possibleItems = [
+        "Haferflocken",
+        "Milch",
+        "Joghurt",
+        "Eier",
+        "Banane",
+        "Apfel",
+        "Hähnchen",
+        "Reis",
+        "Nudeln",
+        "Kartoffeln",
+        "Brokkoli",
+        "Tomaten",
+        "Paprika",
+        "Salat",
+        "Brot",
+        "Quark",
+        "Beeren",
+        "Nüsse"
+    ];
+
+    const found =
+        possibleItems.filter(item =>
+            text.includes(item.toLowerCase())
+        );
+
+    if (!found.length) {
+
+        container.innerHTML =
+            `<div class="text-slate-500 text-center py-8">
+                Keine Lebensmittel automatisch erkannt.
+            </div>`;
+
+        return;
+    }
+
+    container.innerHTML =
+        found.map(item => `
+            <label class="flex items-center gap-3 p-4 rounded-xl bg-white/[.03]">
+                <input type="checkbox"
+                       class="w-5 h-5 accent-emerald-500">
+                <span>${item}</span>
+            </label>
+        `).join("");
+}
+
+
+/* =========================================================
+   AI COACH
+   ========================================================= */
+
+async function sendCoachMessage() {
+
+    const input =
+        document.getElementById("coach-input");
+
+    const message =
+        input.value.trim();
+
+    if (!message) return;
+
+    addCoachMessage(
+        message,
+        "user"
+    );
+
+    input.value = "";
+
+    const key = getApiKey();
+
+    if (!key) {
+
+        addCoachMessage(
+            "Bitte hinterlege zuerst deinen Gemini API Key unter Einstellungen → KI & API.",
+            "ai"
+        );
+
+        return;
+    }
+
+    addCoachMessage(
+        "Ich denke kurz nach...",
+        "ai"
+    );
+
+    try {
+
+        const response =
+            await fetch(
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + encodeURIComponent(key),
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        contents: [
+                            {
+                                parts: [
+                                    {
+                                        text:
+                                            "Du bist ein freundlicher Fitness-Coach. Antworte verständlich, motivierend und sicher. Nutzerfrage: " +
+                                            message
+                                    }
+                                ]
+                            }
+                        ]
+                    })
+                }
+            );
+
+        const data =
+            await response.json();
+
+        const answer =
+            data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+            "Ich konnte gerade keine Antwort erstellen.";
+
+        removeLastCoachMessage();
+
+        addCoachMessage(
+            answer,
+            "ai"
+        );
+
+    } catch (error) {
+
+        removeLastCoachMessage();
+
+        addCoachMessage(
+            "Es gab einen Fehler bei der Verbindung zur KI.",
+            "ai"
+        );
+    }
+}
+
+function addCoachMessage(text, type) {
+
+    const container =
+        document.getElementById("coach-messages");
+
+    const isUser =
+        type === "user";
+
+    const html = `
+        <div class="flex gap-3 ${isUser ? "justify-end" : ""}">
+
+            ${
+                !isUser
+                ? `
+                    <div class="w-9 h-9 rounded-xl bg-emerald-500/15 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-robot text-emerald-400"></i>
+                    </div>
+                `
+                : ""
+            }
+
+            <div class="${isUser
+                ? "bg-emerald-500 text-black"
+                : "bg-white/[.04] text-slate-300"
+            } rounded-2xl px-4 py-3 max-w-[80%] whitespace-pre-wrap">
+                ${escapeHtml(text)}
+            </div>
+
+        </div>
+    `;
+
+    container.insertAdjacentHTML(
+        "beforeend",
+        html
+    );
+
+    container.scrollTop =
+        container.scrollHeight;
+}
+
+function removeLastCoachMessage() {
+
+    const container =
+        document.getElementById("coach-messages");
+
+    if (container.lastElementChild) {
+        container.lastElementChild.remove();
+    }
+}
+
+
+/* =========================================================
+   FEEDBACK
+   ========================================================= */
+   async function sendFeedback() {
+    const rating = Number(
+        document.getElementById("feedback-rating").value
+    );
+
+    const category =
+        document.getElementById("feedback-category").value;
+
+    const message =
+        document.getElementById("feedback-message").value.trim();
+
+    const status =
+        document.getElementById("feedback-status");
+
+    if (!message) {
+        status.textContent = "Bitte schreibe eine Nachricht.";
+        status.className =
+            "text-sm text-red-400 text-center mt-4";
+        return;
+    }
+
+    // Feedback in Supabase speichern
+    if (supabaseClient) {
+        const {
+            data: { user }
+        } = await supabaseClient.auth.getUser();
+
+        if (user) {
+            const { error } = await supabaseClient
+                .from("feedback")
+                .insert({
+                    message: message,
+                    rating: rating,
+                    category: category
+                });
+
+            if (error) {
+                console.error("Supabase Feedbackfehler:", error);
+                status.textContent =
+                    "Feedback konnte nicht gespeichert werden.";
+                status.className =
+                    "text-sm text-red-400 text-center mt-4";
+                return;
+            }
+        }
+    }
+
+    status.textContent = "Danke für dein Feedback! ❤️";
+    status.className =
+        "text-sm text-emerald-400 text-center mt-4";
+
+    document.getElementById("feedback-message").value = "";
+}
+/* =========================================================
+   CLEAR DATA
+   ========================================================= */
+
+function clearLocalData() {
+
+    const confirmed =
+        confirm(
+            "Möchtest du wirklich alle lokalen FITNESS AI PRO Daten löschen?"
+        );
+
+    if (!confirmed) return;
+
+    Object.values(STORAGE_KEYS)
+        .forEach(key =>
+            localStorage.removeItem(key)
+        );
+
+    location.reload();
+}
+
+
+/* =========================================================
+   HTML ESCAPE
+   ========================================================= */
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+
+/* =========================================================
+   STARTUP
+   ========================================================= */
+
+function restoreApp() {
+
+    restoreProfile();
+
+    restoreApiKeyStatus();
+
+    const plan = getPlan();
+
+    if (plan) {
+        applyPlan(plan);
+    }
+
+    renderWeightHistory();
+
+    if (supabaseClient) {
+
+        document.getElementById(
+            "connection-status"
+        ).textContent =
+            "● Supabase bereit";
+
+        document.getElementById(
+            "connection-status"
+        ).className =
+            "text-xs text-emerald-400 mt-1";
+
+    } else {
+
+        document.getElementById(
+            "connection-status"
+        ).textContent =
+            "● Lokal gespeichert";
+
+        document.getElementById(
+            "connection-status"
+        ).className =
+            "text-xs text-yellow-400 mt-1";
+    }
+}
+
+restoreApp();
+</script>
+
+</body>
+</html>
