@@ -1,8 +1,12 @@
 {
+  "name": "fitness-ai-pro",
+  "version": "1.0.0",
+  "description": "FITNESS AI PRO",
+  "main": "server.js",
   "scripts": {
-    "start": "servor --reload"
+    "start": "node server.js"
   },
   "dependencies": {
-    "servor": "^4.0.2"
+    "express": "^5.1.0"
   }
 }
