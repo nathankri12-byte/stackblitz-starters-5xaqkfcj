@@ -959,22 +959,76 @@ ${userMessage}
     const url =
       `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`;
       console.log("🚀 Gemini Anfrage wird gesendet...");
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: "user",
-            parts: [
-              {
-                text: finalPrompt
-              }
-            ]
-          }
-        ],
+    const controller = new AbortController();
+const timeout = setTimeout(() => controller.abort(), 15000);
+
+try {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              text: finalPrompt
+            }
+          ]
+        }
+      ],
+      generationConfig: {
+        maxOutputTokens: 1800
+      }
+    }),
+    signal: controller.signal
+  });
+
+  clearTimeout(timeout);
+
+  const data = await response.json();
+
+  console.log("Gemini HTTP Status:", response.status);
+  console.log("Gemini Response:", data);
+
+  if (!response.ok) {
+    throw new Error(
+      `Gemini API Fehler ${response.status}: ${
+        data?.error?.message || JSON.stringify(data)
+      }`
+    );
+  }
+
+  const answer = data?.candidates?.[0]?.content?.parts
+    ?.map(part => part.text || "")
+    .join("")
+    .trim();
+
+  if (!answer) {
+    throw new Error("Gemini hat keine Antwort zurückgegeben.");
+  }
+
+  if (showInChat) {
+    updateLastAIMessage(formatAIText(answer));
+  }
+
+  return answer;
+
+} catch (error) {
+  clearTimeout(timeout);
+
+  console.error("❌ GEMINI FEHLER:", error);
+
+  if (showInChat) {
+    updateLastAIMessage(
+      `❌ **KI-Fehler**\n\n${error.message}`
+    );
+  }
+
+  return null;
+}
      generationConfig: {
       maxOutputTokens: 1800
       }
