@@ -923,7 +923,7 @@ async function askGemini(userMessage, options = {}) {
     });
 
     const requestPromise = supabaseClient.functions.invoke(
-      "gemini-chat",
+      "smooth-handler",
       {
         body: {
           message: userMessage,
