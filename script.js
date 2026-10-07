@@ -955,80 +955,56 @@ ${systemInstruction}
 Aufgabe des Nutzers:
 ${userMessage}
 `;
-
-    const url =
-      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`;
-      console.log("🚀 Gemini Anfrage wird gesendet...");
-    const controller = new AbortController();
-const timeout = setTimeout(() => controller.abort(), 15000);
-
-try {
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      contents: [
+    try {
+      const response = await fetch(
+        "https://qnouktkkbrwcdzgaqthi.supabase.co/functions/v1/gemini-chat",
         {
-          role: "user",
-          parts: [
-            {
-              text: finalPrompt
-            }
-          ]
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": supabaseClient.supabaseKey
+          },
+          body: JSON.stringify({
+            message: userMessage,
+            profile: currentProfile,
+            history: []
+          })
         }
-      ],
-      generationConfig: {
-        maxOutputTokens: 1800
+      );
+
+      const data = await response.json();
+
+      console.log("Gemini Edge Function:", response.status, data);
+
+      if (!response.ok || !data.success) {
+        throw new Error(
+          data?.error || `KI-Fehler ${response.status}`
+        );
       }
-    }),
-    signal: controller.signal
-  });
 
-  clearTimeout(timeout);
+      const answer = data.answer;
 
-  const data = await response.json();
+      if (!answer) {
+        throw new Error("Die KI hat keine Antwort zurückgegeben.");
+      }
 
-  console.log("Gemini HTTP Status:", response.status);
-  console.log("Gemini Response:", data);
+      if (showInChat) {
+        updateLastAIMessage(formatAIText(answer));
+      }
 
-  if (!response.ok) {
-    throw new Error(
-      `Gemini API Fehler ${response.status}: ${
-        data?.error?.message || JSON.stringify(data)
-      }`
-    );
-  }
+      return answer;
 
-  const answer = data?.candidates?.[0]?.content?.parts
-    ?.map(part => part.text || "")
-    .join("")
-    .trim();
+    } catch (error) {
+      console.error("❌ GEMINI FEHLER:", error);
 
-  if (!answer) {
-    throw new Error("Gemini hat keine Antwort zurückgegeben.");
-  }
+      if (showInChat) {
+        updateLastAIMessage(
+          `❌ **KI-Fehler**\n\n${error.message}`
+        );
+      }
 
-  if (showInChat) {
-    updateLastAIMessage(formatAIText(answer));
-  }
-
-  return answer;
-
-} catch (error) {
-  clearTimeout(timeout);
-
-  console.error("❌ GEMINI FEHLER:", error);
-
-  if (showInChat) {
-    updateLastAIMessage(
-      `❌ **KI-Fehler**\n\n${error.message}`
-    );
-  }
-
-  return null;
-}
+      return null;
+    }
      generationConfig: {
       maxOutputTokens: 1800
       }
