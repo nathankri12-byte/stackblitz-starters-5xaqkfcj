@@ -958,7 +958,7 @@ ${userMessage}
 
     const url =
       `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`;
-
+      console.log("🚀 Gemini Anfrage wird gesendet...");
     const response = await fetch(url, {
       method: "POST",
       headers: {
@@ -981,7 +981,7 @@ ${userMessage}
         }
       })
     });
-
+console.log("📡 Gemini Antwort erhalten!");
     const data = await response.json();
 
     console.log("Gemini HTTP Status:", response.status);
