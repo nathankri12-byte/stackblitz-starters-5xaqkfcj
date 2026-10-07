@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FITNESS AI PRO</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --bg: #080b10;
+      --panel: #10151d;
+      --panel-2: #151c26;
+      --border: #26313e;
+      --text: #f5f7fa;
+      --muted: #8f9baa;
+      --accent: #55e6a5;
+      --accent-dark: #27b97a;
+      --danger: #ff6262;
+      --warning: #ffca5c;
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .auth-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top right, rgba(85,230,165,.12), transparent 35%),
+        var(--bg);
+    }
+
+    .auth-card {
+      width: min(460px, 100%);
+      background: rgba(16,21,29,.95);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 25px 80px rgba(0,0,0,.35);
+    }
+
+    .logo {
+      font-weight: 900;
+      font-size: 27px;
+      letter-spacing: -.7px;
+    }
+
+    .logo span {
+      color: var(--accent);
+    }
+
+    .auth-card h1 {
+      margin: 35px 0 8px;
+      font-size: 30px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin: 25px 0;
+      background: var(--panel-2);
+      padding: 5px;
+      border-radius: 12px;
+    }
+
+    .tabs button {
+      flex: 1;
+      border: 0;
+      padding: 11px;
+      border-radius: 9px;
+      background: transparent;
+      color: var(--muted);
+    }
+
+    .tabs button.active {
+      background: var(--accent);
+      color: #06130d;
+      font-weight: 800;
+    }
+
+    .field {
+      margin-bottom: 15px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      color: #dce2e8;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: #0b1017;
+      color: var(--text);
+      border-radius: 11px;
+      padding: 13px 14px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+    }
+
+    .primary-btn,
+    .secondary-btn,
+    .danger-btn {
+      border: 0;
+      border-radius: 11px;
+      padding: 13px 16px;
+      font-weight: 800;
+      transition: .2s;
+    }
+
+    .primary-btn {
+      width: 100%;
+      background: var(--accent);
+      color: #06130d;
+    }
+
+    .primary-btn:hover {
+      background: #70efb5;
+      transform: translateY(-1px);
+    }
+
+    .secondary-btn {
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .danger-btn {
+      background: rgba(255,98,98,.12);
+      color: #ff8585;
+      border: 1px solid rgba(255,98,98,.25);
+    }
+
+    .message {
+      margin-top: 12px;
+      padding: 11px 13px;
+      border-radius: 10px;
+      display: none;
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .message.error {
+      background: rgba(255,98,98,.1);
+      color: #ff9898;
+    }
+
+    .message.success {
+      background: rgba(85,230,165,.1);
+      color: var(--accent);
+    }
+
+    .app {
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: 70px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(8,11,16,.92);
+      backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-pill {
+      color: var(--muted);
+      font-size: 13px;
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .layout {
+      display: flex;
+      min-height: calc(100vh - 70px);
+    }
+
+    .sidebar {
+      width: 230px;
+      border-right: 1px solid var(--border);
+      padding: 20px 13px;
+      background: #0b0f15;
+      flex-shrink: 0;
+    }
+
+    .nav-btn {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: 0;
+      color: var(--muted);
+      padding: 12px 14px;
+      border-radius: 11px;
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+
+    .nav-btn:hover,
+    .nav-btn.active {
+      color: var(--text);
+      background: var(--panel-2);
+    }
+
+    .nav-btn.active {
+      color: var(--accent);
+    }
+
+    main {
+      flex: 1;
+      padding: 30px;
+      max-width: 1500px;
+      width: 100%;
+      margin: auto;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .page-title {
+      margin-bottom: 25px;
+    }
+
+    .page-title h1 {
+      margin: 0 0 6px;
+      font-size: 30px;
+    }
+
+    .page-title p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 17px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .span-3 { grid-column: span 3; }
+    .span-4 { grid-column: span 4; }
+    .span-6 { grid-column: span 6; }
+    .span-8 { grid-column: span 8; }
+    .span-12 { grid-column: span 12; }
+
+    .stat-value {
+      font-size: 29px;
+      font-weight: 900;
+      margin-top: 8px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .card h2,
+    .card h3 {
+      margin-top: 0;
+    }
+
+    .choice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .choice {
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--panel-2);
+      color: var(--text);
+      text-align: left;
+    }
+
+    .choice.selected {
+      border-color: var(--accent);
+      box-shadow: inset 0 0 0 1px var(--accent);
+    }
+
+    .choice strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .choice small {
+      color: var(--muted);
+    }
+
+    .exercise {
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      padding: 17px;
+      border-radius: 14px;
+      margin-bottom: 12px;
+    }
+
+    .exercise-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .exercise-name {
+      font-size: 18px;
+      font-weight: 850;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 5px 8px;
+      border-radius: 8px;
+      background: rgba(85,230,165,.1);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .exercise p {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .video-link {
+      display: inline-block;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .row > * {
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .row .small {
+      flex: 0 0 auto;
+    }
+
+    .weight-list {
+      max-height: 300px;
+      overflow: auto;
+    }
+
+    .weight-entry {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .meal {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 15px;
+      margin-bottom: 10px;
+    }
+
+    .meal strong {
+      color: var(--accent);
+    }
+
+    .shopping-item,
+    .feedback-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .shopping-item.done {
+      opacity: .5;
+      text-decoration: line-through;
+    }
+
+    .chat {
+      height: 390px;
+      overflow-y: auto;
+      padding: 10px;
+      background: #0b1017;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 12px;
+    }
+
+    .chat-message {
+      max-width: 85%;
+      padding: 12px 14px;
+      border-radius: 13px;
+      margin-bottom: 10px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .chat-message.user {
+      margin-left: auto;
+      background: rgba(85,230,165,.12);
+      border: 1px solid rgba(85,230,165,.2);
+    }
+
+    .chat-message.ai {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.65);
+      display: grid;
+      place-items: center;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      text-align: center;
+      width: min(380px, 100%);
+    }
+
+    .spinner {
+      width: 38px;
+      height: 38px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      margin: 0 auto 15px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .empty {
+      color: var(--muted);
+      text-align: center;
+      padding: 30px 10px;
+    }
+
+    .admin-badge {
+      color: var(--warning);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    @media (max-width: 900px) {
+      .sidebar {
+        width: 75px;
+      }
+
+      .nav-btn {
+        text-align: center;
+        font-size: 0;
+      }
+
+      .nav-btn::first-letter {
+        font-size: 20px;
+      }
+
+      main {
+        padding: 20px;
+      }
+
+      .span-3,
+      .span-4,
+      .span-6,
+      .span-8 {
+        grid-column: span 12;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .topbar {
+        padding: 0 12px;
+      }
+
+      .user-pill {
+        display: none;
+      }
+
+      .sidebar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 66px;
+        z-index: 60;
+        display: flex;
+        overflow-x: auto;
+        border-right: 0;
+        border-top: 1px solid var(--border);
+        padding: 5px;
+      }
+
+      .nav-btn {
+        min-width: 72px;
+        margin: 0;
+        text-align: center;
+        font-size: 11px;
+      }
+
+      .nav-btn span {
+        display: block;
+      }
+
+      main {
+        padding-bottom: 85px;
+      }
+
+      .choice-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- AUTH -->
+  <div id="authScreen" class="auth-screen">
+    <div class="auth-card">
+      <div class="logo">FITNESS <span>AI PRO</span></div>
+
+      <h1 id="authTitle">Willkommen zurück</h1>
+      <p class="subtitle">
+        Dein persönlicher Trainings-, Ernährungs- und Fortschrittsbegleiter.
+      </p>
+
+      <div class="tabs">
+        <button id="loginTab" class="active" onclick="switchAuth('login')">Login</button>
+        <button id="registerTab" onclick="switchAuth('register')">Registrieren</button>
+      </div>
+
+      <form id="authForm">
+        <div id="nameField" class="field hidden">
+          <label for="authName">Name</label>
+          <input id="authName" type="text" placeholder="Dein Name" />
+        </div>
+
+        <div class="field">
+          <label for="authEmail">E-Mail</label>
+          <input id="authEmail" type="email" placeholder="deine@email.de" required />
+        </div>
+
+        <div class="field">
+          <label for="authPassword">Passwort</label>
+          <input id="authPassword" type="password" placeholder="Mindestens 6 Zeichen" required />
+        </div>
+
+        <button class="primary-btn" type="submit" id="authSubmit">
+          Einloggen
+        </button>
+      </form>
+
+      <button
+        id="forgotPassword"
+        class="secondary-btn"
+        style="width:100%;margin-top:10px;"
+        onclick="resetPassword()"
+      >
+        Passwort vergessen
+      </button>
+
+      <div id="authMessage" class="message"></div>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="app" class="app hidden">
+
+    <header class="topbar">
+      <div class="logo">FITNESS <span>AI PRO</span></div>
+
+      <div class="topbar-right">
+        <div id="userEmail" class="user-pill"></div>
+        <button class="secondary-btn" onclick="logout()">Logout</button>
+      </div>
+    </header>
+
+    <div class="layout">
+
+      <aside class="sidebar">
+        <button class="nav-btn active" onclick="showSection('dashboard', this)">🏠 <span>Dashboard</span></button>
+        <button class="nav-btn" onclick="showSection('training', this)">🏋️ <span>Training</span></button>
+        <button class="nav-btn" onclick="showSection('nutrition', this)">🍎 <span>Ernährung</span></button>
+        <button class="nav-btn" onclick="showSection('progress', this)">📊 <span>Fortschritt</span></button>
+        <button class="nav-btn" onclick="showSection('shopping', this)">🛒 <span>Einkauf</span></button>
+        <button class="nav-btn" onclick="showSection('coach', this)">🤖 <span>AI Coach</span></button>
+        <button class="nav-btn" onclick="showSection('feedback', this)">⭐ <span>Feedback</span></button>
+        <button class="nav-btn" onclick="showSection('profile', this)">⚙️ <span>Profil</span></button>
+        <button id="adminNav" class="nav-btn hidden" onclick="showSection('admin', this)">🛡️ <span>Admin</span></button>
+      </aside>
+
+      <main>
+
+        <!-- DASHBOARD -->
+        <section id="dashboard" class="section active">
+          <div class="page-title">
+            <h1>Hallo, <span id="dashboardName">Athlet</span> 👋</h1>
+            <p>Dein persönlicher Überblick.</p>
+          </div>
+
+          <div class="grid">
+            <div class="card span-3">
+              <div class="stat-label">Aktuelles Gewicht</div>
+              <div class="stat-value" id="dashWeight">–</div>
+            </div>
+
+            <div class="card span-3">
+              <div class="stat-label">Durchschnitt</div>
+              <div class="stat-value" id="dashAverage">–</div>
+            </div>
+
+            <div class="card span-3">
+              <div class="stat-label">Trainingsort</div>
+              <div class="stat-value" id="dashLocation">–</div>
+            </div>
+
+            <div class="card span-3">
+              <div class="stat-label">Einkauf offen</div>
+              <div class="stat-value" id="dashShopping">0</div>
+            </div>
+
+            <div class="card span-8">
+              <h2>Dein Ziel</h2>
+              <p id="dashGoal" class="subtitle">Noch kein Ziel festgelegt.</p>
+            </div>
+
+            <div class="card span-4">
+              <h2>Schnellstart</h2>
+              <button class="primary-btn" onclick="showSectionById('training')">
+                Training erstellen
+              </button>
+              <button class="secondary-btn" style="width:100%;margin-top:9px;" onclick="showSectionById('nutrition')">
+                Essen planen
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- TRAINING -->
+        <section id="training" class="section">
+          <div class="page-title">
+            <h1>Training 🏋️</h1>
+            <p>Wähle deinen Trainingsort und lass dir einen Plan erstellen.</p>
+          </div>
+
+          <div class="grid">
+            <div class="card span-6">
+              <h2>Wo trainierst du?</h2>
+
+              <div class="choice-grid">
+                <button id="homeChoice" class="choice" onclick="selectTrainingLocation('home')">
+                  <strong>🏠 Zuhause</strong>
+                  <small>Ohne Fitnessstudio, mit wenig oder keinem Equipment.</small>
+                </button>
+
+                <button id="gymChoice" class="choice" onclick="selectTrainingLocation('gym')">
+                  <strong>🏋️ Gym</strong>
+                  <small>Mit Geräten, Hanteln und typischem Studio-Equipment.</small>
+                </button>
+              </div>
+
+              <div style="margin-top:15px;">
+                <label class="field">
+                  <span style="display:block;margin-bottom:7px;">Trainingsdauer</span>
+                  <select id="trainingDuration">
+                    <option value="30">30 Minuten</option>
+                    <option value="45" selected>45 Minuten</option>
+                    <option value="60">60 Minuten</option>
+                    <option value="75">75 Minuten</option>
+                  </select>
+                </label>
+              </div>
+
+              <button class="primary-btn" style="margin-top:5px;" onclick="generateWorkout()">
+                🤖 KI-Trainingsplan erstellen
+              </button>
+            </div>
+
+            <div class="card span-6">
+              <h2>Hinweis</h2>
+              <p class="subtitle">
+                Die KI erstellt einen altersgerechten Plan. Bei Schmerzen oder
+                gesundheitlichen Problemen solltest du eine erwachsene
+                Vertrauensperson bzw. Fachpersonal einbeziehen.
+              </p>
+              <p class="subtitle">
+                Bei jeder Übung findest du außerdem eine Video-Erklärung.
+              </p>
+            </div>
+
+            <div class="card span-12">
+              <h2>Dein Trainingsplan</h2>
+              <div id="workoutResult" class="empty">
+                Noch kein Trainingsplan erstellt.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- NUTRITION -->
+        <section id="nutrition" class="section">
+          <div class="page-title">
+            <h1>Ernährung 🍎</h1>
+            <p>Die KI hilft dir beim Optimieren und Planen deiner Ernährung.</p>
+          </div>
+
+          <div class="grid">
+            <div class="card span-4">
+              <h2>Was möchtest du?</h2>
+
+              <button class="secondary-btn" style="width:100%;margin-bottom:10px;" onclick="generateMealPlan('day')">
+                🍽️ Tagesplan
+              </button>
+
+              <button class="secondary-btn" style="width:100%;margin-bottom:10px;" onclick="generateMealPlan('week')">
+                📅 Wochenplan
+              </button>
+
+              <button class="secondary-btn" style="width:100%;" onclick="askFoodOptimization()">
+                🤖 Mein Essen optimieren
+              </button>
+
+              <div id="foodPromptBox" class="hidden" style="margin-top:15px;">
+                <textarea id="foodPrompt" placeholder="Was isst du normalerweise? Was möchtest du verbessern?"></textarea>
+                <button class="primary-btn" style="margin-top:9px;" onclick="optimizeFood()">
+                  KI fragen
+                </button>
+              </div>
+            </div>
+
+            <div class="card span-8">
+              <h2>KI-Ernährungsplan</h2>
+              <div id="mealResult" class="empty">
+                Noch kein Essensplan erstellt.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PROGRESS -->
+        <section id="progress" class="section">
+          <div class="page-title">
+            <h1>Fortschritt 📊</h1>
+            <p>Trage dein Gewicht mit Datum ein und beobachte deinen Verlauf.</p>
+          </div>
+
+          <div class="grid">
+            <div class="card span-4">
+              <h2>Neuen Eintrag</h2>
+
+              <div class="field">
+                <label>Datum</label>
+                <input id="weightDate" type="date" />
+              </div>
+
+              <div class="field">
+                <label>Gewicht in kg</label>
+                <input id="weightValue" type="number" step="0.1" min="1" placeholder="z. B. 65.2" />
+              </div>
+
+              <button class="primary-btn" onclick="addWeightEntry()">
+                Gewicht speichern
+              </button>
+            </div>
+
+            <div class="card span-4">
+              <div class="stat-label">Aktuelles Gewicht</div>
+              <div id="currentWeight" class="stat-value">–</div>
+
+              <div class="stat-label" style="margin-top:25px;">Durchschnitt</div>
+              <div id="averageWeight" class="stat-value">–</div>
+            </div>
+
+            <div class="card span-4">
+              <div class="stat-label">Einträge</div>
+              <div id="weightCount" class="stat-value">0</div>
+            </div>
+
+            <div class="card span-12">
+              <h2>Gewichtsverlauf</h2>
+              <div id="weightChart"></div>
+            </div>
+
+            <div class="card span-12">
+              <h2>Alle Einträge</h2>
+              <div id="weightList" class="weight-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SHOPPING -->
+        <section id="shopping" class="section">
+          <div class="page-title">
+            <h1>Einkaufsliste 🛒</h1>
+            <p>Deine Einkaufsliste wird mit den Essensplänen verbunden.</p>
+          </div>
+
+          <div class="grid">
+            <div class="card span-8">
+              <div class="row">
+                <input id="shoppingInput" placeholder="Artikel hinzufügen..." />
+                <button class="primary-btn small" onclick="addShoppingItem()">Hinzufügen</button>
+              </div>
+
+              <div id="shoppingList" style="margin-top:20px;"></div>
+            </div>
+
+            <div class="card span-4">
+              <h2>Plan → Einkauf</h2>
+              <p class="subtitle">
+                Wenn du einen Essensplan generierst, werden seine Zutaten
+                automatisch in diese Liste übernommen.
+              </p>
+
+              <button class="danger-btn" style="width:100%;" onclick="clearCompletedShopping()">
+                Erledigte löschen
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- AI COACH -->
+        <section id="coach" class="section">
+          <div class="page-title">
+            <h1>AI Coach 🤖</h1>
+            <p>Stelle deinem persönlichen Fitness- und Ernährungscoach Fragen.</p>
+          </div>
+
+          <div class="card">
+            <div id="chat" class="chat">
+              <div class="chat-message ai">
+                Hi! Ich bin dein AI Coach. Frag mich etwas zu Training,
+                Übungen oder ausgewogener Ernährung.
+              </div>
+            </div>
+
+            <div class="row">
+              <textarea id="chatInput" style="min-height:70px;" placeholder="Deine Frage..."></textarea>
+              <button class="primary-btn small" onclick="sendCoachMessage()">Senden</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- FEEDBACK -->
+        <section id="feedback" class="section">
+          <div class="page-title">
+            <h1>Feedback ⭐</h1>
+            <p>Dein Feedback wird deinem Benutzerkonto zugeordnet.</p>
+          </div>
+
+          <div class="grid">
+            <div class="card span-6">
+              <h2>Feedback senden</h2>
+
+              <div class="field">
+                <label>Bewertung</label>
+                <select id="feedbackRating">
+                  <option value="5">⭐⭐⭐⭐⭐</option>
+                  <option value="4">⭐⭐⭐⭐</option>
+                  <option value="3">⭐⭐⭐</option>
+                  <option value="2">⭐⭐</option>
+                  <option value="1">⭐</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label>Kategorie</label>
+                <select id="feedbackCategory">
+                  <option value="Allgemein">Allgemein</option>
+                  <option value="Training">Training</option>
+                  <option value="Ernährung">Ernährung</option>
+                  <option value="AI Coach">AI Coach</option>
+                  <option value="Design">Design</option>
+                  <option value="Fehler">Fehler</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label>Nachricht</label>
+                <textarea id="feedbackMessage" placeholder="Was können wir verbessern?"></textarea>
+              </div>
+
+              <button class="primary-btn" onclick="submitFeedback()">
+                Feedback senden
+              </button>
+
+              <div id="feedbackStatus" class="message"></div>
+            </div>
+
+            <div class="card span-6">
+              <h2>Mein Feedback</h2>
+              <div id="myFeedback"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PROFILE -->
+        <section id="profile" class="section">
+          <div class="page-title">
+            <h1>Profil ⚙️</h1>
+            <p>Deine persönlichen Angaben für die KI.</p>
+          </div>
+
+          <div class="grid">
+            <div class="card span-6">
+              <h2>Persönliche Daten</h2>
+
+              <div class="field">
+                <label>Name</label>
+                <input id="profileName" type="text" />
+              </div>
+
+              <div class="field">
+                <label>Alter</label>
+                <input id="profileAge" type="number" min="10" max="100" />
+              </div>
+
+              <div class="field">
+                <label>Größe in cm</label>
+                <input id="profileHeight" type="number" min="100" max="230" />
+              </div>
+
+              <div class="field">
+                <label>Trainingsort</label>
+                <select id="profileLocation">
+                  <option value="home">🏠 Zuhause</option>
+                  <option value="gym">🏋️ Gym</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label>Ziel</label>
+                <select id="profileGoal">
+                  <option value="fitness">Fitness verbessern</option>
+                  <option value="muscle">Muskulatur aufbauen</option>
+                  <option value="strength">Stärker werden</option>
+                  <option value="healthy">Gesunde Gewohnheiten</option>
+                  <option value="weight_management">Gewicht gesund begleiten</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label>Ernährungsweise</label>
+                <input id="profileDiet" type="text" placeholder="z. B. vegetarisch, keine Einschränkung" />
+              </div>
+
+              <button class="primary-btn" onclick="saveProfile()">
+                Profil speichern
+              </button>
+
+              <div id="profileStatus" class="message"></div>
+            </div>
+
+            <div class="card span-6">
+              <h2>Account</h2>
+              <p class="subtitle">
+                Angemeldet als:
+              </p>
+              <strong id="profileEmail"></strong>
+
+              <hr style="border-color:var(--border);margin:25px 0;" />
+
+              <button class="danger-btn" style="width:100%;" onclick="logout()">
+                Ausloggen
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ADMIN -->
+        <section id="admin" class="section">
+          <div class="page-title">
+            <h1>Feedback-Übersicht 🛡️</h1>
+            <p>Nur für Benutzer mit Admin-Rechten.</p>
+          </div>
+
+          <div class="card">
+            <div id="adminFeedback"></div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loadingModal" class="modal hidden">
+    <div class="modal-card">
+      <div class="spinner"></div>
+      <strong id="loadingText">KI arbeitet...</strong>
+      <p class="subtitle">Einen Moment bitte.</p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
