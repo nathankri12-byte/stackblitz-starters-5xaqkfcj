@@ -1088,13 +1088,16 @@ function addAIMessage(type, text, id = null) {
 }
 
 
-function updateAIMessage(id, text) {
-  const element =
-    document.getElementById(id);
+function updateLastAIMessage(text) {
+  const chat = document.getElementById("aiChat");
+  if (!chat) return;
 
-  if (!element) return;
+  const messages = chat.querySelectorAll(".ai-message.assistant");
+  const lastMessage = messages[messages.length - 1];
 
-  element.innerHTML = text;
+  if (lastMessage) {
+    lastMessage.innerHTML = text;
+  }
 }
 
 
