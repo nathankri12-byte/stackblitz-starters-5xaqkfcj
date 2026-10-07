@@ -9,7 +9,7 @@
 ========================= */
 
 const GEMINI_API_KEY = "AQ.Ab8RN6J0m0ctfLgZbTnFDlebdpjiveGBeS2y0Sb7xVp67YsZwA";
-const GEMINI_MODEL = "gemini-2.5-flash";
+const GEMINI_MODEL = "gemini-3.8-flash";
 
 const SUPABASE_URL = "https://qnouktkkbrwcdzgaqthi.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_sdHv-8wTkJ5s9WQQp88A8Q_ZyNKHm5t";
