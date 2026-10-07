@@ -8,11 +8,11 @@
    CONFIG
 ========================= */
 
-const GEMINI_API_KEY = "DEIN_GEMINI_API_KEY";
+const GEMINI_API_KEY = "AQ.Ab8RN6J0m0ctfLgZbTnFDlebdpjiveGBeS2y0Sb7xVp67YsZwA";
 const GEMINI_MODEL = "gemini-2.5-flash";
 
-const SUPABASE_URL = "DEINE_SUPABASE_URL";
-const SUPABASE_PUBLISHABLE_KEY = "DEIN_SUPABASE_PUBLISHABLE_KEY";
+const SUPABASE_URL = "https://qnouktkkbrwcdzgaqthi.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_sdHv-8wTkJ5s9WQQp88A8Q_ZyNKHm5t";
 
 /*
   Nur für deinen Test.
