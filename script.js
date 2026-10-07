@@ -7,7 +7,7 @@
 // ------------------------------------------------------
 
 // HIER DEINEN GEMINI API KEY EINTRAGEN
-const GEMINI_API_KEY = "DEIN_GEMINI_API_KEY";
+const GEMINI_API_KEY = "AQ.Ab8RN6J0m0ctfLgZbTnFDlebdpjiveGBeS2y0Sb7xVp67YsZwA";
 
 // Aktuelles Gemini-Modell für schnelle Antworten
 const GEMINI_MODEL = "gemini-2.5-flash";
