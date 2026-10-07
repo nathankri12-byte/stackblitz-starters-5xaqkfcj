@@ -1757,135 +1757,29 @@ function updateApiStatus(){
  * - kurze Requests
  */
 
-async function callGemini(
-    prompt,
-    model,
-    maxTokens=1200
-){
+async function callGemini(prompt, model, maxTokens=1200){
 
-    if(!hasGeminiKey()){
+    const response = await fetch("/api/gemini", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            prompt,
+            model,
+            maxTokens
+        })
+    });
 
+    const data = await response.json();
+
+    if(!response.ok){
         throw new Error(
-            "Kein Gemini API Key hinterlegt."
+            data?.error || "Gemini konnte nicht antworten."
         );
-
     }
 
-
-    const controller =
-        new AbortController();
-
-
-    const timeout =
-        setTimeout(
-            () => controller.abort(),
-            30000
-        );
-
-
-    try{
-
-        const endpoint =
-            "https://generativelanguage.googleapis.com/v1beta/models/" +
-            encodeURIComponent(model) +
-            ":generateContent?key=" +
-            encodeURIComponent(
-                GEMINI_API_KEY
-            );
-
-
-        const response =
-            await fetch(
-                endpoint,
-                {
-                    method:"POST",
-
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    signal:
-                        controller.signal,
-
-                    body:
-                        JSON.stringify({
-
-                            contents:[
-                                {
-                                    parts:[
-                                        {
-                                            text:
-                                                prompt
-                                        }
-                                    ]
-                                }
-                            ],
-
-                            generationConfig:{
-
-                                temperature:
-                                    0.25,
-
-                                maxOutputTokens:
-                                    maxTokens,
-
-                                responseMimeType:
-                                    "application/json"
-
-                            }
-
-                        })
-
-                }
-            );
-
-
-        const data =
-            await response.json();
-
-
-        if(!response.ok){
-
-            throw new Error(
-                data?.error?.message ||
-                "Gemini Fehler " +
-                response.status
-            );
-
-        }
-
-
-        const text =
-            data
-            ?.candidates?.[0]
-            ?.content
-            ?.parts
-            ?.map(part => part.text || "")
-            .join("")
-            .trim();
-
-
-        if(!text){
-
-            throw new Error(
-                "Die KI hat keine Antwort geliefert."
-            );
-
-        }
-
-
-        return text;
-
-
-    }finally{
-
-        clearTimeout(
-            timeout
-        );
-
-    }
-
+    return data.text;
 }
 
 
