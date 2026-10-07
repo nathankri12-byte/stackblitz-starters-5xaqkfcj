@@ -975,10 +975,9 @@ ${userMessage}
             ]
           }
         ],
-        generationConfig: {
-          temperature,
-          maxOutputTokens: 1800
-        }
+     generationConfig: {
+      maxOutputTokens: 1800
+      }
       })
     });
 console.log("📡 Gemini Antwort erhalten!");
