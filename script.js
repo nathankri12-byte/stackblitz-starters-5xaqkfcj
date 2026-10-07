@@ -888,147 +888,153 @@ function useAIQuickPrompt(prompt) {
    AI CHAT
 ========================= */
 
-async function askGemini() {
-  const input =
-    document.getElementById("aiInput");
+async function askGemini(userMessage, options = {}) {
+  const {
+    showInChat = true,
+    systemInstruction = "",
+    temperature = 0.7
+  } = options;
 
-  const chat =
-    document.getElementById("aiChat");
+  if (!GEMINI_API_KEY || GEMINI_API_KEY === "DEIN_GEMINI_API_KEY") {
+    const errorMessage = "Gemini API-Key fehlt.";
+    
+    if (showInChat) {
+      addAIMessage("error", errorMessage);
+    }
 
-  if (!input || !chat) return;
-
-  const message =
-    input.value.trim();
-
-  if (!message) return;
-
-  if (
-    !GEMINI_API_KEY ||
-    GEMINI_API_KEY === "DEIN_GEMINI_API_KEY"
-  ) {
-    addAIMessage(
-      "ai",
-      "⚠️ Der Gemini-API-Key wurde noch nicht in der script.js eingetragen."
-    );
-    return;
+    console.error(errorMessage);
+    return null;
   }
 
-  addAIMessage("user", message);
-
-  input.value = "";
-
-  const loadingId =
-    "ai-loading-" + Date.now();
-
-  addAIMessage(
-    "ai",
-    "⏳ Ich denke kurz nach...",
-    loadingId
-  );
+  if (showInChat) {
+    addAIMessage("user", userMessage);
+    addAIMessage("assistant", "⏳ Die KI denkt gerade …");
+  }
 
   try {
+    const context = `
+Du bist der KI-Coach von FITNESS AI PRO.
 
-    const context =
-      buildAIContext();
+Der Nutzer ist 14 Jahre alt.
+Antworte altersgerecht, motivierend und sicher.
 
-    const systemPrompt = `
-Du bist FITNESS AI PRO, ein freundlicher persönlicher Fitness- und Ernährungsassistent.
+Vermeide:
+- Crash-Diäten
+- extreme Kalorienrestriktion
+- gefährliche Trainingsmethoden
+- Empfehlungen zum schnellen Abnehmen
+- leistungssteigernde Substanzen
 
-Nutzerdaten:
+Fokus:
+- gesunde Ernährung
+- ausreichend Energie
+- Kraft und Fitness
+- Technik
+- Regeneration
+- langfristige Gewohnheiten
+
+${typeof currentProfile !== "undefined" && currentProfile
+  ? `
+Nutzerprofil:
+Name: ${currentProfile.name || "unbekannt"}
+Alter: ${currentProfile.age || "unbekannt"}
+Größe: ${currentProfile.height || "unbekannt"} cm
+Gewicht: ${currentProfile.weight || "unbekannt"} kg
+Ziel: ${currentProfile.goal || "unbekannt"}
+Trainingsort: ${currentProfile.training_location || "unbekannt"}
+Ernährung: ${currentProfile.diet || "keine Angabe"}
+`
+  : ""}
+`;
+
+    const finalPrompt = `
 ${context}
 
-Aufgabe:
-Beantworte die Frage des Nutzers klar, verständlich und praktisch.
+${systemInstruction}
 
-Wenn es um Training geht:
-- berücksichtige Trainingsort und Ziel
-- gib Übungen, Sätze, Wiederholungen und Pausen sinnvoll an
-- erkläre Übungen verständlich
-- keine gefährlichen oder extremen Empfehlungen
-
-Wenn es um Ernährung geht:
-- ausgewogene Ernährung
-- ausreichend Energie und Nährstoffe
-- keine Crash-Diäten
-- keine extremen Kalorienvorgaben
-- bei einem minderjährigen Nutzer niemals aggressive Gewichtsabnahme empfehlen
-
-Der Nutzer ist möglicherweise minderjährig.
-Gesundheit, Wachstum und ausreichende Ernährung stehen im Vordergrund.
-
-Frage des Nutzers:
-${message}
+Aufgabe des Nutzers:
+${userMessage}
 `;
 
     const url =
-      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`;
 
-    const response =
-      await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: systemPrompt
-                }
-              ]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 1800
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            role: "user",
+            parts: [
+              {
+                text: finalPrompt
+              }
+            ]
           }
-        })
-      });
+        ],
+        generationConfig: {
+          temperature,
+          maxOutputTokens: 1800
+        }
+      })
+    });
 
-    const data =
-      await response.json();
+    const data = await response.json();
+
+    console.log("Gemini HTTP Status:", response.status);
+    console.log("Gemini Response:", data);
 
     if (!response.ok) {
-      console.error(data);
+      let details = "";
 
-      updateAIMessage(
-        loadingId,
-        "❌ Die KI konnte gerade keine Antwort liefern."
+      if (data?.error?.message) {
+        details = data.error.message;
+      } else {
+        details = JSON.stringify(data);
+      }
+
+      throw new Error(
+        `Gemini API Fehler ${response.status}: ${details}`
       );
-
-      return;
     }
 
     const answer =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      data?.candidates?.[0]?.content?.parts
+        ?.map(part => part.text || "")
+        .join("")
+        .trim();
 
     if (!answer) {
-      updateAIMessage(
-        loadingId,
-        "❌ Die KI hat keine Antwort zurückgegeben."
+      throw new Error(
+        "Gemini hat keine verwertbare Antwort zurückgegeben."
       );
-      return;
     }
 
-    updateAIMessage(
-      loadingId,
-      formatAIText(answer)
-    );
+    if (showInChat) {
+      updateLastAIMessage(formatAIText(answer));
+    }
 
-    maybeExtractPlan(answer);
+    return answer;
 
   } catch (error) {
+    console.error("❌ GEMINI FEHLER:", error);
 
-    console.error(error);
+    const readableError =
+      error?.message ||
+      "Unbekannter Fehler bei der Gemini-Verbindung.";
 
-    updateAIMessage(
-      loadingId,
-      "❌ Verbindung zur KI fehlgeschlagen."
-    );
+    if (showInChat) {
+      updateLastAIMessage(
+        `❌ **KI-Fehler**\n\n${readableError}`
+      );
+    }
+
+    return null;
   }
 }
-
 
 /* =========================
    AI CONTEXT
