@@ -17,7 +17,7 @@ const GEMINI_MODEL = "gemini-2.5-flash";
 // SUPABASE
 // ------------------------------------------------------
 
-const SUPABASE_URL = "https://qnouktkkbrwcdzgaqthi.supabase.co/rest/v1/";
+const SUPABASE_URL = "https://qnouktkkbrwcdzgaqthi.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_sdHv-8wTkJ5s9WQQp88A8Q_ZyNKHm5t";
 
 const supabaseClient = window.supabase.createClient(
