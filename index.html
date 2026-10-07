@@ -1,0 +1,1974 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b0f14" />
+  <title>FITNESS AI PRO</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --bg: #080b10;
+      --bg2: #0e131a;
+      --card: #121820;
+      --card2: #171f29;
+      --border: #26313d;
+      --text: #f5f7fa;
+      --muted: #8d9aaa;
+      --accent: #7c5cff;
+      --accent2: #9a82ff;
+      --green: #35d07f;
+      --red: #ff5d6c;
+      --orange: #ffad42;
+      --blue: #42a5ff;
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at 80% -10%, rgba(124,92,255,.18), transparent 35%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* AUTH */
+
+    #authScreen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .auth-container {
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .logo-icon {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 16px;
+      border-radius: 22px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--accent), #4934b5);
+      font-size: 32px;
+      box-shadow: 0 15px 45px rgba(124,92,255,.25);
+    }
+
+    .logo h1 {
+      font-size: 30px;
+      letter-spacing: -1px;
+    }
+
+    .logo p {
+      color: var(--muted);
+      margin-top: 7px;
+    }
+
+    .auth-card {
+      background: rgba(18,24,32,.94);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 26px;
+      box-shadow: 0 25px 80px rgba(0,0,0,.35);
+    }
+
+    .auth-tabs {
+      display: flex;
+      gap: 6px;
+      background: #0a0e13;
+      padding: 5px;
+      border-radius: 12px;
+      margin-bottom: 22px;
+    }
+
+    .auth-tabs button {
+      flex: 1;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      padding: 11px;
+      border-radius: 9px;
+    }
+
+    .auth-tabs button.active {
+      background: var(--card2);
+      color: white;
+    }
+
+    .field {
+      margin-bottom: 15px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      color: #cbd3dd;
+      font-size: 14px;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: #0b1016;
+      color: white;
+      border-radius: 12px;
+      padding: 13px 14px;
+      outline: none;
+    }
+
+    .field textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--accent);
+    }
+
+    .primary-btn {
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+      font-weight: 700;
+      margin-top: 5px;
+    }
+
+    .secondary-btn {
+      border: 1px solid var(--border);
+      background: var(--card2);
+      color: white;
+      border-radius: 11px;
+      padding: 11px 15px;
+    }
+
+    .auth-message {
+      margin-top: 14px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    /* APP */
+
+    #app {
+      min-height: 100vh;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 245px;
+      min-height: 100vh;
+      background: rgba(10,14,19,.96);
+      border-right: 1px solid var(--border);
+      padding: 22px 14px;
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      z-index: 20;
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 8px 10px 25px;
+      font-weight: 800;
+      font-size: 17px;
+    }
+
+    .sidebar-logo span {
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--accent), #4934b5);
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .nav button {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 0;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--muted);
+      text-align: left;
+    }
+
+    .nav button:hover,
+    .nav button.active {
+      background: var(--card2);
+      color: white;
+    }
+
+    .nav-icon {
+      width: 23px;
+      text-align: center;
+      font-size: 18px;
+    }
+
+    .sidebar-bottom {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 18px;
+    }
+
+    .logout-btn {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      border-radius: 12px;
+      padding: 11px;
+    }
+
+    .main {
+      margin-left: 245px;
+      width: calc(100% - 245px);
+      padding: 30px;
+      max-width: 1500px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+
+    .topbar h2 {
+      font-size: 28px;
+      letter-spacing: -.7px;
+    }
+
+    .topbar p {
+      color: var(--muted);
+      margin-top: 5px;
+    }
+
+    .user-pill {
+      border: 1px solid var(--border);
+      background: var(--card);
+      padding: 10px 14px;
+      border-radius: 30px;
+      color: #cbd3dd;
+      font-size: 14px;
+    }
+
+    /* SECTIONS */
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+      animation: fadeIn .2s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(23,31,41,.95), rgba(15,21,28,.95));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 21px;
+    }
+
+    .card h3 {
+      margin-bottom: 7px;
+    }
+
+    .card-description {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    /* DASHBOARD */
+
+    .hero {
+      background:
+        radial-gradient(circle at 100% 0%, rgba(124,92,255,.28), transparent 45%),
+        linear-gradient(135deg, #161326, #10161e);
+      border: 1px solid #31285c;
+      border-radius: 23px;
+      padding: 28px;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      font-size: 31px;
+      margin-bottom: 8px;
+    }
+
+    .hero p {
+      color: #aeb6c3;
+      max-width: 700px;
+      line-height: 1.6;
+    }
+
+    .stat-card {
+      min-height: 130px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .stat-small {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 7px;
+    }
+
+    /* AI */
+
+    .ai-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(260px, .7fr);
+      gap: 18px;
+    }
+
+    .ai-card {
+      min-height: 620px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ai-header {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ai-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--accent), #4835aa);
+      font-size: 22px;
+    }
+
+    .ai-header p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 3px;
+    }
+
+    .ai-chat {
+      flex: 1;
+      padding: 20px 0;
+      overflow-y: auto;
+      min-height: 400px;
+    }
+
+    .ai-message {
+      max-width: 85%;
+      padding: 13px 15px;
+      border-radius: 15px;
+      margin-bottom: 12px;
+      line-height: 1.6;
+      font-size: 14px;
+      white-space: pre-wrap;
+    }
+
+    .ai-message.ai {
+      background: #1a222c;
+      border: 1px solid var(--border);
+    }
+
+    .ai-message.user {
+      background: linear-gradient(135deg, #5d45c9, #765be9);
+      margin-left: auto;
+    }
+
+    .ai-input-area {
+      display: flex;
+      gap: 8px;
+      border-top: 1px solid var(--border);
+      padding-top: 15px;
+    }
+
+    .ai-input-area textarea {
+      flex: 1;
+      resize: none;
+      height: 52px;
+      border: 1px solid var(--border);
+      background: #0b1016;
+      color: white;
+      border-radius: 13px;
+      padding: 14px;
+      outline: none;
+    }
+
+    .ai-send {
+      width: 55px;
+      border: 0;
+      border-radius: 13px;
+      background: var(--accent);
+      color: white;
+      font-size: 20px;
+    }
+
+    .quick-actions {
+      display: grid;
+      gap: 9px;
+      margin-top: 15px;
+    }
+
+    .quick-actions button {
+      text-align: left;
+      border: 1px solid var(--border);
+      background: #10161e;
+      color: #dce2ea;
+      border-radius: 11px;
+      padding: 11px;
+    }
+
+    .quick-actions button:hover {
+      border-color: var(--accent);
+    }
+
+    /* TRAINING */
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 18px;
+    }
+
+    .section-header h3 {
+      margin: 0;
+    }
+
+    .exercise-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .exercise-number {
+      position: absolute;
+      right: 18px;
+      top: 18px;
+      color: #4e5a68;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .exercise-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin: 13px 0;
+    }
+
+    .tag {
+      background: #202a35;
+      color: #aeb9c6;
+      border-radius: 20px;
+      padding: 5px 9px;
+      font-size: 12px;
+    }
+
+    .exercise-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 15px;
+    }
+
+    .exercise-actions a,
+    .exercise-actions button {
+      flex: 1;
+      text-align: center;
+      border: 1px solid var(--border);
+      background: #10161e;
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 13px;
+    }
+
+    /* NUTRITION */
+
+    .meal-card {
+      border-left: 3px solid var(--green);
+    }
+
+    .meal-time {
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .shopping-list {
+      list-style: none;
+    }
+
+    .shopping-list li {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      color: #d5dce5;
+    }
+
+    .shopping-list li::before {
+      content: "□";
+      margin-right: 9px;
+      color: var(--accent2);
+    }
+
+    /* PROGRESS */
+
+    .weight-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 9px;
+      align-items: end;
+    }
+
+    .weight-list {
+      margin-top: 18px;
+    }
+
+    .weight-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .average-box {
+      text-align: center;
+      padding: 25px;
+      border-radius: 15px;
+      background: #10161e;
+      margin-top: 18px;
+    }
+
+    .average-box strong {
+      display: block;
+      font-size: 34px;
+      margin-top: 7px;
+    }
+
+    /* FEEDBACK */
+
+    .rating {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .rating button {
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--border);
+      background: #0c1218;
+      color: #596674;
+      border-radius: 10px;
+      font-size: 18px;
+    }
+
+    .rating button.selected {
+      background: #30265f;
+      border-color: var(--accent);
+      color: white;
+    }
+
+    .feedback-item {
+      padding: 15px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .feedback-meta {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 7px;
+    }
+
+    /* PROFILE */
+
+    .profile-avatar {
+      width: 75px;
+      height: 75px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, var(--accent), #4934b5);
+      display: grid;
+      place-items: center;
+      font-size: 30px;
+      margin-bottom: 15px;
+    }
+
+    /* MOBILE */
+
+    .mobile-header {
+      display: none;
+    }
+
+    @media (max-width: 1000px) {
+      .grid-3 {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .ai-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .sidebar {
+        display: none;
+      }
+
+      .main {
+        margin-left: 0;
+        width: 100%;
+        padding: 18px;
+        padding-bottom: 90px;
+      }
+
+      .mobile-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 22px;
+      }
+
+      .mobile-header strong {
+        font-size: 18px;
+      }
+
+      .mobile-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 72px;
+        background: rgba(10,14,19,.97);
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 50;
+      }
+
+      .mobile-nav button {
+        background: transparent;
+        border: 0;
+        color: var(--muted);
+        font-size: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        align-items: center;
+      }
+
+      .mobile-nav button.active {
+        color: white;
+      }
+
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        display: block;
+      }
+
+      .user-pill {
+        display: inline-block;
+        margin-top: 12px;
+      }
+
+      .hero h1 {
+        font-size: 25px;
+      }
+
+      .weight-form {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================
+       AUTH
+  ========================== -->
+
+  <section id="authScreen">
+    <div class="auth-container">
+
+      <div class="logo">
+        <div class="logo-icon">⚡</div>
+        <h1>FITNESS AI PRO</h1>
+        <p>Dein persönlicher KI-Fitness-Coach</p>
+      </div>
+
+      <div class="auth-card">
+
+        <div class="auth-tabs">
+          <button id="loginTab" class="active" onclick="showAuthMode('login')">
+            Anmelden
+          </button>
+
+          <button id="registerTab" onclick="showAuthMode('register')">
+            Registrieren
+          </button>
+        </div>
+
+        <form id="loginForm" onsubmit="event.preventDefault(); loginUser();">
+
+          <div class="field">
+            <label>E-Mail</label>
+            <input
+              id="loginEmail"
+              type="email"
+              placeholder="deine@email.de"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label>Passwort</label>
+            <input
+              id="loginPassword"
+              type="password"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+
+          <button class="primary-btn" type="submit">
+            Anmelden
+          </button>
+
+        </form>
+
+        <form
+          id="registerForm"
+          class="hidden"
+          onsubmit="event.preventDefault(); registerUser();"
+        >
+
+          <div class="field">
+            <label>Name</label>
+            <input
+              id="registerName"
+              type="text"
+              placeholder="Dein Name"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label>E-Mail</label>
+            <input
+              id="registerEmail"
+              type="email"
+              placeholder="deine@email.de"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label>Passwort</label>
+            <input
+              id="registerPassword"
+              type="password"
+              placeholder="Mindestens 6 Zeichen"
+              minlength="6"
+              required
+            />
+          </div>
+
+          <button class="primary-btn" type="submit">
+            Konto erstellen
+          </button>
+
+        </form>
+
+        <div id="authMessage" class="auth-message"></div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- =========================
+       APP
+  ========================== -->
+
+  <div id="app" class="hidden">
+
+    <!-- DESKTOP SIDEBAR -->
+
+    <aside class="sidebar">
+
+      <div class="sidebar-logo">
+        <span>⚡</span>
+        FITNESS AI PRO
+      </div>
+
+      <nav class="nav">
+
+        <button class="active" onclick="showTab('dashboard')" data-tab="dashboard">
+          <span class="nav-icon">🏠</span>
+          Dashboard
+        </button>
+
+        <button onclick="showTab('ai')" data-tab="ai">
+          <span class="nav-icon">🤖</span>
+          KI-Coach
+        </button>
+
+        <button onclick="showTab('training')" data-tab="training">
+          <span class="nav-icon">🏋️</span>
+          Training
+        </button>
+
+        <button onclick="showTab('nutrition')" data-tab="nutrition">
+          <span class="nav-icon">🍎</span>
+          Ernährung
+        </button>
+
+        <button onclick="showTab('progress')" data-tab="progress">
+          <span class="nav-icon">📈</span>
+          Fortschritt
+        </button>
+
+        <button onclick="showTab('feedback')" data-tab="feedback">
+          <span class="nav-icon">💬</span>
+          Feedback
+        </button>
+
+        <button onclick="showTab('profile')" data-tab="profile">
+          <span class="nav-icon">⚙️</span>
+          Profil
+        </button>
+
+        <button
+          id="adminNavButton"
+          class="hidden"
+          onclick="showTab('admin')"
+          data-tab="admin"
+        >
+          <span class="nav-icon">🛠️</span>
+          Admin
+        </button>
+
+      </nav>
+
+      <div class="sidebar-bottom">
+        <button class="logout-btn" onclick="logout()">
+          Abmelden
+        </button>
+      </div>
+
+    </aside>
+
+
+    <!-- MOBILE NAV -->
+
+    <div class="mobile-nav">
+
+      <button class="active" onclick="showTab('dashboard')" data-tab="dashboard">
+        <span>🏠</span>
+        Home
+      </button>
+
+      <button onclick="showTab('ai')" data-tab="ai">
+        <span>🤖</span>
+        KI
+      </button>
+
+      <button onclick="showTab('training')" data-tab="training">
+        <span>🏋️</span>
+        Training
+      </button>
+
+      <button onclick="showTab('nutrition')" data-tab="nutrition">
+        <span>🍎</span>
+        Essen
+      </button>
+
+      <button onclick="showTab('progress')" data-tab="progress">
+        <span>📈</span>
+        Fortschritt
+      </button>
+
+    </div>
+
+
+    <!-- MAIN -->
+
+    <main class="main">
+
+      <div class="mobile-header">
+        <strong>⚡ FITNESS AI PRO</strong>
+        <button class="secondary-btn" onclick="showTab('profile')">⚙️</button>
+      </div>
+
+
+      <!-- =========================
+           DASHBOARD
+      ========================== -->
+
+      <section id="dashboard" class="page active">
+
+        <div class="topbar">
+          <div>
+            <h2>Dashboard</h2>
+            <p id="dashboardGreeting">Willkommen zurück.</p>
+          </div>
+
+          <div class="user-pill" id="userEmailDisplay">
+            -
+          </div>
+        </div>
+
+        <div class="hero">
+
+          <h1>Dein Training. Deine Daten. Deine KI.</h1>
+
+          <p>
+            FITNESS AI PRO hilft dir dabei, dein Training zu planen,
+            deine Übungen zu verstehen, deine Ernährung zu organisieren
+            und deinen Fortschritt übersichtlich zu verfolgen.
+          </p>
+
+          <button
+            class="primary-btn"
+            style="max-width:230px;margin-top:20px"
+            onclick="showTab('ai')"
+          >
+            🤖 KI-Coach öffnen
+          </button>
+
+        </div>
+
+
+        <div class="grid grid-3">
+
+          <div class="card stat-card">
+            <div class="stat-label">TRAININGSORT</div>
+            <div class="stat-value" id="dashboardTrainingLocation">
+              -
+            </div>
+            <div class="stat-small">
+              Dein aktueller Trainingsort
+            </div>
+          </div>
+
+          <div class="card stat-card">
+            <div class="stat-label">ZIEL</div>
+            <div class="stat-value" id="dashboardGoal">
+              -
+            </div>
+            <div class="stat-small">
+              Dein persönliches Ziel
+            </div>
+          </div>
+
+          <div class="card stat-card">
+            <div class="stat-label">GEWICHT</div>
+            <div class="stat-value" id="dashboardWeight">
+              -
+            </div>
+            <div class="stat-small">
+              Letzter eingetragener Wert
+            </div>
+          </div>
+
+        </div>
+
+
+        <div class="grid grid-2" style="margin-top:18px">
+
+          <div class="card">
+
+            <div class="section-header">
+              <h3>🏋️ Heute</h3>
+              <button
+                class="secondary-btn"
+                onclick="showTab('training')"
+              >
+                Training
+              </button>
+            </div>
+
+            <p class="card-description">
+              Dein heutiges Training wird hier angezeigt.
+              Sobald dein KI-Trainingsplan erstellt wurde,
+              kannst du ihn direkt hier starten.
+            </p>
+
+            <div
+              id="dashboardWorkout"
+              style="margin-top:15px"
+            >
+              Noch kein Trainingsplan erstellt.
+            </div>
+
+          </div>
+
+
+          <div class="card">
+
+            <div class="section-header">
+              <h3>🤖 KI-Empfehlung</h3>
+              <button
+                class="secondary-btn"
+                onclick="showTab('ai')"
+              >
+                KI öffnen
+              </button>
+            </div>
+
+            <p
+              id="dashboardAIRecommendation"
+              class="card-description"
+            >
+              Starte den KI-Coach, um einen individuellen Plan
+              zu erstellen.
+            </p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           AI
+      ========================== -->
+
+      <section id="ai" class="page">
+
+        <div class="topbar">
+          <div>
+            <h2>🤖 KI-Coach</h2>
+            <p>Dein persönlicher Fitness- und Ernährungsassistent</p>
+          </div>
+        </div>
+
+
+        <div class="ai-layout">
+
+          <div class="card ai-card">
+
+            <div class="ai-header">
+
+              <div class="ai-avatar">
+                🤖
+              </div>
+
+              <div>
+                <h3>FITNESS AI</h3>
+                <p>Bereit, dir zu helfen</p>
+              </div>
+
+            </div>
+
+
+            <div id="aiChat" class="ai-chat">
+
+              <div class="ai-message ai">
+                👋 Hey! Ich bin dein FITNESS AI Coach.
+                <br><br>
+                Du kannst mich zum Beispiel bitten:
+                <br><br>
+                • „Erstelle mir einen Trainingsplan.“
+                <br>
+                • „Was soll ich heute trainieren?“
+                <br>
+                • „Erkläre mir diese Übung.“
+                <br>
+                • „Erstelle mir einen gesunden Mahlzeitenplan.“
+                <br>
+                • „Optimiere meinen bisherigen Plan.“
+              </div>
+
+            </div>
+
+
+            <div class="ai-input-area">
+
+              <textarea
+                id="aiInput"
+                placeholder="Frag deinen KI-Coach..."
+                onkeydown="
+                  if(event.key === 'Enter' && !event.shiftKey){
+                    event.preventDefault();
+                    askGemini();
+                  }
+                "
+              ></textarea>
+
+              <button
+                class="ai-send"
+                onclick="askGemini()"
+              >
+                ➤
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <div class="card">
+
+            <h3>Schnellaktionen</h3>
+
+            <p class="card-description">
+              Starte direkt mit einer Aufgabe.
+            </p>
+
+
+            <div class="quick-actions">
+
+              <button onclick="useAIQuickPrompt('Erstelle mir einen vollständigen Trainingsplan für mich.')">
+                🏋️ Trainingsplan erstellen
+              </button>
+
+              <button onclick="useAIQuickPrompt('Was sollte ich heute trainieren?')">
+                🔥 Heutiges Training
+              </button>
+
+              <button onclick="useAIQuickPrompt('Erstelle mir einen gesunden Mahlzeitenplan für eine Woche.')">
+                🍎 Mahlzeitenplan
+              </button>
+
+              <button onclick="useAIQuickPrompt('Erstelle mir eine Einkaufsliste passend zu meinem Mahlzeitenplan.')">
+                🛒 Einkaufsliste
+              </button>
+
+              <button onclick="useAIQuickPrompt('Optimiere meinen aktuellen Trainingsplan.')">
+                ⚡ Plan optimieren
+              </button>
+
+            </div>
+
+
+            <div
+              class="card"
+              style="margin-top:18px;background:#0d131a"
+            >
+
+              <h3>Deine Angaben</h3>
+
+              <p
+                id="aiUserInfo"
+                class="card-description"
+                style="margin-top:10px"
+              >
+                Noch keine Profildaten geladen.
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           TRAINING
+      ========================== -->
+
+      <section id="training" class="page">
+
+        <div class="topbar">
+          <div>
+            <h2>🏋️ Training</h2>
+            <p>Dein individueller Trainingsbereich</p>
+          </div>
+
+          <button
+            class="primary-btn"
+            style="width:auto"
+            onclick="showTab('ai')"
+          >
+            🤖 Mit KI planen
+          </button>
+        </div>
+
+
+        <div class="grid grid-2">
+
+          <div class="card">
+
+            <h3>Trainings-Einstellungen</h3>
+
+            <p class="card-description">
+              Passe deinen Trainingsort und dein Ziel an.
+            </p>
+
+            <div class="field" style="margin-top:18px">
+
+              <label>Wo trainierst du?</label>
+
+              <select
+                id="trainingLocation"
+                onchange="saveProfile()"
+              >
+                <option value="">Auswählen</option>
+                <option value="Zuhause">🏠 Zuhause</option>
+                <option value="Fitnessstudio">🏋️ Fitnessstudio</option>
+              </select>
+
+            </div>
+
+
+            <div class="field">
+
+              <label>Dein Ziel</label>
+
+              <select
+                id="goal"
+                onchange="saveProfile()"
+              >
+                <option value="">Auswählen</option>
+                <option value="Fitness">Allgemeine Fitness</option>
+                <option value="Muskelaufbau">Muskelaufbau</option>
+                <option value="Kraft">Kraft</option>
+                <option value="Ausdauer">Ausdauer</option>
+                <option value="Sportliche Leistung">Sportliche Leistung</option>
+              </select>
+
+            </div>
+
+          </div>
+
+
+          <div class="card">
+
+            <h3>📅 Dein Trainingsplan</h3>
+
+            <p class="card-description">
+              Dein KI-generierter Wochenplan wird hier angezeigt.
+            </p>
+
+            <div
+              id="trainingPlan"
+              style="margin-top:18px"
+            >
+
+              <p class="card-description">
+                Noch kein Trainingsplan vorhanden.
+              </p>
+
+              <button
+                class="secondary-btn"
+                style="margin-top:14px"
+                onclick="useAIQuickPrompt('Erstelle mir jetzt einen vollständigen Wochen-Trainingsplan. Berücksichtige meine Profildaten und meinen Trainingsort.')"
+              >
+                🤖 Plan mit KI erstellen
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div style="margin-top:18px">
+
+          <div class="section-header">
+            <div>
+              <h3>Übungen</h3>
+              <p class="card-description">
+                Erklärungen und Videos zu deinen Übungen.
+              </p>
+            </div>
+          </div>
+
+          <div
+            id="exerciseList"
+            class="grid grid-3"
+          >
+
+            <div class="card exercise-card">
+
+              <div class="exercise-number">01</div>
+
+              <h3>Liegestütze</h3>
+
+              <p class="card-description">
+                Brust, Schultern und Trizeps.
+              </p>
+
+              <div class="exercise-tags">
+                <span class="tag">Brust</span>
+                <span class="tag">Schulter</span>
+                <span class="tag">Trizeps</span>
+              </div>
+
+              <div class="exercise-actions">
+
+                <a
+                  href="https://www.youtube.com/results?search_query=Liegestütze+Technik"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  🎥 Video
+                </a>
+
+                <button onclick="useAIQuickPrompt('Erkläre mir die richtige Technik für Liegestütze.')">
+                  🤖 KI
+                </button>
+
+              </div>
+
+            </div>
+
+
+            <div class="card exercise-card">
+
+              <div class="exercise-number">02</div>
+
+              <h3>Kniebeugen</h3>
+
+              <p class="card-description">
+                Beine und Gesäß.
+              </p>
+
+              <div class="exercise-tags">
+                <span class="tag">Beine</span>
+                <span class="tag">Po</span>
+              </div>
+
+              <div class="exercise-actions">
+
+                <a
+                  href="https://www.youtube.com/results?search_query=Kniebeugen+Technik"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  🎥 Video
+                </a>
+
+                <button onclick="useAIQuickPrompt('Erkläre mir die richtige Technik für Kniebeugen.')">
+                  🤖 KI
+                </button>
+
+              </div>
+
+            </div>
+
+
+            <div class="card exercise-card">
+
+              <div class="exercise-number">03</div>
+
+              <h3>Plank</h3>
+
+              <p class="card-description">
+                Rumpf und Core.
+              </p>
+
+              <div class="exercise-tags">
+                <span class="tag">Core</span>
+                <span class="tag">Bauch</span>
+              </div>
+
+              <div class="exercise-actions">
+
+                <a
+                  href="https://www.youtube.com/results?search_query=Plank+richtige+Technik"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  🎥 Video
+                </a>
+
+                <button onclick="useAIQuickPrompt('Erkläre mir die richtige Technik für Planks.')">
+                  🤖 KI
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           NUTRITION
+      ========================== -->
+
+      <section id="nutrition" class="page">
+
+        <div class="topbar">
+
+          <div>
+            <h2>🍎 Ernährung</h2>
+            <p>Gesunde Ernährung mit Unterstützung deiner KI</p>
+          </div>
+
+        </div>
+
+
+        <div class="grid grid-2">
+
+          <div class="card">
+
+            <h3>🤖 Ernährungs-KI</h3>
+
+            <p class="card-description">
+              Lass dir einen ausgewogenen Mahlzeitenplan erstellen
+              oder optimiere deine Ernährung.
+            </p>
+
+            <div class="field" style="margin-top:18px">
+
+              <label>Was möchtest du?</label>
+
+              <textarea
+                id="nutritionPrompt"
+                placeholder="Zum Beispiel: Erstelle mir einen einfachen Wochenplan mit Frühstück, Mittagessen und Abendessen."
+              ></textarea>
+
+            </div>
+
+            <button
+              class="primary-btn"
+              onclick="askNutritionAI()"
+            >
+              🍎 Plan erstellen
+            </button>
+
+          </div>
+
+
+          <div class="card">
+
+            <h3>🛒 Einkaufsliste</h3>
+
+            <p class="card-description">
+              Die Einkaufsliste wird automatisch aus deinem
+              Mahlzeitenplan erstellt.
+            </p>
+
+            <div
+              id="shoppingList"
+              style="margin-top:18px"
+            >
+              <p class="card-description">
+                Noch keine Einkaufsliste vorhanden.
+              </p>
+            </div>
+
+            <button
+              class="secondary-btn"
+              style="margin-top:15px"
+              onclick="createShoppingList()"
+            >
+              🛒 Einkaufsliste erstellen
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div style="margin-top:18px">
+
+          <div class="card">
+
+            <div class="section-header">
+              <div>
+                <h3>🍽️ Mein Mahlzeitenplan</h3>
+                <p class="card-description">
+                  Dein aktueller KI-Ernährungsplan.
+                </p>
+              </div>
+            </div>
+
+            <div
+              id="mealPlan"
+              class="grid grid-3"
+            >
+
+              <div class="card meal-card">
+
+                <div class="meal-time">
+                  FRÜHSTÜCK
+                </div>
+
+                <h3>Noch kein Plan</h3>
+
+                <p class="card-description">
+                  Erstelle deinen persönlichen Mahlzeitenplan mit der KI.
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           PROGRESS
+      ========================== -->
+
+      <section id="progress" class="page">
+
+        <div class="topbar">
+
+          <div>
+            <h2>📈 Fortschritt</h2>
+            <p>Verfolge deine Entwicklung über die Zeit.</p>
+          </div>
+
+        </div>
+
+
+        <div class="grid grid-2">
+
+          <div class="card">
+
+            <h3>⚖️ Gewicht eintragen</h3>
+
+            <p class="card-description">
+              Trage dein Gewicht mit Datum ein, um deinen Verlauf
+              zu verfolgen.
+            </p>
+
+            <div class="weight-form" style="margin-top:18px">
+
+              <div class="field" style="margin:0">
+                <label>Datum</label>
+                <input
+                  id="weightDate"
+                  type="date"
+                />
+              </div>
+
+              <div class="field" style="margin:0">
+                <label>Gewicht (kg)</label>
+                <input
+                  id="weightValue"
+                  type="number"
+                  step="0.1"
+                  placeholder="z. B. 60"
+                />
+              </div>
+
+              <button
+                class="primary-btn"
+                style="width:auto"
+                onclick="addWeight()"
+              >
+                Speichern
+              </button>
+
+            </div>
+
+            <div id="weightList" class="weight-list"></div>
+
+          </div>
+
+
+          <div class="card">
+
+            <h3>📊 Durchschnitt</h3>
+
+            <p class="card-description">
+              Durchschnitt aus deinen gespeicherten Einträgen.
+            </p>
+
+            <div class="average-box">
+
+              <span class="card-description">
+                Durchschnittliches Gewicht
+              </span>
+
+              <strong id="averageWeight">
+                —
+              </strong>
+
+            </div>
+
+            <p
+              class="card-description"
+              style="margin-top:15px"
+            >
+              Wichtig: Gewicht allein sagt nicht aus, wie fit oder gesund
+              du bist. Gerade im Wachstum sind regelmäßige Mahlzeiten,
+              Bewegung und ausreichende Energie wichtiger als eine
+              aggressive Gewichtsabnahme.
+            </p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           FEEDBACK
+      ========================== -->
+
+      <section id="feedback" class="page">
+
+        <div class="topbar">
+
+          <div>
+            <h2>💬 Feedback</h2>
+            <p>Hilf uns, FITNESS AI PRO besser zu machen.</p>
+          </div>
+
+        </div>
+
+
+        <div class="grid grid-2">
+
+          <div class="card">
+
+            <h3>Dein Feedback</h3>
+
+            <p class="card-description">
+              Schreib uns, was dir gefällt oder was verbessert
+              werden sollte.
+            </p>
+
+
+            <div class="field" style="margin-top:18px">
+
+              <label>Bewertung</label>
+
+              <div id="feedbackRating" class="rating">
+
+                <button onclick="selectRating(1)">1</button>
+                <button onclick="selectRating(2)">2</button>
+                <button onclick="selectRating(3)">3</button>
+                <button onclick="selectRating(4)">4</button>
+                <button onclick="selectRating(5)">5</button>
+
+              </div>
+
+            </div>
+
+
+            <div class="field">
+
+              <label>Nachricht</label>
+
+              <textarea
+                id="feedbackMessage"
+                placeholder="Was können wir verbessern?"
+              ></textarea>
+
+            </div>
+
+
+            <button
+              class="primary-btn"
+              onclick="sendFeedback()"
+            >
+              Feedback senden
+            </button>
+
+            <div
+              id="feedbackStatus"
+              class="auth-message"
+            ></div>
+
+          </div>
+
+
+          <div class="card">
+
+            <h3>📋 Mein Feedback</h3>
+
+            <p class="card-description">
+              Hier kannst du deine bisherigen Rückmeldungen sehen.
+            </p>
+
+            <div
+              id="myFeedback"
+              style="margin-top:18px"
+            >
+              Noch kein Feedback vorhanden.
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           PROFILE
+      ========================== -->
+
+      <section id="profile" class="page">
+
+        <div class="topbar">
+
+          <div>
+            <h2>⚙️ Profil</h2>
+            <p>Deine persönlichen FITNESS-AI-Einstellungen.</p>
+          </div>
+
+        </div>
+
+
+        <div class="grid grid-2">
+
+          <div class="card">
+
+            <div class="profile-avatar">
+              👤
+            </div>
+
+            <h3 id="profileName">
+              Dein Profil
+            </h3>
+
+            <p
+              id="profileEmail"
+              class="card-description"
+            >
+              -
+            </p>
+
+          </div>
+
+
+          <div class="card">
+
+            <h3>Persönliche Daten</h3>
+
+            <div class="field" style="margin-top:18px">
+
+              <label>Name</label>
+
+              <input
+                id="profileNameInput"
+                type="text"
+                placeholder="Dein Name"
+              />
+
+            </div>
+
+
+            <div class="field">
+
+              <label>Alter</label>
+
+              <input
+                id="profileAge"
+                type="number"
+                min="10"
+                max="100"
+                placeholder="Alter"
+              />
+
+            </div>
+
+
+            <div class="field">
+
+              <label>Größe (cm)</label>
+
+              <input
+                id="profileHeight"
+                type="number"
+                placeholder="z. B. 175"
+              />
+
+            </div>
+
+
+            <div class="field">
+
+              <label>Ernährungsweise</label>
+
+              <select id="profileDiet">
+
+                <option value="">
+                  Keine Angabe
+                </option>
+
+                <option value="Alles">
+                  Alles
+                </option>
+
+                <option value="Vegetarisch">
+                  Vegetarisch
+                </option>
+
+                <option value="Vegan">
+                  Vegan
+                </option>
+
+              </select>
+
+            </div>
+
+
+            <button
+              class="primary-btn"
+              onclick="saveProfile()"
+            >
+              Profil speichern
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           ADMIN
+      ========================== -->
+
+      <section id="admin" class="page">
+
+        <div class="topbar">
+
+          <div>
+            <h2>🛠️ Admin</h2>
+            <p>Feedback und Rückmeldungen der Nutzer.</p>
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <h3>Alle Feedbacks</h3>
+
+          <div
+            id="allFeedback"
+            style="margin-top:18px"
+          >
+            Feedback wird geladen...
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+  <!-- Deine JavaScript-Datei -->
+  <script src="script.js"></script>
+
+</body>
+</html>
