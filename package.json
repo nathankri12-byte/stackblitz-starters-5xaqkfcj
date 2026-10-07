@@ -1,4 +1,7 @@
 {
+  "name": "fitness-ai-pro",
+  "version": "1.0.0",
+  "description": "FITNESS AI PRO",
   "scripts": {
     "start": "servor --reload"
   },
