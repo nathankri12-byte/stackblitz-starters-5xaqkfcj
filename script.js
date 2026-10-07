@@ -887,7 +887,113 @@ function useAIQuickPrompt(prompt) {
 /* =========================
    AI CHAT
 ========================= */
+async function askGemini(userMessage, options = {}) {
+  const {
+    showInChat = true,
+    systemInstruction = ""
+  } = options;
 
+  if (!userMessage || !userMessage.trim()) {
+    return null;
+  }
+
+  if (!supabaseClient) {
+    const error = "Supabase ist nicht verbunden.";
+
+    if (showInChat) {
+      addAIMessage("error", error);
+    }
+
+    return null;
+  }
+
+  if (showInChat) {
+    addAIMessage("user", userMessage);
+    addAIMessage("assistant", "⏳ Die KI denkt gerade …");
+  }
+
+  const profile = currentProfile || {};
+
+  try {
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(
+        () => reject(new Error("Die KI braucht zu lange. Bitte versuche es erneut.")),
+        20000
+      );
+    });
+
+    const requestPromise = supabaseClient.functions.invoke(
+      "gemini-chat",
+      {
+        body: {
+          message: userMessage,
+          profile: {
+            name: profile.name || "unbekannt",
+            age: profile.age || "unbekannt",
+            height: profile.height || "unbekannt",
+            weight: profile.weight || "unbekannt",
+            goal: profile.goal || "unbekannt",
+            training_location:
+              profile.training_location || "unbekannt",
+            diet: profile.diet || "keine Angabe"
+          },
+          systemInstruction,
+          history: []
+        }
+      }
+    );
+
+    const { data, error } = await Promise.race([
+      requestPromise,
+      timeoutPromise
+    ]);
+
+    if (error) {
+      throw new Error(error.message || "Die KI konnte nicht erreicht werden.");
+    }
+
+    if (!data) {
+      throw new Error("Die KI hat keine Antwort zurückgegeben.");
+    }
+
+    if (!data.success) {
+      throw new Error(
+        data.error || "Die KI konnte keine Antwort erstellen."
+      );
+    }
+
+    const answer = String(data.answer || "").trim();
+
+    if (!answer) {
+      throw new Error("Die KI hat keine verwertbare Antwort zurückgegeben.");
+    }
+
+    console.log("✅ Gemini Antwort erhalten");
+
+    if (showInChat) {
+      updateLastAIMessage(formatAIText(answer));
+    }
+
+    maybeExtractPlan(answer);
+
+    return answer;
+
+  } catch (error) {
+    console.error("❌ GEMINI FEHLER:", error);
+
+    const message =
+      error?.message ||
+      "Unbekannter Fehler bei der KI.";
+
+    if (showInChat) {
+      updateLastAIMessage(
+        `❌ **KI-Fehler**\n\n${escapeHTML(message)}`
+      );
+    }
+
+    return null;
+  }
+}
 
 
 /* =========================
