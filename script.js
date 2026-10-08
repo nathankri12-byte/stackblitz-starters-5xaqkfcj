@@ -1864,28 +1864,14 @@ ${systemInstruction}
 ========================================================= */
 
 async function generateTrainingPlan() {
-
-  if (
-    !supabaseClient ||
-    !currentUser
-  ) {
-    alert(
-      "Bitte melde dich zuerst an."
-    );
+  if (!supabaseClient || !currentUser) {
+    alert("Bitte melde dich zuerst an.");
     return null;
   }
 
-  /*
-    Sofort zum Trainingsbereich.
-    Der Chat wird NICHT geöffnet.
-  */
-
   showTab("training");
 
-  const container =
-    document.getElementById(
-      "trainingPlan"
-    );
+  const container = document.getElementById("trainingPlan");
 
   if (container) {
     container.innerHTML = `
@@ -1897,14 +1883,12 @@ async function generateTrainingPlan() {
     `;
   }
 
-  const profile =
-    currentProfile || {};
+  const profile = currentProfile || {};
 
   const prompt = `
-Erstelle mir einen vollständigen persönlichen Wochen-Trainingsplan.
+Erstelle einen vollständigen persönlichen Wochen-Trainingsplan.
 
-Berücksichtige dabei unbedingt mein Profil:
-
+Profil:
 Name: ${profile.name || "unbekannt"}
 Alter: ${profile.age || "unbekannt"}
 Größe: ${profile.height || "unbekannt"} cm
@@ -1916,30 +1900,44 @@ Der Nutzer ist minderjährig.
 
 Erstelle einen altersgerechten, sicheren und realistischen Wochenplan.
 
-Gib den Plan übersichtlich nach Wochentagen aus.
+WICHTIG:
+Der Plan muss exakt nach diesem Format aufgebaut sein:
 
-Für jeden Trainingstag:
-- Schwerpunkt
-- Übungen
-- Sätze und Wiederholungen bzw. Zeit
-- kurze Pausenempfehlung
-- kurze Hinweise zur Technik
+MONTAG | SCHWERPUNKT
+ÜBUNG: Name der Übung | SÄTZE: 3 | WIEDERHOLUNGEN: 10 | DAUER: -
+ÜBUNG: Name der Übung | SÄTZE: 3 | WIEDERHOLUNGEN: 12 | DAUER: -
 
-Plane außerdem Ruhetage bzw. leichte Tage ein.
+DIENSTAG | RUHETAG
 
-Keine extremen Belastungen, keine Crash-Diäten und keine gefährlichen Trainingsmethoden.
+MITTWOCH | SCHWERPUNKT
+ÜBUNG: Name der Übung | SÄTZE: 3 | WIEDERHOLUNGEN: 10 | DAUER: -
 
-Wichtig:
-Antworte ausschließlich mit dem Trainingsplan.
+DONNERSTAG | RUHETAG
+
+FREITAG | SCHWERPUNKT
+ÜBUNG: Name der Übung | SÄTZE: 3 | WIEDERHOLUNGEN: 10 | DAUER: -
+
+SAMSTAG | LEICHTER TAG
+ÜBUNG: Name der Übung | SÄTZE: 2 | WIEDERHOLUNGEN: 10 | DAUER: -
+
+SONNTAG | RUHETAG
+
+Regeln:
+- Verwende nur Übungen, die am angegebenen Trainingsort möglich sind.
+- Für Übungen mit Wiederholungen verwende WIEDERHOLUNGEN.
+- Für Übungen wie Plank verwende DAUER, z.B. 30 Sekunden.
+- Keine extremen Gewichte.
+- Keine gefährlichen oder extremen Trainingsmethoden.
+- Plane ausreichend Erholung ein.
+- Keine Crash-Diäten.
+- Pro Trainingstag maximal 6 Übungen.
+- Jeder Trainingstag soll einen klaren Schwerpunkt haben.
+- Gib ausschließlich den Trainingsplan aus.
+- Keine Einleitung.
+- Keine Erklärung außerhalb des Plans.
   `.trim();
 
-  const answer =
-    await askGemini(
-      prompt,
-      {
-        showInChat: false
-      }
-    );
+  const answer = await askGemini(prompt, { showInChat: false });
 
   if (!answer) {
     if (container) {
@@ -1952,19 +1950,10 @@ Antworte ausschließlich mit dem Trainingsplan.
         </div>
       `;
     }
-
     return null;
   }
 
-  /*
-    Plan lokal speichern.
-  */
-
-  localStorage.setItem(
-    "fitness_ai_training_plan",
-    answer
-  );
-
+  localStorage.setItem("fitness_ai_training_plan", answer);
   localStorage.setItem(
     "fitness_ai_training_plan_updated",
     new Date().toISOString()
@@ -1974,7 +1963,6 @@ Antworte ausschließlich mit dem Trainingsplan.
 
   return answer;
 }
-
 
 /* =========================================================
    DIRECT MEAL PLAN
@@ -2312,54 +2300,122 @@ function renderMealPlan(
    TRAINING PLAN RENDER
 ========================================================= */
 
-function renderTrainingPlan(
-  text
-) {
+function renderTrainingPlan(text) {
+  const container = document.getElementById("trainingPlan");
+  if (!container) return;
 
-  const container =
-    document.getElementById(
-      "trainingPlan"
-    );
-
-  if (!container) {
-    return;
-  }
-
-  const lines =
-    text
-      .split("\n")
-      .map(
-        line =>
-          line.trim()
-      )
-      .filter(Boolean)
-      .slice(0, 60);
+  const lines = text
+    .split("\n")
+    .map(line => line.trim())
+    .filter(Boolean)
+    .slice(0, 60);
 
   container.innerHTML = `
-    <div style="display:grid;gap:9px">
+    <div style="display:grid;gap:12px">
+      ${lines.map((line, index) => `
+        <div
+          class="training-exercise-card"
+          style="
+            padding:15px;
+            border:1px solid var(--border);
+            border-radius:14px;
+            background:#10161e;
+            display:flex;
+            align-items:center;
+            gap:12px;
+          "
+        >
+          <input
+            type="checkbox"
+            id="trainingCheck_${index}"
+            style="
+              width:22px;
+              height:22px;
+              cursor:pointer;
+              flex-shrink:0;
+            "
+            onchange="toggleTrainingExercise(${index}, this.checked)"
+          >
 
-      ${lines
-        .map(
-          line => `
-            <div
-              style="
-                padding:11px;
-                border:1px solid var(--border);
-                border-radius:10px;
-                background:#10161e;
-                line-height:1.6;
-              "
-            >
-              ${formatAIText(line)}
-            </div>
-          `
-        )
-        .join("")}
-
+          <label
+            for="trainingCheck_${index}"
+            style="
+              cursor:pointer;
+              line-height:1.5;
+              flex:1;
+            "
+          >
+            ${formatAIText(line)}
+          </label>
+        </div>
+      `).join("")}
     </div>
   `;
 }
+async function toggleTrainingExercise(index, completed) {
+  if (!supabaseClient || !currentUser) {
+    alert("Bitte melde dich zuerst an.");
+    return;
+  }
 
+  const plan = localStorage.getItem("fitness_ai_training_plan");
+
+  if (!plan) return;
+
+  const lines = plan
+    .split("\n")
+    .map(line => line.trim())
+    .filter(Boolean)
+    .slice(0, 60);
+
+  const exerciseName = lines[index];
+
+  if (!exerciseName) return;
+
+  const today = new Date();
+  const trainingDate = today.toISOString().split("T")[0];
+
+  try {
+    if (completed) {
+      const { error } = await supabaseClient
+        .from("training_entries")
+        .upsert(
+          {
+            user_id: currentUser.id,
+            exercise_name: exerciseName,
+            training_date: trainingDate,
+            completed: true
+          },
+          {
+            onConflict: "user_id,exercise_name,training_date"
+          }
+        );
+
+      if (error) throw error;
+
+      console.log("✅ Übung abgeschlossen:", exerciseName);
+    } else {
+      const { error } = await supabaseClient
+        .from("training_entries")
+        .delete()
+        .eq("user_id", currentUser.id)
+        .eq("exercise_name", exerciseName)
+        .eq("training_date", trainingDate);
+
+      if (error) throw error;
+
+      console.log("↩️ Übung zurückgesetzt:", exerciseName);
+    }
+
+  } catch (error) {
+    console.error("Fehler beim Speichern der Übung:", error);
+
+    alert(
+      "Die Übung konnte nicht gespeichert werden.\n\n" +
+      (error.message || "Unbekannter Fehler")
+    );
+  }
+}
 
 /* =========================================================
    WEIGHT
