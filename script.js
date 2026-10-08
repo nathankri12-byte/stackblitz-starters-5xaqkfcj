@@ -1356,7 +1356,55 @@ function useAIQuickPrompt(prompt) {
   input.focus();
 }
 
+/* =========================================================
+   AI INPUT
+========================================================= */
 
+function setupAIInput() {
+  const input =
+    document.getElementById("aiInput");
+
+  const sendButton =
+    document.getElementById("aiSendButton");
+
+  if (!input) {
+    console.warn("⚠️ aiInput wurde nicht gefunden.");
+    return;
+  }
+
+  /*
+    Enter = Nachricht senden
+    Shift + Enter = neue Zeile
+  */
+
+  input.addEventListener("keydown", event => {
+    if (
+      event.key === "Enter" &&
+      !event.shiftKey
+    ) {
+      event.preventDefault();
+
+      askGemini();
+    }
+  });
+
+  /*
+    Senden-Button zusätzlich per JavaScript
+    verbinden.
+    Dadurch funktioniert er auch dann,
+    wenn das onclick im HTML einmal nicht greift.
+  */
+
+  if (sendButton) {
+    sendButton.addEventListener("click", event => {
+      event.preventDefault();
+
+      askGemini();
+    });
+  }
+
+  console.log("✅ KI-Eingabe bereit.");
+}
 /* =========================================================
    BUILD AI CONTEXT
 ========================================================= */
