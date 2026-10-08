@@ -1478,7 +1478,57 @@ function isMealPlanRequest(text) {
   );
 }
 
+/* =========================================================
+   AI CHAT UI
+========================================================= */
 
+function addAIMessage(role, text) {
+  const chat = document.getElementById("aiChat");
+
+  if (!chat) {
+    console.error("❌ aiChat wurde nicht gefunden.");
+    return null;
+  }
+
+  const message = document.createElement("div");
+
+  message.className =
+    role === "user"
+      ? "ai-message user-message"
+      : "ai-message assistant-message";
+
+  message.innerHTML = formatAIText(text);
+
+  chat.appendChild(message);
+
+  chat.scrollTop = chat.scrollHeight;
+
+  return message;
+}
+
+
+function updateLastAIMessage(text) {
+  const chat = document.getElementById("aiChat");
+
+  if (!chat) {
+    console.error("❌ aiChat wurde nicht gefunden.");
+    return;
+  }
+
+  const messages =
+    chat.querySelectorAll(".ai-message");
+
+  if (!messages.length) {
+    return;
+  }
+
+  const lastMessage =
+    messages[messages.length - 1];
+
+  lastMessage.innerHTML = text;
+
+  chat.scrollTop = chat.scrollHeight;
+}
 /* =========================================================
    AI CHAT
 ========================================================= */
