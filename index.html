@@ -1187,27 +1187,25 @@
 
             <div class="ai-input-area">
 
-              <textarea
-                id="aiInput"
-                placeholder="Frag deinen KI-Coach..."
-                onkeydown="
-                  if(event.key === 'Enter' && !event.shiftKey){
-                    event.preventDefault();
-                    askGemini();
-                  }
-                "
-              ></textarea>
+  <textarea
+    id="aiInput"
+    placeholder="Frag deinen KI-Coach..."
+    rows="1"
+    autocomplete="off"
+    spellcheck="true"
+  ></textarea>
 
-              <button
-                class="ai-send"
-                onclick="askGemini()"
-              >
-                ➤
-              </button>
+  <button
+    type="button"
+    class="ai-send"
+    id="aiSendButton"
+    onclick="askGemini()"
+    aria-label="Nachricht senden"
+  >
+    ➤
+  </button>
 
-            </div>
-
-          </div>
+</div>
 
 
           <div class="card">
