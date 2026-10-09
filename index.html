@@ -641,6 +641,16 @@
       margin-top: 7px;
     }
 
+    .weight-chart-card { margin-top:20px; padding-top:18px; border-top:1px solid var(--border); }
+    .weight-chart-card h4 { margin-bottom:12px; }
+    .weight-chart { min-width:0; }
+    .weight-chart-summary { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:8px; color:var(--muted); font-size:13px; }
+    .weight-chart-summary strong { color:var(--text); font-size:13px; text-align:right; }
+    .weight-chart-scroll { width:100%; overflow-x:auto; }
+    .weight-chart svg { display:block; width:100%; min-width:280px; height:auto; }
+    .weight-chart-label { fill:var(--muted); font-size:12px; }
+    .weight-chart-dot { fill:var(--accent); stroke:var(--card); stroke-width:2; }
+
     /* FEEDBACK */
 
     .rating {
@@ -1697,6 +1707,12 @@
             </div>
 
             <div id="weightList" class="weight-list"></div>
+            <div class="weight-chart-card">
+              <h4>Dein Gewichtsverlauf</h4>
+              <div id="weightChart" class="weight-chart">
+                <p class="card-description">Sobald du Gewichtseinträge speicherst, erscheint hier dein Verlauf.</p>
+              </div>
+            </div>
 
           </div>
 
