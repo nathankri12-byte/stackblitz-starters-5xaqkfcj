@@ -2717,7 +2717,8 @@ async function addWeight() {
     await loadWeights();
 
   } catch (error) {
-    console.error(error);
+    console.error("Gewichtseintrag konnte nicht verarbeitet werden:", error);
+    alert("Der Gewichtseintrag konnte nicht verarbeitet werden. Bitte versuche es erneut.");
   }
 }
 
@@ -2763,7 +2764,13 @@ async function loadWeights() {
     );
 
   } catch (error) {
-    console.error(error);
+    console.error("Gewichtsdaten konnten nicht geladen werden:", error);
+    const list = document.getElementById("weightList");
+    const average = document.getElementById("averageWeight");
+    if (list) {
+      list.innerHTML = '<p class="card-description">Gewichtsdaten konnten nicht geladen werden. Bitte versuche es später erneut.</p>';
+    }
+    if (average) average.textContent = "—";
   }
 }
 
