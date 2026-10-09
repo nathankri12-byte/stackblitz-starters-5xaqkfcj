@@ -109,6 +109,13 @@ function showAuthMode(mode) {
    AUTH MESSAGE
 ========================================================= */
 
+function setInlineStatus(id, message, success = false) {
+  const element = document.getElementById(id);
+  if (!element) return;
+  element.textContent = message || "";
+  element.style.color = success ? "var(--green)" : "var(--red)";
+}
+
 function setAuthMessage(
   message,
   success = false
@@ -620,10 +627,9 @@ function fillProfileUI() {
 
 
 async function saveProfile() {
-  if (
-    !currentUser ||
-    !supabaseClient
-  ) {
+  setInlineStatus("profileStatus", "");
+  if (!currentUser || !supabaseClient) {
+    setInlineStatus("profileStatus", "Bitte melde dich zuerst an.");
     return;
   }
 
@@ -674,19 +680,19 @@ async function saveProfile() {
 
   // Eingaben vor dem Schreiben in die Datenbank validieren.
   if (name.length > 80) {
-    alert("Der Name darf höchstens 80 Zeichen lang sein.");
+    setInlineStatus("profileStatus", "Der Name darf höchstens 80 Zeichen lang sein.");
     return;
   }
 
   const ageNumber = age === "" || age == null ? null : Number(age);
   if (ageNumber !== null && (!Number.isInteger(ageNumber) || ageNumber < 1 || ageNumber > 120)) {
-    alert("Bitte gib ein gültiges Alter zwischen 1 und 120 Jahren ein.");
+    setInlineStatus("profileStatus", "Bitte gib ein gültiges Alter zwischen 1 und 120 Jahren ein.");
     return;
   }
 
   const heightNumber = height === "" || height == null ? null : Number(height);
   if (heightNumber !== null && (!Number.isFinite(heightNumber) || heightNumber < 50 || heightNumber > 250)) {
-    alert("Bitte gib eine Körpergröße zwischen 50 und 250 cm ein.");
+    setInlineStatus("profileStatus", "Bitte gib eine Körpergröße zwischen 50 und 250 cm ein.");
     return;
   }
 
@@ -807,6 +813,7 @@ async function saveProfile() {
 
     updateDashboard();
     renderExercises();
+    setInlineStatus("profileStatus", "Profil erfolgreich gespeichert.", true);
 
     console.log(
       "✅ Profil gespeichert."
@@ -819,9 +826,7 @@ async function saveProfile() {
       error
     );
 
-    alert(
-      "Beim Speichern des Profils ist ein Fehler aufgetreten."
-    );
+    setInlineStatus("profileStatus", "Beim Speichern des Profils ist ein Fehler aufgetreten.");
   }
 }
 
@@ -2612,11 +2617,10 @@ function renderMetricChart(entries, field, label, unit) {
 ========================================================= */
 
 async function addWeight() {
+  setInlineStatus("weightStatus", "");
 
-  if (
-    !currentUser ||
-    !supabaseClient
-  ) {
+  if (!currentUser || !supabaseClient) {
+    setInlineStatus("weightStatus", "Bitte melde dich zuerst an.");
     return;
   }
 
@@ -2635,14 +2639,14 @@ async function addWeight() {
       ?.value;
 
   if (!date || weight === "" || weight == null) {
-    alert("Bitte Datum und Gewicht eingeben.");
+    setInlineStatus("weightStatus", "Bitte Datum und Gewicht eingeben.");
     return;
   }
 
   // Keine zukünftigen Einträge: Sie verfälschen Verlauf und Durchschnitt.
   const today = getLocalDateInputValue();
   if (date > today) {
-    alert("Bitte wähle heute oder ein Datum in der Vergangenheit.");
+    setInlineStatus("weightStatus", "Bitte wähle heute oder ein Datum in der Vergangenheit.");
     return;
   }
 
@@ -2654,9 +2658,8 @@ async function addWeight() {
     ) ||
     numericWeight <= 0
   ) {
-    alert(
-      "Bitte ein gültiges Gewicht eingeben."
-    );
+    setInlineStatus("weightStatus", "Bitte gib ein gültiges Gewicht zwischen 1 und 500 kg ein.");
+    return;
     return;
   }
 
@@ -2697,10 +2700,7 @@ async function addWeight() {
 
       console.error(error);
 
-      alert(
-        "Der Gewichtseintrag konnte nicht gespeichert werden:\n\n" +
-        error.message
-      );
+      setInlineStatus("weightStatus", "Der Gewichtseintrag konnte nicht gespeichert werden. Bitte versuche es erneut.");
 
       return;
     }
@@ -2747,10 +2747,11 @@ async function addWeight() {
 
     updateDashboard();
     await loadWeights();
+    setInlineStatus("weightStatus", "Gewicht erfolgreich gespeichert.", true);
 
   } catch (error) {
     console.error("Gewichtseintrag konnte nicht verarbeitet werden:", error);
-    alert("Der Gewichtseintrag konnte nicht verarbeitet werden. Bitte versuche es erneut.");
+    setInlineStatus("weightStatus", "Der Gewichtseintrag konnte nicht verarbeitet werden. Bitte versuche es erneut.");
   }
 }
 
