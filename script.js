@@ -847,6 +847,7 @@ async function loadApp() {
   await createProfileIfMissing();
   await loadProfile();
   await loadWeights();
+  await loadTrainingProgress();
   await loadFeedback();
   await checkAdmin();
 
@@ -2161,7 +2162,7 @@ function createShoppingList() {
     );
 
   if (shoppingIndex < 0) {
-    list.innerHTML = '<p class="card-description">In deinem Mahlzeitenplan wurde keine Einkaufsliste erkannt. Bitte bitte die KI um eine Einkaufsliste.</p>';
+    list.innerHTML = '<p class="card-description">In deinem Mahlzeitenplan wurde keine Einkaufsliste erkannt. Bitte die KI um eine Einkaufsliste.</p>';
     return;
   }
 
