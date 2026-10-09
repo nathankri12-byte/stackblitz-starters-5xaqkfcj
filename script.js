@@ -2481,6 +2481,26 @@ function renderTrainingPlan(text) {
                               data-exercise="${escape(exercise.name)}"
                             >
                           </div>
+                            <input
+  type="number"
+  min="0"
+  step="1"
+  placeholder="z. B. 60"
+  class="training-duration-input"
+  data-exercise="${escape(exercise.name)}"
+>
+</div>
+<button
+  type="button"
+  class="primary-btn save-performance-btn"
+  style="margin-top:12px;width:100%"
+  onclick="saveTrainingPerformance(this)"
+>
+  Werte speichern
+</button>
+</div>
+</div>
+</div>
                         </div>
                       </div>
                     </div>
@@ -2572,6 +2592,122 @@ async function loadSavedTrainingEntries() {
       "Gespeicherte Trainingsdaten konnten nicht geladen werden:",
       error
     );
+  }
+}
+async function saveTrainingPerformance(input) {
+  if (!currentUser || !supabaseClient) {
+    alert("Bitte melde dich zuerst an.");
+    return;
+  }
+  const exerciseName = input.dataset.exercise;
+  if (!exerciseName) {
+    console.error("Der Übungsname fehlt.");
+    return;
+  }
+  const exerciseCard = input.closest(".exercise-card");
+  const checkbox = exerciseCard?.querySelector(
+    ".training-exercise-checkbox"
+  );
+  const dayName = checkbox?.dataset.day;
+  if (!dayName) {
+    console.error("Der Trainingstag fehlt.");
+    return;
+  }
+  const weightInput = exerciseCard.querySelector(
+    ".training-weight-input"
+  );
+  const repsInput = exerciseCard.querySelector(
+    ".training-reps-input"
+  );
+  const durationInput = exerciseCard.querySelector(
+    ".training-duration-input"
+  );
+  const weight = weightInput.value.trim() === ""
+    ? null
+    : Number(weightInput.value);
+  const reps = repsInput.value.trim() === ""
+    ? null
+    : Number(repsInput.value);
+  const duration = durationInput.value.trim() === ""
+    ? null
+    : Number(durationInput.value);
+  const weekdays = {
+    SONNTAG: 0,
+    MONTAG: 1,
+    DIENSTAG: 2,
+    MITTWOCH: 3,
+    DONNERSTAG: 4,
+    FREITAG: 5,
+    SAMSTAG: 6
+  };
+  const today = new Date();
+  const targetDay = weekdays[dayName.toUpperCase()];
+  if (targetDay === undefined) {
+    console.error("Ungültiger Trainingstag:", dayName);
+    return;
+  }
+  const trainingDate = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate()
+  );
+  const daysUntilTraining =
+    (targetDay - today.getDay() + 7) % 7;
+  trainingDate.setDate(
+    trainingDate.getDate() + daysUntilTraining
+  );
+  const dateString = [
+    trainingDate.getFullYear(),
+    String(trainingDate.getMonth() + 1).padStart(2, "0"),
+    String(trainingDate.getDate()).padStart(2, "0")
+  ].join("-");
+  const saveButton = exerciseCard.querySelector(
+    ".save-performance-btn"
+  );
+  if (saveButton) {
+    saveButton.disabled = true;
+    saveButton.textContent = "Speichert ...";
+  }
+  try {
+    const { error } = await supabaseClient
+      .from("training_entries")
+      .upsert(
+        {
+          user_id: currentUser.id,
+          exercise_name: exerciseName,
+          training_date: dateString,
+          completed: checkbox.checked,
+          weight: weight,
+          reps: reps,
+          duration_seconds: duration
+        },
+        {
+          onConflict: "user_id,exercise_name,training_date"
+        }
+      );
+    if (error) {
+      throw error;
+    }
+    if (saveButton) {
+      saveButton.textContent = "✓ Gespeichert";
+    }
+    console.log("Trainingsleistung gespeichert:", {
+      exerciseName,
+      weight,
+      reps,
+      duration,
+      dateString
+    });
+  } catch (error) {
+    console.error("Fehler beim Speichern der Leistung:", error);
+    if (saveButton) {
+      saveButton.textContent = "Erneut speichern";
+    }
+    alert("Die Werte konnten nicht gespeichert werden. Bitte versuche es erneut.");
+  } finally {
+    if (saveButton) {
+      saveButton.disabled = false;
+    }
   }
 }
 async function toggleTrainingExercise(checkbox) {
