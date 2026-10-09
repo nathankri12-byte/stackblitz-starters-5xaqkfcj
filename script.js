@@ -2302,108 +2302,200 @@ function renderMealPlan(
 
 function renderTrainingPlan(text) {
   const container = document.getElementById("trainingPlan");
-  if (!container) return;
+
+  if (!container) {
+    console.error("Der Trainingsplan-Container wurde nicht gefunden.");
+    return;
+  }
+
+  if (!text || !text.trim()) {
+    container.innerHTML = `
+      <p class="card-description">
+        Noch kein Trainingsplan vorhanden.
+      </p>
+    `;
+    return;
+  }
+
+  const days = [];
+  let currentDay = null;
 
   const lines = text
-    .split("\n")
+    .split(/\r?\n/)
     .map(line => line.trim())
     .filter(Boolean);
 
-  let html = "";
-  let currentDay = "";
-
-  lines.forEach((line, index) => {
-    // Trainingstag erkennen
+  for (const line of lines) {
     const dayMatch = line.match(
       /^(MONTAG|DIENSTAG|MITTWOCH|DONNERSTAG|FREITAG|SAMSTAG|SONNTAG)\s*\|\s*(.+)$/i
     );
 
     if (dayMatch) {
-      currentDay = dayMatch[1].toUpperCase();
+      currentDay = {
+        name: dayMatch[1].toUpperCase(),
+        focus: dayMatch[2].trim(),
+        exercises: []
+      };
 
-      html += `
-        <div style="
-          margin-top:18px;
-          padding:16px;
-          border:1px solid var(--border);
-          border-radius:14px;
-          background:#151d27;
-        ">
-          <h3 style="margin:0 0 5px">
-            ${escapeHTML(currentDay)}
-          </h3>
-          <p class="card-description" style="margin:0">
-            ${escapeHTML(dayMatch[2])}
-          </p>
-          <div style="display:grid;gap:10px;margin-top:14px">
-      `;
-
-      return;
+      days.push(currentDay);
+      continue;
     }
 
-    // Übungszeile erkennen
-    if (/^ÜBUNG:/i.test(line)) {
-      const nameMatch = line.match(/ÜBUNG:\s*([^|]+)/i);
-      const setsMatch = line.match(/SÄTZE:\s*([^|]+)/i);
-      const repsMatch = line.match(/WIEDERHOLUNGEN:\s*([^|]+)/i);
-      const durationMatch = line.match(/DAUER:\s*([^|]+)/i);
+    if (/^ÜBUNG\s*:/i.test(line)) {
+      if (!currentDay) {
+        currentDay = {
+          name: "TRAINING",
+          focus: "Deine Übungen",
+          exercises: []
+        };
 
-      const name = nameMatch?.[1]?.trim() || "Übung";
-      const sets = setsMatch?.[1]?.trim() || "—";
-      const reps = repsMatch?.[1]?.trim() || "—";
-      const duration = durationMatch?.[1]?.trim() || "—";
+        days.push(currentDay);
+      }
 
-      const exerciseId = `training_${index}`;
+      const exerciseText = line.replace(/^ÜBUNG\s*:\s*/i, "");
+      const parts = exerciseText.split("|");
 
-      html += `
-        <label for="${exerciseId}" style="
-          display:flex;
-          align-items:center;
-          gap:12px;
-          padding:14px;
-          border:1px solid var(--border);
-          border-radius:12px;
-          background:#10161e;
-          cursor:pointer;
-        ">
-          <input
-            type="checkbox"
-            id="${exerciseId}"
-            style="width:22px;height:22px;flex-shrink:0"
-            onchange="toggleTrainingExercise(${index}, this.checked)"
-          >
+      const name = parts[0].trim();
 
-          <span style="flex:1;line-height:1.5">
-            <strong>${escapeHTML(name)}</strong><br>
-            <small class="card-description">
-              ${escapeHTML(sets)} Sätze ·
-              ${escapeHTML(reps)} Wiederholungen ·
-              ${escapeHTML(duration)}
-            </small>
-          </span>
-        </label>
-      `;
+      if (!name) continue;
+
+      const details = parts.slice(1).map(part => part.trim());
+
+      currentDay.exercises.push({
+        name,
+        details,
+        originalLine: line
+      });
     }
-  });
+  }
 
-  html += `
-      </div>
-    </div>
-  `;
-
-  if (!html.trim()) {
+  if (days.length === 0) {
     container.innerHTML = `
-      <div class="card">
-        <p>Dein Trainingsplan konnte nicht dargestellt werden.</p>
-        <p class="card-description">
-          Bitte generiere den Trainingsplan erneut.
+      <div class="card" style="margin-top:15px">
+        <h3>Trainingsplan konnte nicht erkannt werden</h3>
+        <p class="card-description" style="margin-top:10px">
+          Bitte erstelle den Plan erneut. Die KI muss die Wochentage
+          und Übungen im vereinbarten Format ausgeben.
         </p>
+        <button
+          class="secondary-btn"
+          style="margin-top:14px"
+          onclick="generateTrainingPlan()"
+        >
+          🔄 Plan erneut erstellen
+        </button>
       </div>
     `;
+
+    console.warn("Unbekanntes Trainingsplan-Format:", text);
     return;
   }
 
-  container.innerHTML = html;
+  const escape = value =>
+    String(value).replace(/[&<>"']/g, char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[char]);
+
+  container.innerHTML = `
+    <div style="display:grid;gap:18px;margin-top:15px">
+      ${days.map((day, dayIndex) => `
+        <div class="card" style="background:#0d131a">
+          <div class="section-header">
+            <div>
+              <h3>📅 ${escape(day.name)}</h3>
+              <p class="card-description">${escape(day.focus)}</p>
+            </div>
+            <span class="tag">
+              ${day.exercises.length} Übungen
+            </span>
+          </div>
+
+          ${
+            day.exercises.length
+              ? `<div style="display:grid;gap:12px">
+                  ${day.exercises.map((exercise, exerciseIndex) => `
+                    <div
+                      class="card exercise-card"
+                      style="padding:16px;background:#151d27"
+                    >
+                      <div style="display:flex;gap:12px;align-items:flex-start">
+                        <input
+                          type="checkbox"
+                          class="training-exercise-checkbox"
+                          data-exercise="${escape(exercise.name)}"
+                          data-day="${escape(day.name)}"
+                          data-day-index="${dayIndex}"
+                          data-exercise-index="${exerciseIndex}"
+                          onchange="toggleTrainingExercise(this)"
+                          style="width:20px;height:20px;flex-shrink:0;margin-top:3px;accent-color:#35d07f"
+                          aria-label="${escape(exercise.name)} erledigt"
+                        >
+
+                        <div style="flex:1;min-width:0">
+                          <h3 style="margin-bottom:8px">
+                            ${escape(exercise.name)}
+                          </h3>
+
+                          <div class="exercise-tags">
+                            ${exercise.details.map(detail => `
+                              <span class="tag">${escape(detail)}</span>
+                            `).join("")}
+                          </div>
+
+                          <div class="field" style="margin-top:12px;margin-bottom:0">
+                            <label>Gewicht (kg), falls zutreffend</label>
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.5"
+                              placeholder="z. B. 20"
+                              class="training-weight-input"
+                              data-exercise="${escape(exercise.name)}"
+                            >
+                          </div>
+
+                          <div class="field" style="margin-top:10px;margin-bottom:0">
+                            <label>Erreichte Wiederholungen</label>
+                            <input
+                              type="number"
+                              min="0"
+                              step="1"
+                              placeholder="z. B. 10"
+                              class="training-reps-input"
+                              data-exercise="${escape(exercise.name)}"
+                            >
+                          </div>
+
+                          <div class="field" style="margin-top:10px;margin-bottom:0">
+                            <label>Dauer in Sekunden (bei Zeitübungen)</label>
+                            <input
+                              type="number"
+                              min="0"
+                              step="1"
+                              placeholder="z. B. 60"
+                              class="training-duration-input"
+                              data-exercise="${escape(exercise.name)}"
+                            >
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  `).join("")}
+                </div>`
+              : `<p class="card-description">
+                  Für diesen Tag sind keine Übungen eingeplant.
+                </p>`
+          }
+        </div>
+      `).join("")}
+    </div>
+  `;
+
+  console.log("Trainingsplan als Tageskarten dargestellt:", days);
 }
 async function toggleTrainingExercise(index, completed) {
   if (!supabaseClient || !currentUser) {
