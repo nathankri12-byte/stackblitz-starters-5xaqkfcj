@@ -1496,8 +1496,8 @@ function addAIMessage(role, text) {
 
   message.className =
     role === "user"
-      ? "ai-message user-message"
-      : "ai-message assistant-message";
+      ? "ai-message user"
+      : "ai-message ai";
 
   message.innerHTML = formatAIText(text);
 
@@ -1591,9 +1591,7 @@ async function askGemini(
     if (showInChat) {
       addAIMessage(
         "assistant",
-        formatAIText(
-          "❌ Supabase ist nicht verbunden."
-        )
+        "❌ Supabase ist nicht verbunden."
       );
     }
 
@@ -1605,9 +1603,7 @@ async function askGemini(
     if (showInChat) {
       addAIMessage(
         "assistant",
-        formatAIText(
-          "❌ Bitte melde dich zuerst an."
-        )
+        "❌ Bitte melde dich zuerst an."
       );
     }
 
@@ -1756,11 +1752,12 @@ ${systemInstruction}
         }
       );
 
+    let timeoutId;
+
     const timeoutPromise =
       new Promise(
         (_, reject) => {
-
-          setTimeout(
+          timeoutId = window.setTimeout(
             () => {
               reject(
                 new Error(
@@ -1770,15 +1767,19 @@ ${systemInstruction}
             },
             30000
           );
-
         }
       );
 
-    const result =
-      await Promise.race([
+    let result;
+
+    try {
+      result = await Promise.race([
         requestPromise,
         timeoutPromise
       ]);
+    } finally {
+      window.clearTimeout(timeoutId);
+    }
 
     const {
       data,
@@ -1786,10 +1787,33 @@ ${systemInstruction}
     } = result;
 
     if (error) {
-      throw new Error(
+      let details =
         error.message ||
-        "Die Verbindung zur KI ist fehlgeschlagen."
-      );
+        "Die Verbindung zur KI ist fehlgeschlagen.";
+
+      /*
+        Supabase zeigt bei HTTP-Fehlern oft nur
+        „Edge Function returned a non-2xx status code“.
+        Wenn möglich, lesen wir zusätzlich den eigentlichen
+        Fehlertext aus der Response der Edge Function.
+      */
+      try {
+        const response = error.context;
+        if (response && typeof response.clone === "function") {
+          const body = await response.clone().json();
+          details =
+            body?.error ||
+            body?.message ||
+            details;
+        }
+      } catch (parseError) {
+        console.warn(
+          "Die genaue KI-Fehlermeldung konnte nicht gelesen werden:",
+          parseError
+        );
+      }
+
+      throw new Error(details);
     }
 
     if (!data) {
