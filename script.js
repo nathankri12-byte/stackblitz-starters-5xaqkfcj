@@ -672,6 +672,24 @@ async function saveProfile() {
       )
       ?.value || "";
 
+  // Eingaben vor dem Schreiben in die Datenbank validieren.
+  if (name.length > 80) {
+    alert("Der Name darf höchstens 80 Zeichen lang sein.");
+    return;
+  }
+
+  const ageNumber = age === "" || age == null ? null : Number(age);
+  if (ageNumber !== null && (!Number.isInteger(ageNumber) || ageNumber < 1 || ageNumber > 120)) {
+    alert("Bitte gib ein gültiges Alter zwischen 1 und 120 Jahren ein.");
+    return;
+  }
+
+  const heightNumber = height === "" || height == null ? null : Number(height);
+  if (heightNumber !== null && (!Number.isFinite(heightNumber) || heightNumber < 50 || heightNumber > 250)) {
+    alert("Bitte gib eine Körpergröße zwischen 50 und 250 cm ein.");
+    return;
+  }
+
   /*
     EXAKT die Namen deiner Supabase-Spalten.
   */
@@ -683,15 +701,9 @@ async function saveProfile() {
     Name:
       name,
 
-    Age:
-      age
-        ? Number(age)
-        : null,
+    Age: ageNumber,
 
-    Height:
-      height
-        ? Number(height)
-        : null,
+    Height: heightNumber,
 
     Diet:
       diet,
@@ -2622,15 +2634,19 @@ async function addWeight() {
       )
       ?.value;
 
-  if (!date || !weight) {
-    alert(
-      "Bitte Datum und Gewicht eingeben."
-    );
+  if (!date || weight === "" || weight == null) {
+    alert("Bitte Datum und Gewicht eingeben.");
     return;
   }
 
-  const numericWeight =
-    Number(weight);
+  // Keine zukünftigen Einträge: Sie verfälschen Verlauf und Durchschnitt.
+  const today = getLocalDateInputValue();
+  if (date > today) {
+    alert("Bitte wähle heute oder ein Datum in der Vergangenheit.");
+    return;
+  }
+
+  const numericWeight = Number(weight);
 
   if (
     !Number.isFinite(
@@ -2646,22 +2662,36 @@ async function addWeight() {
 
   try {
 
-    const {
-      error
-    } =
-      await supabaseClient
-        .from(
-          "weight_entries"
-        )
+    // Pro Tag nur einen Gewichtswert führen. Ein erneutes Speichern
+    // desselben Datums aktualisiert den vorhandenen Eintrag statt Duplikate anzulegen.
+    const { data: existingEntry, error: lookupError } = await supabaseClient
+      .from("weight_entries")
+      .select("id")
+      .eq("user_id", currentUser.id)
+      .eq("date", date)
+      .limit(1)
+      .maybeSingle();
+
+    if (lookupError) throw lookupError;
+
+    let saveResult;
+    if (existingEntry) {
+      saveResult = await supabaseClient
+        .from("weight_entries")
+        .update({ weight: numericWeight })
+        .eq("user_id", currentUser.id)
+        .eq("id", existingEntry.id);
+    } else {
+      saveResult = await supabaseClient
+        .from("weight_entries")
         .insert({
-          user_id:
-            currentUser.id,
-
+          user_id: currentUser.id,
           date,
-
-          weight:
-            numericWeight
+          weight: numericWeight
         });
+    }
+
+    const { error } = saveResult;
 
     if (error) {
 
