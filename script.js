@@ -2307,50 +2307,103 @@ function renderTrainingPlan(text) {
   const lines = text
     .split("\n")
     .map(line => line.trim())
-    .filter(Boolean)
-    .slice(0, 60);
+    .filter(Boolean);
 
-  container.innerHTML = `
-    <div style="display:grid;gap:12px">
-      ${lines.map((line, index) => `
-        <div
-          class="training-exercise-card"
-          style="
-            padding:15px;
-            border:1px solid var(--border);
-            border-radius:14px;
-            background:#10161e;
-            display:flex;
-            align-items:center;
-            gap:12px;
-          "
-        >
+  let html = "";
+  let currentDay = "";
+
+  lines.forEach((line, index) => {
+    // Trainingstag erkennen
+    const dayMatch = line.match(
+      /^(MONTAG|DIENSTAG|MITTWOCH|DONNERSTAG|FREITAG|SAMSTAG|SONNTAG)\s*\|\s*(.+)$/i
+    );
+
+    if (dayMatch) {
+      currentDay = dayMatch[1].toUpperCase();
+
+      html += `
+        <div style="
+          margin-top:18px;
+          padding:16px;
+          border:1px solid var(--border);
+          border-radius:14px;
+          background:#151d27;
+        ">
+          <h3 style="margin:0 0 5px">
+            ${escapeHTML(currentDay)}
+          </h3>
+          <p class="card-description" style="margin:0">
+            ${escapeHTML(dayMatch[2])}
+          </p>
+          <div style="display:grid;gap:10px;margin-top:14px">
+      `;
+
+      return;
+    }
+
+    // Übungszeile erkennen
+    if (/^ÜBUNG:/i.test(line)) {
+      const nameMatch = line.match(/ÜBUNG:\s*([^|]+)/i);
+      const setsMatch = line.match(/SÄTZE:\s*([^|]+)/i);
+      const repsMatch = line.match(/WIEDERHOLUNGEN:\s*([^|]+)/i);
+      const durationMatch = line.match(/DAUER:\s*([^|]+)/i);
+
+      const name = nameMatch?.[1]?.trim() || "Übung";
+      const sets = setsMatch?.[1]?.trim() || "—";
+      const reps = repsMatch?.[1]?.trim() || "—";
+      const duration = durationMatch?.[1]?.trim() || "—";
+
+      const exerciseId = `training_${index}`;
+
+      html += `
+        <label for="${exerciseId}" style="
+          display:flex;
+          align-items:center;
+          gap:12px;
+          padding:14px;
+          border:1px solid var(--border);
+          border-radius:12px;
+          background:#10161e;
+          cursor:pointer;
+        ">
           <input
             type="checkbox"
-            id="trainingCheck_${index}"
-            style="
-              width:22px;
-              height:22px;
-              cursor:pointer;
-              flex-shrink:0;
-            "
+            id="${exerciseId}"
+            style="width:22px;height:22px;flex-shrink:0"
             onchange="toggleTrainingExercise(${index}, this.checked)"
           >
 
-          <label
-            for="trainingCheck_${index}"
-            style="
-              cursor:pointer;
-              line-height:1.5;
-              flex:1;
-            "
-          >
-            ${formatAIText(line)}
-          </label>
-        </div>
-      `).join("")}
+          <span style="flex:1;line-height:1.5">
+            <strong>${escapeHTML(name)}</strong><br>
+            <small class="card-description">
+              ${escapeHTML(sets)} Sätze ·
+              ${escapeHTML(reps)} Wiederholungen ·
+              ${escapeHTML(duration)}
+            </small>
+          </span>
+        </label>
+      `;
+    }
+  });
+
+  html += `
+      </div>
     </div>
   `;
+
+  if (!html.trim()) {
+    container.innerHTML = `
+      <div class="card">
+        <p>Dein Trainingsplan konnte nicht dargestellt werden.</p>
+        <p class="card-description">
+          Bitte generiere den Trainingsplan erneut.
+        </p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = html;
 }
 async function toggleTrainingExercise(index, completed) {
   if (!supabaseClient || !currentUser) {
