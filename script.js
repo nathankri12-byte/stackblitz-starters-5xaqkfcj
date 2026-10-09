@@ -2757,7 +2757,16 @@ async function loadWeights() {
         );
 
     if (error) {
-      console.error(error);
+      console.error("Gewichtsdaten konnten nicht geladen werden:", error);
+      const message = "Gewichtsdaten konnten nicht geladen werden. Bitte prüfe deine Verbindung und versuche es erneut.";
+      const list = document.getElementById("weightList");
+      const chart = document.getElementById("weightChart");
+      const average = document.getElementById("averageWeight");
+      const dashboardWeight = document.getElementById("dashboardWeight");
+      if (list) list.innerHTML = '<p class="card-description">' + escapeHTML(message) + '</p>';
+      if (chart) chart.innerHTML = '<p class="card-description">' + escapeHTML(message) + '</p>';
+      if (average) average.textContent = "—";
+      if (dashboardWeight) dashboardWeight.textContent = "—";
       return;
     }
 
