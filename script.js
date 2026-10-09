@@ -2497,68 +2497,97 @@ function renderTrainingPlan(text) {
 
   console.log("Trainingsplan als Tageskarten dargestellt:", days);
 }
-async function toggleTrainingExercise(index, completed) {
-  if (!supabaseClient || !currentUser) {
+async function toggleTrainingExercise(checkbox) {
+  if (!currentUser) {
     alert("Bitte melde dich zuerst an.");
+    checkbox.checked = false;
     return;
   }
 
-  const plan = localStorage.getItem("fitness_ai_training_plan");
+  const exerciseName = checkbox.dataset.exercise;
+  const dayName = checkbox.dataset.day;
 
-  if (!plan) return;
+  if (!exerciseName || !dayName) {
+    console.error("Übungsname oder Trainingstag fehlt.");
+    checkbox.checked = false;
+    return;
+  }
 
-  const lines = plan
-    .split("\n")
-    .map(line => line.trim())
-    .filter(Boolean)
-    .slice(0, 60);
-
-  const exerciseName = lines[index];
-
-  if (!exerciseName) return;
+  // Datum des passenden Trainingstags bestimmen
+  const weekdays = {
+    SONNTAG: 0,
+    MONTAG: 1,
+    DIENSTAG: 2,
+    MITTWOCH: 3,
+    DONNERSTAG: 4,
+    FREITAG: 5,
+    SAMSTAG: 6
+  };
 
   const today = new Date();
-  const trainingDate = today.toISOString().split("T")[0];
+  const targetDay = weekdays[dayName.toUpperCase()];
+
+  if (targetDay === undefined) {
+    alert("Der Trainingstag konnte nicht erkannt werden.");
+    checkbox.checked = !checkbox.checked;
+    return;
+  }
+
+  const trainingDate = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate()
+  );
+
+  const daysUntilTraining = (targetDay - today.getDay() + 7) % 7;
+
+  trainingDate.setDate(
+    trainingDate.getDate() + daysUntilTraining
+  );
+
+  const dateString = [
+    trainingDate.getFullYear(),
+    String(trainingDate.getMonth() + 1).padStart(2, "0"),
+    String(trainingDate.getDate()).padStart(2, "0")
+  ].join("-");
+
+  checkbox.disabled = true;
 
   try {
-    if (completed) {
-      const { error } = await supabaseClient
-        .from("training_entries")
-        .upsert(
-          {
-            user_id: currentUser.id,
-            exercise_name: exerciseName,
-            training_date: trainingDate,
-            completed: true
-          },
-          {
-            onConflict: "user_id,exercise_name,training_date"
-          }
-        );
+    const { error } = await supabaseClient
+      .from("training_entries")
+      .upsert(
+        {
+          user_id: currentUser.id,
+          exercise_name: exerciseName,
+          training_date: dateString,
+          completed: checkbox.checked
+        },
+        {
+          onConflict: "user_id,exercise_name,training_date"
+        }
+      );
 
-      if (error) throw error;
-
-      console.log("✅ Übung abgeschlossen:", exerciseName);
-    } else {
-      const { error } = await supabaseClient
-        .from("training_entries")
-        .delete()
-        .eq("user_id", currentUser.id)
-        .eq("exercise_name", exerciseName)
-        .eq("training_date", trainingDate);
-
-      if (error) throw error;
-
-      console.log("↩️ Übung zurückgesetzt:", exerciseName);
+    if (error) {
+      throw error;
     }
 
+    console.log(
+      "Übungsstatus gespeichert:",
+      exerciseName,
+      checkbox.checked
+    );
   } catch (error) {
-    console.error("Fehler beim Speichern der Übung:", error);
+    console.error("Fehler beim Speichern:", error);
+
+    checkbox.checked = !checkbox.checked;
 
     alert(
-      "Die Übung konnte nicht gespeichert werden.\n\n" +
-      (error.message || "Unbekannter Fehler")
+      "Die Übung konnte nicht gespeichert werden. " +
+      "Bitte prüfe deine Verbindung und die Supabase-Einstellungen."
     );
+  } finally {
+    checkbox.disabled = false;
   }
 }
 
