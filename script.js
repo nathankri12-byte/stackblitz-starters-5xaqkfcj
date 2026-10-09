@@ -847,6 +847,7 @@ async function loadApp() {
   await createProfileIfMissing();
   await loadProfile();
   await loadWeights();
+  await loadTrainingProgress();
   await loadFeedback();
   await checkAdmin();
 
@@ -921,6 +922,7 @@ function showTab(tabName) {
     "progress"
   ) {
     loadWeights();
+    loadTrainingProgress();
   }
 
   /*
@@ -2091,6 +2093,7 @@ Antworte ausschließlich mit dem Essensplan und der Einkaufsliste.
   );
 
   renderMealPlan(answer);
+  createShoppingList();
 
   return answer;
 }
@@ -2158,8 +2161,12 @@ function createShoppingList() {
       "einkaufsliste"
     );
 
-  let shoppingText =
-    mealPlan;
+  if (shoppingIndex < 0) {
+    list.innerHTML = '<p class="card-description">In deinem Mahlzeitenplan wurde keine Einkaufsliste erkannt. Bitte die KI um eine Einkaufsliste.</p>';
+    return;
+  }
+
+  let shoppingText = mealPlan;
 
   if (shoppingIndex >= 0) {
     shoppingText =
@@ -2239,6 +2246,7 @@ function loadSavedMealPlan() {
 
   if (plan) {
     renderMealPlan(plan);
+    createShoppingList();
   }
 }
 
@@ -2300,508 +2308,265 @@ function renderMealPlan(
    TRAINING PLAN RENDER
 ========================================================= */
 
+function getTrainingDateForDay(dayName, referenceDate = new Date()) {
+  const weekdays = { SONNTAG: 0, MONTAG: 1, DIENSTAG: 2, MITTWOCH: 3, DONNERSTAG: 4, FREITAG: 5, SAMSTAG: 6 };
+  const targetDay = weekdays[String(dayName || "").toUpperCase()];
+  if (targetDay === undefined) return null;
+  const date = new Date(referenceDate.getFullYear(), referenceDate.getMonth(), referenceDate.getDate());
+  const mondayOffset = (date.getDay() + 6) % 7;
+  date.setDate(date.getDate() - mondayOffset + ((targetDay + 6) % 7));
+  return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join("-");
+}
+
 function renderTrainingPlan(text) {
   const container = document.getElementById("trainingPlan");
-
-  if (!container) {
-    console.error("Der Trainingsplan-Container wurde nicht gefunden.");
-    return;
-  }
-
+  if (!container) return;
   if (!text || !text.trim()) {
-    container.innerHTML = `
-      <p class="card-description">
-        Noch kein Trainingsplan vorhanden.
-      </p>
-    `;
+    container.innerHTML = '<p class="card-description">Noch kein Trainingsplan vorhanden.</p>';
     return;
   }
 
   const days = [];
   let currentDay = null;
-
-  const lines = text
-    .split(/\r?\n/)
-    .map(line => line.trim())
-    .filter(Boolean);
-
-  for (const line of lines) {
-    const dayMatch = line.match(
-      /^(MONTAG|DIENSTAG|MITTWOCH|DONNERSTAG|FREITAG|SAMSTAG|SONNTAG)\s*\|\s*(.+)$/i
-    );
-
-    if (dayMatch) {
-      currentDay = {
-        name: dayMatch[1].toUpperCase(),
-        focus: dayMatch[2].trim(),
-        exercises: []
-      };
-
+  for (const line of text.split(/\r?\n/).map(value => value.trim()).filter(Boolean)) {
+    const match = line.match(/^(MONTAG|DIENSTAG|MITTWOCH|DONNERSTAG|FREITAG|SAMSTAG|SONNTAG)\s*\|\s*(.+)$/i);
+    if (match) {
+      currentDay = { name: match[1].toUpperCase(), focus: match[2].trim(), exercises: [] };
       days.push(currentDay);
-      continue;
-    }
-
-    if (/^ÜBUNG\s*:/i.test(line)) {
+    } else if (/^ÜBUNG\s*:/i.test(line)) {
       if (!currentDay) {
-        currentDay = {
-          name: "TRAINING",
-          focus: "Deine Übungen",
-          exercises: []
-        };
-
+        currentDay = { name: "TRAINING", focus: "Deine Übungen", exercises: [] };
         days.push(currentDay);
       }
-
-      const exerciseText = line.replace(/^ÜBUNG\s*:\s*/i, "");
-      const parts = exerciseText.split("|");
-
-      const name = parts[0].trim();
-
-      if (!name) continue;
-
-      const details = parts.slice(1).map(part => part.trim());
-
-      currentDay.exercises.push({
-        name,
-        details,
-        originalLine: line
-      });
+      const parts = line.replace(/^ÜBUNG\s*:\s*/i, "").split("|");
+      if (parts[0].trim()) currentDay.exercises.push({ name: parts[0].trim(), details: parts.slice(1).map(value => value.trim()) });
     }
   }
 
-  if (days.length === 0) {
-    container.innerHTML = `
-      <div class="card" style="margin-top:15px">
-        <h3>Trainingsplan konnte nicht erkannt werden</h3>
-        <p class="card-description" style="margin-top:10px">
-          Bitte erstelle den Plan erneut. Die KI muss die Wochentage
-          und Übungen im vereinbarten Format ausgeben.
-        </p>
-        <button
-          class="secondary-btn"
-          style="margin-top:14px"
-          onclick="generateTrainingPlan()"
-        >
-          🔄 Plan erneut erstellen
-        </button>
-      </div>
-    `;
-
+  if (!days.length) {
+    container.innerHTML = '<div class="card"><h3>Trainingsplan konnte nicht erkannt werden</h3><p class="card-description">Bitte erstelle den Plan erneut.</p><button class="secondary-btn" onclick="generateTrainingPlan()">🔄 Plan erneut erstellen</button></div>';
     console.warn("Unbekanntes Trainingsplan-Format:", text);
     return;
   }
 
-  const escape = value =>
-    String(value).replace(/[&<>"']/g, char => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    })[char]);
+  const escape = value => String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  })[char]);
 
-  container.innerHTML = `
-    <div style="display:grid;gap:18px;margin-top:15px">
-      ${days.map((day, dayIndex) => `
-        <div class="card" style="background:#0d131a">
-          <div class="section-header">
-            <div>
-              <h3>📅 ${escape(day.name)}</h3>
-              <p class="card-description">${escape(day.focus)}</p>
-            </div>
-            <span class="tag">
-              ${day.exercises.length} Übungen
-            </span>
-          </div>
+  container.innerHTML = '<div class="training-days">' + days.map(day =>
+    '<section class="card training-day-card"><div class="section-header"><div><h3>📅 ' + escape(day.name) +
+    '</h3><p class="card-description">' + escape(day.focus) + '</p></div><span class="tag">' + day.exercises.length + ' Übungen</span></div>' +
+    (day.exercises.length
+      ? '<div class="training-exercises">' + day.exercises.map(exercise =>
+          '<article class="card exercise-card training-exercise-card"><div class="training-exercise-heading">' +
+          '<input type="checkbox" class="training-exercise-checkbox" data-exercise="' + escape(exercise.name) +
+          '" data-day="' + escape(day.name) + '" onchange="toggleTrainingExercise(this)" aria-label="' + escape(exercise.name) + ' erledigt">' +
+          '<div class="training-exercise-title"><h4>' + escape(exercise.name) + '</h4><div class="exercise-tags">' +
+          exercise.details.map(detail => '<span class="tag">' + escape(detail) + '</span>').join("") +
+          '</div></div></div><div class="training-metrics">' +
+          '<div class="field"><label>Gewicht (kg)</label><input type="number" min="0" step="0.5" placeholder="z. B. 20" class="training-weight-input" inputmode="decimal"></div>' +
+          '<div class="field"><label>Wiederholungen</label><input type="number" min="0" step="1" placeholder="z. B. 10" class="training-reps-input" inputmode="numeric"></div>' +
+          '<div class="field"><label>Dauer (Sek.)</label><input type="number" min="0" step="1" placeholder="z. B. 60" class="training-duration-input" inputmode="numeric"></div>' +
+          '</div><button type="button" class="primary-btn save-performance-btn" onclick="saveTrainingPerformance(this)">Werte speichern</button></article>'
+        ).join("") + '</div>'
+      : '<p class="card-description training-rest-day">Für diesen Tag sind keine Übungen eingeplant.</p>') +
+    '</section>'
+  ).join("") + '</div>';
 
-          ${
-            day.exercises.length
-              ? `<div style="display:grid;gap:12px">
-                  ${day.exercises.map((exercise, exerciseIndex) => `
-                    <div
-                      class="card exercise-card"
-                      style="padding:16px;background:#151d27"
-                    >
-                      <div style="display:flex;gap:12px;align-items:flex-start">
-                        <input
-                          type="checkbox"
-                          class="training-exercise-checkbox"
-                          data-exercise="${escape(exercise.name)}"
-                          data-day="${escape(day.name)}"
-                          data-day-index="${dayIndex}"
-                          data-exercise-index="${exerciseIndex}"
-                          onchange="toggleTrainingExercise(this)"
-                          style="width:20px;height:20px;flex-shrink:0;margin-top:3px;accent-color:#35d07f"
-                          aria-label="${escape(exercise.name)} erledigt"
-                        >
-
-                        <div style="flex:1;min-width:0">
-                          <h3 style="margin-bottom:8px">
-                            ${escape(exercise.name)}
-                          </h3>
-
-                          <div class="exercise-tags">
-                            ${exercise.details.map(detail => `
-                              <span class="tag">${escape(detail)}</span>
-                            `).join("")}
-                          </div>
-
-                          <div class="field" style="margin-top:12px;margin-bottom:0">
-                            <label>Gewicht (kg), falls zutreffend</label>
-                            <input
-                              type="number"
-                              min="0"
-                              step="0.5"
-                              placeholder="z. B. 20"
-                              class="training-weight-input"
-                              data-exercise="${escape(exercise.name)}"
-                            >
-                          </div>
-
-                          <div class="field" style="margin-top:10px;margin-bottom:0">
-                            <label>Erreichte Wiederholungen</label>
-                            <input
-                              type="number"
-                              min="0"
-                              step="1"
-                              placeholder="z. B. 10"
-                              class="training-reps-input"
-                              data-exercise="${escape(exercise.name)}"
-                            >
-                          </div>
-
-                          <div class="field" style="margin-top:10px;margin-bottom:0">
-                            <label>Dauer in Sekunden (bei Zeitübungen)</label>
-                            <input
-                              type="number"
-                              min="0"
-                              step="1"
-                              placeholder="z. B. 60"
-                              class="training-duration-input"
-                              data-exercise="${escape(exercise.name)}"
-                            >
-                          </div>
-                            <input
-  type="number"
-  min="0"
-  step="1"
-  placeholder="z. B. 60"
-  class="training-duration-input"
-  data-exercise="${escape(exercise.name)}"
->
-</div>
-<button
-  type="button"
-  class="primary-btn save-performance-btn"
-  style="margin-top:12px;width:100%"
-  onclick="saveTrainingPerformance(this)"
->
-  Werte speichern
-</button>
-</div>
-</div>
-</div>
-                        </div>
-                      </div>
-                    </div>
-                  `).join("")}
-                </div>`
-              : `<p class="card-description">
-                  Für diesen Tag sind keine Übungen eingeplant.
-                </p>`
-          }
-        </div>
-      `).join("")}
-    </div>
-  `;
-
-  console.log("Trainingsplan als Tageskarten dargestellt:", days);
-  loadSavedTrainingEntries();
+  void loadSavedTrainingEntries();
 }
+
+function readTrainingNumber(input, label, integer = false) {
+  const raw = input?.value?.trim() || "";
+  if (!raw) return null;
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value < 0 || (integer && !Number.isInteger(value))) {
+    throw new Error(label + (integer ? " muss eine ganze Zahl ab 0 sein." : " muss eine Zahl ab 0 sein."));
+  }
+  return value;
+}
+
 async function loadSavedTrainingEntries() {
-  if (!currentUser || !supabaseClient) {
-    return;
-  }
-
+  if (!currentUser || !supabaseClient) return;
   try {
-    const { data, error } = await supabaseClient
-      .from("training_entries")
-      .select("exercise_name, training_date, completed")
+    const { data, error } = await supabaseClient.from("training_entries")
+      .select("exercise_name, training_date, completed, weight, reps, duration_seconds")
       .eq("user_id", currentUser.id);
-
-    if (error) {
-      throw error;
-    }
-
-    const entries = data || [];
-
-    document
-      .querySelectorAll(".training-exercise-checkbox")
-      .forEach(checkbox => {
-        const exerciseName = checkbox.dataset.exercise;
-        const dayName = checkbox.dataset.day;
-
-        const weekdays = {
-          SONNTAG: 0,
-          MONTAG: 1,
-          DIENSTAG: 2,
-          MITTWOCH: 3,
-          DONNERSTAG: 4,
-          FREITAG: 5,
-          SAMSTAG: 6
-        };
-
-        const targetDay = weekdays[dayName.toUpperCase()];
-
-        if (targetDay === undefined) {
-          return;
-        }
-
-        const today = new Date();
-
-        const trainingDate = new Date(
-          today.getFullYear(),
-          today.getMonth(),
-          today.getDate()
-        );
-
-        const daysUntilTraining =
-          (targetDay - today.getDay() + 7) % 7;
-
-        trainingDate.setDate(
-          trainingDate.getDate() + daysUntilTraining
-        );
-
-        const dateString = [
-          trainingDate.getFullYear(),
-          String(trainingDate.getMonth() + 1).padStart(2, "0"),
-          String(trainingDate.getDate()).padStart(2, "0")
-        ].join("-");
-
-        const savedEntry = entries.find(entry =>
-          entry.exercise_name === exerciseName &&
-          entry.training_date === dateString
-        );
-
-        checkbox.checked = savedEntry?.completed === true;
-      });
-
-    console.log("Gespeicherte Trainingsdaten geladen.");
-  } catch (error) {
-    console.error(
-      "Gespeicherte Trainingsdaten konnten nicht geladen werden:",
-      error
-    );
-  }
-}
-async function saveTrainingPerformance(input) {
-  if (!currentUser || !supabaseClient) {
-    alert("Bitte melde dich zuerst an.");
-    return;
-  }
-  const exerciseName = input.dataset.exercise;
-  if (!exerciseName) {
-    console.error("Der Übungsname fehlt.");
-    return;
-  }
-  const exerciseCard = input.closest(".exercise-card");
-  const checkbox = exerciseCard?.querySelector(
-    ".training-exercise-checkbox"
-  );
-  const dayName = checkbox?.dataset.day;
-  if (!dayName) {
-    console.error("Der Trainingstag fehlt.");
-    return;
-  }
-  const weightInput = exerciseCard.querySelector(
-    ".training-weight-input"
-  );
-  const repsInput = exerciseCard.querySelector(
-    ".training-reps-input"
-  );
-  const durationInput = exerciseCard.querySelector(
-    ".training-duration-input"
-  );
-  const weight = weightInput.value.trim() === ""
-    ? null
-    : Number(weightInput.value);
-  const reps = repsInput.value.trim() === ""
-    ? null
-    : Number(repsInput.value);
-  const duration = durationInput.value.trim() === ""
-    ? null
-    : Number(durationInput.value);
-  const weekdays = {
-    SONNTAG: 0,
-    MONTAG: 1,
-    DIENSTAG: 2,
-    MITTWOCH: 3,
-    DONNERSTAG: 4,
-    FREITAG: 5,
-    SAMSTAG: 6
-  };
-  const today = new Date();
-  const targetDay = weekdays[dayName.toUpperCase()];
-  if (targetDay === undefined) {
-    console.error("Ungültiger Trainingstag:", dayName);
-    return;
-  }
-  const trainingDate = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate()
-  );
-  const daysUntilTraining =
-    (targetDay - today.getDay() + 7) % 7;
-  trainingDate.setDate(
-    trainingDate.getDate() + daysUntilTraining
-  );
-  const dateString = [
-    trainingDate.getFullYear(),
-    String(trainingDate.getMonth() + 1).padStart(2, "0"),
-    String(trainingDate.getDate()).padStart(2, "0")
-  ].join("-");
-  const saveButton = exerciseCard.querySelector(
-    ".save-performance-btn"
-  );
-  if (saveButton) {
-    saveButton.disabled = true;
-    saveButton.textContent = "Speichert ...";
-  }
-  try {
-    const { error } = await supabaseClient
-      .from("training_entries")
-      .upsert(
-        {
-          user_id: currentUser.id,
-          exercise_name: exerciseName,
-          training_date: dateString,
-          completed: checkbox.checked,
-          weight: weight,
-          reps: reps,
-          duration_seconds: duration
-        },
-        {
-          onConflict: "user_id,exercise_name,training_date"
-        }
-      );
-    if (error) {
-      throw error;
-    }
-    if (saveButton) {
-      saveButton.textContent = "✓ Gespeichert";
-    }
-    console.log("Trainingsleistung gespeichert:", {
-      exerciseName,
-      weight,
-      reps,
-      duration,
-      dateString
+    if (error) throw error;
+    const entries = new Map((data || []).map(entry => [entry.exercise_name + "::" + entry.training_date, entry]));
+    document.querySelectorAll(".training-exercise-checkbox").forEach(checkbox => {
+      const date = getTrainingDateForDay(checkbox.dataset.day);
+      const entry = date ? entries.get(checkbox.dataset.exercise + "::" + date) : null;
+      const card = checkbox.closest(".training-exercise-card");
+      checkbox.checked = entry?.completed === true;
+      const weight = card?.querySelector(".training-weight-input");
+      const reps = card?.querySelector(".training-reps-input");
+      const duration = card?.querySelector(".training-duration-input");
+      if (weight) weight.value = entry?.weight ?? "";
+      if (reps) reps.value = entry?.reps ?? "";
+      if (duration) duration.value = entry?.duration_seconds ?? "";
     });
   } catch (error) {
-    console.error("Fehler beim Speichern der Leistung:", error);
-    if (saveButton) {
-      saveButton.textContent = "Erneut speichern";
-    }
-    alert("Die Werte konnten nicht gespeichert werden. Bitte versuche es erneut.");
-  } finally {
-    if (saveButton) {
-      saveButton.disabled = false;
-    }
+    console.error("Gespeicherte Trainingsdaten konnten nicht geladen werden:", error);
   }
 }
+
+async function saveTrainingPerformance(button) {
+  if (!currentUser || !supabaseClient) {
+    alert("Bitte melde dich zuerst an.");
+    return;
+  }
+  const card = button?.closest(".training-exercise-card");
+  const checkbox = card?.querySelector(".training-exercise-checkbox");
+  const exerciseName = checkbox?.dataset.exercise;
+  const trainingDate = getTrainingDateForDay(checkbox?.dataset.day);
+  if (!card || !exerciseName || !trainingDate) {
+    alert("Die Trainingskarte konnte nicht erkannt werden. Bitte lade die Seite neu.");
+    return;
+  }
+
+  let weight, reps, duration;
+  try {
+    weight = readTrainingNumber(card.querySelector(".training-weight-input"), "Gewicht");
+    reps = readTrainingNumber(card.querySelector(".training-reps-input"), "Wiederholungen", true);
+    duration = readTrainingNumber(card.querySelector(".training-duration-input"), "Dauer", true);
+  } catch (error) {
+    alert(error.message);
+    return;
+  }
+
+  const originalLabel = button.textContent;
+  button.disabled = true;
+  button.textContent = "Speichert …";
+  try {
+    const { error } = await supabaseClient.from("training_entries").upsert({
+      user_id: currentUser.id, exercise_name: exerciseName, training_date: trainingDate,
+      completed: checkbox.checked, weight, reps, duration_seconds: duration
+    }, { onConflict: "user_id,exercise_name,training_date" });
+    if (error) throw error;
+    button.textContent = "✓ Gespeichert";
+    await loadTrainingProgress();
+    window.setTimeout(() => { if (button.isConnected) button.textContent = "Werte speichern"; }, 1800);
+  } catch (error) {
+    console.error("Fehler beim Speichern der Trainingsleistung:", error);
+    button.textContent = "Erneut versuchen";
+    alert("Die Werte konnten nicht gespeichert werden. Bitte versuche es erneut.");
+  } finally {
+    button.disabled = false;
+    if (button.textContent === "Speichert …") button.textContent = originalLabel;
+  }
+}
+
 async function toggleTrainingExercise(checkbox) {
-  if (!currentUser) {
+  if (!currentUser || !supabaseClient) {
     alert("Bitte melde dich zuerst an.");
     checkbox.checked = false;
     return;
   }
-
   const exerciseName = checkbox.dataset.exercise;
-  const dayName = checkbox.dataset.day;
-
-  if (!exerciseName || !dayName) {
-    console.error("Übungsname oder Trainingstag fehlt.");
-    checkbox.checked = false;
-    return;
-  }
-
-  // Datum des passenden Trainingstags bestimmen
-  const weekdays = {
-    SONNTAG: 0,
-    MONTAG: 1,
-    DIENSTAG: 2,
-    MITTWOCH: 3,
-    DONNERSTAG: 4,
-    FREITAG: 5,
-    SAMSTAG: 6
-  };
-
-  const today = new Date();
-  const targetDay = weekdays[dayName.toUpperCase()];
-
-  if (targetDay === undefined) {
-    alert("Der Trainingstag konnte nicht erkannt werden.");
+  const trainingDate = getTrainingDateForDay(checkbox.dataset.day);
+  const card = checkbox.closest(".training-exercise-card");
+  if (!exerciseName || !trainingDate || !card) {
     checkbox.checked = !checkbox.checked;
     return;
   }
-
-  const trainingDate = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate()
-  );
-
-  const daysUntilTraining = (targetDay - today.getDay() + 7) % 7;
-
-  trainingDate.setDate(
-    trainingDate.getDate() + daysUntilTraining
-  );
-
-  const dateString = [
-    trainingDate.getFullYear(),
-    String(trainingDate.getMonth() + 1).padStart(2, "0"),
-    String(trainingDate.getDate()).padStart(2, "0")
-  ].join("-");
 
   checkbox.disabled = true;
-
   try {
-    const { error } = await supabaseClient
-      .from("training_entries")
-      .upsert(
-        {
-          user_id: currentUser.id,
-          exercise_name: exerciseName,
-          training_date: dateString,
-          completed: checkbox.checked
-        },
-        {
-          onConflict: "user_id,exercise_name,training_date"
-        }
-      );
-
-    if (error) {
-      throw error;
-    }
-
-    console.log(
-      "Übungsstatus gespeichert:",
-      exerciseName,
-      checkbox.checked
-    );
+    const { data: existing, error: lookupError } = await supabaseClient.from("training_entries")
+      .select("weight, reps, duration_seconds")
+      .eq("user_id", currentUser.id).eq("exercise_name", exerciseName).eq("training_date", trainingDate).maybeSingle();
+    if (lookupError) throw lookupError;
+    const weightInput = card.querySelector(".training-weight-input");
+    const repsInput = card.querySelector(".training-reps-input");
+    const durationInput = card.querySelector(".training-duration-input");
+    const weight = weightInput?.value.trim() !== "" ? readTrainingNumber(weightInput, "Gewicht") : existing?.weight ?? null;
+    const reps = repsInput?.value.trim() !== "" ? readTrainingNumber(repsInput, "Wiederholungen", true) : existing?.reps ?? null;
+    const duration = durationInput?.value.trim() !== "" ? readTrainingNumber(durationInput, "Dauer", true) : existing?.duration_seconds ?? null;
+    const { error } = await supabaseClient.from("training_entries").upsert({
+      user_id: currentUser.id, exercise_name: exerciseName, training_date: trainingDate,
+      completed: checkbox.checked, weight, reps, duration_seconds: duration
+    }, { onConflict: "user_id,exercise_name,training_date" });
+    if (error) throw error;
   } catch (error) {
-    console.error("Fehler beim Speichern:", error);
-
+    console.error("Fehler beim Speichern des Übungsstatus:", error);
     checkbox.checked = !checkbox.checked;
-
-    alert(
-      "Die Übung konnte nicht gespeichert werden. " +
-      "Bitte prüfe deine Verbindung und die Supabase-Einstellungen."
-    );
+    alert("Die Übung konnte nicht gespeichert werden. Bitte prüfe deine Verbindung und versuche es erneut.");
   } finally {
     checkbox.disabled = false;
   }
+}
+
+async function loadTrainingProgress() {
+  const container = document.getElementById("trainingProgressCharts");
+  if (!container) return;
+  if (!currentUser || !supabaseClient) {
+    container.innerHTML = '<p class="card-description">Melde dich an, um deinen Trainingsfortschritt zu sehen.</p>';
+    return;
+  }
+  container.innerHTML = '<p class="card-description">Trainingsfortschritt wird geladen …</p>';
+  try {
+    const { data, error } = await supabaseClient.from("training_entries")
+      .select("exercise_name, training_date, completed, weight, reps, duration_seconds")
+      .eq("user_id", currentUser.id).order("training_date", { ascending: true });
+    if (error) throw error;
+    renderTrainingProgress(data || []);
+  } catch (error) {
+    console.error("Trainingsfortschritt konnte nicht geladen werden:", error);
+    container.innerHTML = '<p class="card-description">Der Trainingsfortschritt konnte nicht geladen werden. Bitte versuche es später erneut.</p>';
+  }
+}
+
+function renderTrainingProgress(entries) {
+  const container = document.getElementById("trainingProgressCharts");
+  if (!container) return;
+  const grouped = new Map();
+  entries.forEach(entry => {
+    if (!grouped.has(entry.exercise_name)) grouped.set(entry.exercise_name, []);
+    grouped.get(entry.exercise_name).push(entry);
+  });
+  const cards = [];
+  for (const [name, values] of grouped) {
+    const charts = [
+      renderMetricChart(values, "weight", "Gewicht", "kg"),
+      renderMetricChart(values, "reps", "Wiederholungen", "Wdh."),
+      renderMetricChart(values, "duration_seconds", "Dauer", "Sek.")
+    ].filter(Boolean);
+    if (charts.length) cards.push('<article class="card training-progress-exercise"><div class="section-header"><h4>' +
+      escapeHTML(name) + '</h4><span class="tag">' + values.length + ' Einträge</span></div><div class="training-progress-grid">' +
+      charts.join("") + '</div></article>');
+  }
+  container.innerHTML = cards.length ? cards.join("") :
+    '<p class="card-description">Noch keine Trainingswerte vorhanden. Trage Gewicht, Wiederholungen oder Dauer ein und speichere sie, dann erscheint hier dein Verlauf.</p>';
+}
+
+function renderMetricChart(entries, field, label, unit) {
+  const points = entries.filter(entry => entry[field] !== null && entry[field] !== undefined && entry[field] !== "")
+    .map(entry => ({ date: entry.training_date, value: Number(entry[field]) }))
+    .filter(point => Number.isFinite(point.value)).sort((a, b) => a.date.localeCompare(b.date));
+  if (!points.length) return "";
+  const width = 320, height = 112, padding = 14;
+  const min = Math.min(...points.map(point => point.value));
+  const max = Math.max(...points.map(point => point.value));
+  const range = max - min || 1;
+  const chartWidth = width - padding * 2, chartHeight = height - padding * 2;
+  const plotted = points.map((point, index) => ({
+    ...point,
+    x: points.length === 1 ? width / 2 : padding + index / (points.length - 1) * chartWidth,
+    y: height - padding - (point.value - min) / range * chartHeight
+  }));
+  const polyline = plotted.map(point => point.x.toFixed(1) + "," + point.y.toFixed(1)).join(" ");
+  const circles = plotted.map(point => '<circle cx="' + point.x.toFixed(1) + '" cy="' + point.y.toFixed(1) + '" r="4"><title>' +
+    escapeHTML(formatDate(point.date)) + ': ' + point.value + ' ' + unit + '</title></circle>').join("");
+  const latest = plotted[plotted.length - 1];
+  const value = field === "weight" ? latest.value.toFixed(1) : String(latest.value);
+  return '<div class="training-metric-chart"><div class="training-chart-heading"><span>' + escapeHTML(label) +
+    '</span><strong>' + escapeHTML(value) + ' ' + escapeHTML(unit) + '</strong></div><svg viewBox="0 0 ' + width + ' ' + height +
+    '" role="img" aria-label="' + escapeHTML(label) + '-Verlauf für ' + escapeHTML(entries[0]?.exercise_name || "Übung") + '">' +
+    '<line x1="' + padding + '" y1="' + (height - padding) + '" x2="' + (width - padding) + '" y2="' + (height - padding) +
+    '" class="training-chart-axis"></line><polyline points="' + polyline + '" class="training-chart-line"></polyline>' + circles +
+    '</svg><div class="training-chart-dates"><span>' + escapeHTML(formatDate(plotted[0].date)) + '</span><span>' +
+    escapeHTML(formatDate(latest.date)) + '</span></div></div>';
 }
 
 /* =========================================================
@@ -3580,6 +3345,10 @@ function formatDate(
    INIT
 ========================================================= */
 
+function getLocalDateInputValue(date = new Date()) {
+  return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join("-");
+}
+
 async function init() {
 
   const weightDate =
@@ -3590,9 +3359,7 @@ async function init() {
   if (weightDate) {
 
     weightDate.value =
-      new Date()
-        .toISOString()
-        .split("T")[0];
+      getLocalDateInputValue();
   }
 
   /*
