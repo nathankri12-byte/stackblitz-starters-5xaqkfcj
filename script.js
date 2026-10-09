@@ -2496,6 +2496,83 @@ function renderTrainingPlan(text) {
   `;
 
   console.log("Trainingsplan als Tageskarten dargestellt:", days);
+  loadSavedTrainingEntries();
+}
+async function loadSavedTrainingEntries() {
+  if (!currentUser || !supabaseClient) {
+    return;
+  }
+
+  try {
+    const { data, error } = await supabaseClient
+      .from("training_entries")
+      .select("exercise_name, training_date, completed")
+      .eq("user_id", currentUser.id);
+
+    if (error) {
+      throw error;
+    }
+
+    const entries = data || [];
+
+    document
+      .querySelectorAll(".training-exercise-checkbox")
+      .forEach(checkbox => {
+        const exerciseName = checkbox.dataset.exercise;
+        const dayName = checkbox.dataset.day;
+
+        const weekdays = {
+          SONNTAG: 0,
+          MONTAG: 1,
+          DIENSTAG: 2,
+          MITTWOCH: 3,
+          DONNERSTAG: 4,
+          FREITAG: 5,
+          SAMSTAG: 6
+        };
+
+        const targetDay = weekdays[dayName.toUpperCase()];
+
+        if (targetDay === undefined) {
+          return;
+        }
+
+        const today = new Date();
+
+        const trainingDate = new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          today.getDate()
+        );
+
+        const daysUntilTraining =
+          (targetDay - today.getDay() + 7) % 7;
+
+        trainingDate.setDate(
+          trainingDate.getDate() + daysUntilTraining
+        );
+
+        const dateString = [
+          trainingDate.getFullYear(),
+          String(trainingDate.getMonth() + 1).padStart(2, "0"),
+          String(trainingDate.getDate()).padStart(2, "0")
+        ].join("-");
+
+        const savedEntry = entries.find(entry =>
+          entry.exercise_name === exerciseName &&
+          entry.training_date === dateString
+        );
+
+        checkbox.checked = savedEntry?.completed === true;
+      });
+
+    console.log("Gespeicherte Trainingsdaten geladen.");
+  } catch (error) {
+    console.error(
+      "Gespeicherte Trainingsdaten konnten nicht geladen werden:",
+      error
+    );
+  }
 }
 async function toggleTrainingExercise(checkbox) {
   if (!currentUser) {
