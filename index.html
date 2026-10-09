@@ -689,6 +689,29 @@
       margin-bottom: 15px;
     }
 
+    .training-days { display:grid; gap:18px; margin-top:15px; }
+    .training-exercises { display:grid; gap:12px; margin-top:14px; }
+    .training-exercise-card { padding:16px; background:#151d27; }
+    .training-exercise-heading { display:flex; align-items:flex-start; gap:12px; }
+    .training-exercise-checkbox { width:20px; height:20px; flex:0 0 20px; margin-top:3px; accent-color:var(--green); }
+    .training-exercise-title { flex:1; min-width:0; }
+    .training-exercise-title h4 { margin-bottom:8px; font-size:16px; }
+    .training-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:14px; }
+    .training-metrics .field { min-width:0; margin:0; }
+    .training-metrics label { display:block; margin-bottom:7px; color:var(--muted); font-size:12px; }
+    .training-metrics input { width:100%; min-width:0; border:1px solid var(--border); border-radius:10px; background:#0b1016; color:var(--text); padding:11px 10px; }
+    .training-exercise-card .save-performance-btn { width:100%; margin-top:12px; }
+    .training-rest-day { margin-top:12px; }
+    .training-progress-exercise { margin-top:12px; }
+    .training-progress-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:14px; }
+    .training-metric-chart { min-width:0; border:1px solid var(--border); background:#0d131a; border-radius:12px; padding:12px; }
+    .training-chart-heading,.training-chart-dates { display:flex; justify-content:space-between; gap:8px; color:var(--muted); font-size:12px; }
+    .training-chart-heading strong { color:var(--text); text-align:right; font-size:13px; }
+    .training-metric-chart svg { display:block; width:100%; height:auto; margin:8px 0; overflow:visible; }
+    .training-chart-axis { stroke:var(--border); stroke-width:1; }
+    .training-chart-line { fill:none; stroke:var(--accent2); stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
+    .training-metric-chart circle { fill:var(--accent); stroke:var(--card); stroke-width:1.5; }
+
     /* MOBILE */
 
     .mobile-header {
@@ -776,6 +799,11 @@
       }
 
       .weight-form {
+        grid-template-columns: 1fr;
+      }
+
+      .training-metrics,
+      .training-progress-grid {
         grid-template-columns: 1fr;
       }
     }
@@ -1199,7 +1227,6 @@
     type="button"
     class="ai-send"
     id="aiSendButton"
-    onclick="window.askGemini()"
     aria-label="Nachricht senden"
   >
     ➤
@@ -1706,6 +1733,18 @@
 
           </div>
 
+        </div>
+
+        <div class="card" style="margin-top:18px">
+          <div class="section-header">
+            <div>
+              <h3>🏋️ Trainingsfortschritt pro Übung</h3>
+              <p class="card-description">Deine gespeicherten Gewichte, Wiederholungen und Zeiten im Verlauf.</p>
+            </div>
+          </div>
+          <div id="trainingProgressCharts" style="margin-top:14px">
+            <p class="card-description">Noch keine Trainingswerte vorhanden.</p>
+          </div>
         </div>
 
       </section>
