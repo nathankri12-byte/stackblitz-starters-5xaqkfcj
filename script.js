@@ -3475,9 +3475,9 @@ async function init() {
     );
 
   if (weightDate) {
-
-    weightDate.value =
-      getLocalDateInputValue();
+    const today = getLocalDateInputValue();
+    weightDate.value = today;
+    weightDate.max = today;
   }
 
   /*
