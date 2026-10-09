@@ -2656,10 +2656,10 @@ async function addWeight() {
     !Number.isFinite(
       numericWeight
     ) ||
-    numericWeight <= 0
+    numericWeight <= 0 ||
+    numericWeight > 500
   ) {
     setInlineStatus("weightStatus", "Bitte gib ein gültiges Gewicht zwischen 1 und 500 kg ein.");
-    return;
     return;
   }
 
