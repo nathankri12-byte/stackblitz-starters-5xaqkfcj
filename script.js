@@ -2202,21 +2202,21 @@ function createShoppingList() {
 
   const items =
     shoppingText
-      .split(/\\r?\\n+/)
+      .split(/\r?\n+/)
       .map(line => line.trim())
       .map(line => line
-        .replace(/^\\s*(?:[-•*+]\\s+|\\d+[.)]\\s+)/, "")
-        .replace(/^#{1,6}\\s*/, "")
-        .replace(/\\*{1,3}([^*]+)\\*{1,3}/g, "$1")
+        .replace(/^\s*(?:[-•*+]\s+|\d+[.)]\s+)/, "")
+        .replace(/^#{1,6}\s*/, "")
+        .replace(/\*{1,3}([^*]+)\*{1,3}/g, "$1")
         .replace(/_{1,3}([^_]+)_{1,3}/g, "$1")
-        .replace(/^\\*+\\s*|\\s*\\*+$/g, "")
+        .replace(/^\*+\s*|\s*\*+$/g, "")
         .replace(/^:+|:+$/g, "")
         .trim()
       )
       .filter(line =>
         line &&
         !/^[-_*]{2,}$/.test(line) &&
-        !/^einkaufsliste\\s*:?$/i.test(line) &&
+        !/^einkaufsliste\s*:?$/i.test(line) &&
         !/^montag$/i.test(line) &&
         !/^dienstag$/i.test(line) &&
         !/^mittwoch$/i.test(line) &&
