@@ -2202,26 +2202,28 @@ function createShoppingList() {
 
   const items =
     shoppingText
-      .split(/\n+/)
-      .map(
-        line =>
-          line
-            .replace(
-              /^[-•*]\s*/,
-              ""
-            )
-            .trim()
+      .split(/\\r?\\n+/)
+      .map(line => line.trim())
+      .map(line => line
+        .replace(/^\\s*(?:[-•*+]\\s+|\\d+[.)]\\s+)/, "")
+        .replace(/^#{1,6}\\s*/, "")
+        .replace(/\\*{1,3}([^*]+)\\*{1,3}/g, "$1")
+        .replace(/_{1,3}([^_]+)_{1,3}/g, "$1")
+        .replace(/^\\*+\\s*|\\s*\\*+$/g, "")
+        .replace(/^:+|:+$/g, "")
+        .trim()
       )
-      .filter(
-        line =>
-          line &&
-          !/^montag$/i.test(line) &&
-          !/^dienstag$/i.test(line) &&
-          !/^mittwoch$/i.test(line) &&
-          !/^donnerstag$/i.test(line) &&
-          !/^freitag$/i.test(line) &&
-          !/^samstag$/i.test(line) &&
-          !/^sonntag$/i.test(line)
+      .filter(line =>
+        line &&
+        !/^[-_*]{2,}$/.test(line) &&
+        !/^einkaufsliste\\s*:?$/i.test(line) &&
+        !/^montag$/i.test(line) &&
+        !/^dienstag$/i.test(line) &&
+        !/^mittwoch$/i.test(line) &&
+        !/^donnerstag$/i.test(line) &&
+        !/^freitag$/i.test(line) &&
+        !/^samstag$/i.test(line) &&
+        !/^sonntag$/i.test(line)
       )
       .slice(0, 40);
 
@@ -2793,18 +2795,13 @@ function renderWeights(
     return;
   }
 
+  renderWeightChart(entries);
+
   if (!entries.length) {
-
-    list.innerHTML =
-      `
-        <p class="card-description">
-          Noch keine Einträge.
-        </p>
-      `;
-
-    average.textContent =
-      "—";
-
+    list.innerHTML = '<p class="card-description">Noch keine Einträge.</p>';
+    average.textContent = "—";
+    const dashboardWeight = document.getElementById("dashboardWeight");
+    if (dashboardWeight) dashboardWeight.textContent = "—";
     return;
   }
 
@@ -2880,6 +2877,57 @@ function renderWeights(
     currentProfile.weight =
       values[0];
   }
+}
+
+
+
+function renderWeightChart(entries) {
+  const container = document.getElementById("weightChart");
+  if (!container) return;
+
+  const points = (entries || [])
+    .map(entry => ({ date: entry.date, value: Number(entry.weight) }))
+    .filter(point => point.date && Number.isFinite(point.value) && point.value > 0)
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  if (!points.length) {
+    container.innerHTML = '<p class="card-description">Sobald du mindestens einen Gewichtseintrag speicherst, erscheint hier dein Verlauf.</p>';
+    return;
+  }
+
+  const width = 720, height = 250, left = 52, right = 22, top = 22, bottom = 42;
+  const chartWidth = width - left - right, chartHeight = height - top - bottom;
+  const minValue = Math.min(...points.map(point => point.value));
+  const maxValue = Math.max(...points.map(point => point.value));
+  const paddingValue = Math.max((maxValue - minValue) * 0.18, 0.5);
+  const min = Math.max(0, minValue - paddingValue), max = maxValue + paddingValue;
+  const range = max - min || 1;
+  const plotted = points.map((point, index) => ({
+    ...point,
+    x: points.length === 1 ? left + chartWidth / 2 : left + index / (points.length - 1) * chartWidth,
+    y: top + (max - point.value) / range * chartHeight
+  }));
+  const ticks = [0, 1, 2, 3].map(index => {
+    const value = max - range * index / 3, y = top + chartHeight * index / 3;
+    return '<line x1="' + left + '" y1="' + y + '" x2="' + (width - right) + '" y2="' + y + '" class="training-chart-axis" />' +
+      '<text x="' + (left - 9) + '" y="' + (y + 4) + '" text-anchor="end" class="weight-chart-label">' + value.toFixed(1) + '</text>';
+  }).join("");
+  const line = plotted.map(point => point.x.toFixed(1) + "," + point.y.toFixed(1)).join(" ");
+  const dots = plotted.map(point =>
+    '<circle cx="' + point.x.toFixed(1) + '" cy="' + point.y.toFixed(1) + '" r="5" class="weight-chart-dot"><title>' +
+    escapeHTML(formatDate(point.date) + ": " + point.value.toFixed(1) + " kg") + '</title></circle>'
+  ).join("");
+  const first = plotted[0], last = plotted[plotted.length - 1], delta = last.value - first.value;
+  const deltaText = points.length < 2 ? "Erster Eintrag" : (delta > 0 ? "+" : "") + delta.toFixed(1) + " kg seit dem ersten Eintrag";
+  container.innerHTML =
+    '<div class="weight-chart-summary"><span>' + points.length + (points.length === 1 ? ' Eintrag' : ' Einträge') +
+    '</span><strong>' + escapeHTML(deltaText) + '</strong></div>' +
+    '<div class="weight-chart-scroll"><svg viewBox="0 0 ' + width + ' ' + height +
+    '" role="img" aria-label="Gewichtsverlauf mit ' + points.length + ' gespeicherten Einträgen">' +
+    ticks + '<polyline points="' + line + '" class="training-chart-line"></polyline>' + dots +
+    '<text x="' + left + '" y="' + (height - 12) + '" class="weight-chart-label">' + escapeHTML(formatDate(first.date)) + '</text>' +
+    '<text x="' + (width - right) + '" y="' + (height - 12) + '" text-anchor="end" class="weight-chart-label">' + escapeHTML(formatDate(last.date)) + '</text>' +
+    '</svg></div>';
 }
 
 
