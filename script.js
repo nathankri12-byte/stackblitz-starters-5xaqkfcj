@@ -2376,21 +2376,21 @@ function renderTrainingPlan(text) {
   );
 
   for (const originalLine of rawText.split(/\r?\n/)) {
-    const line = originalLine.trim().replace(/^[-*•]+\\s*/, "").replace(/^\\*{1,2}|\\*{1,2}$/g, "");
+    const line = originalLine.trim().replace(/^[-*•]+\s*/, "").replace(/^\*{1,2}|\*{1,2}$/g, "");
     if (!line) continue;
 
     const heading = line.match(dayHeading);
     if (heading) {
       currentDay = {
         name: heading[1].toUpperCase(),
-        focus: (heading[2] || "").replace(/^\\s*[|:–—-]\\s*/, "").trim() || "Trainingsplan",
+        focus: (heading[2] || "").replace(/^\s*[|:–—-]\s*/, "").trim() || "Trainingsplan",
         exercises: []
       };
       days.push(currentDay);
       continue;
     }
 
-    if (/^(?:RUHETAG|REST DAY|ERHOLUNG)(?:\\b|$)/i.test(line)) {
+    if (/^(?:RUHETAG|REST DAY|ERHOLUNG)(?:\b|$)/i.test(line)) {
       if (!currentDay) {
         currentDay = { name: "ERHOLUNG", focus: "Regeneration", exercises: [] };
         days.push(currentDay);
@@ -2403,25 +2403,20 @@ function renderTrainingPlan(text) {
     if (!currentDay) continue;
 
     let exerciseLine = line;
-    if (/^ÜBUNG\\s*:/i.test(exerciseLine)) {
-      exerciseLine = exerciseLine.replace(/^ÜBUNG\\s*:\\s*/i, "");
-    } else if (/^(?:[-•*]\\s*)/.test(originalLine.trim())) {
-      exerciseLine = originalLine.trim().replace(/^[-•*]\\s*/, "");
-    } else if (/^\\d+[.)]\\s+/.test(exerciseLine)) {
-      exerciseLine = exerciseLine.replace(/^\\d+[.)]\\s+/, "");
+    if (/^ÜBUNG\s*:/i.test(exerciseLine)) {
+      exerciseLine = exerciseLine.replace(/^ÜBUNG\s*:\s*/i, "");
+    } else if (/^(?:[-•*]\s*)/.test(originalLine.trim())) {
+      exerciseLine = originalLine.trim().replace(/^[-•*]\s*/, "");
+    } else if (/^\d+[.)]\s+/.test(exerciseLine)) {
+      exerciseLine = exerciseLine.replace(/^\d+[.)]\s+/, "");
     } else {
       continue;
     }
 
     const parts = exerciseLine.split("|").map(value => value.trim()).filter(Boolean);
-    const name = (parts.shift() || "").replace(/\\*{1,2}/g, "").trim();
+    const name = (parts.shift() || "").replace(/\*{1,2}/g, "").trim();
     if (!name || /^(RUHETAG|REST DAY|ERHOLUNG)$/i.test(name)) continue;
-
-    const detailText = parts.join(" | ");
-    const details = detailText
-      ? [detailText]
-      : [];
-    currentDay.exercises.push({ name, details });
+    currentDay.exercises.push({ name, details: parts });
   }
 
   const escape = value => String(value ?? "").replace(/[&<>"']/g, char => ({
@@ -2429,8 +2424,7 @@ function renderTrainingPlan(text) {
   })[char]);
 
   if (!days.length) {
-    // Selbst wenn die KI vom gewünschten Format abweicht, zeigen wir den
-    // vollständigen Plan auf der Trainingsseite statt ihn zu verwerfen.
+    // Wenn die KI vom gewünschten Format abweicht, trotzdem den ganzen Plan anzeigen.
     container.innerHTML = '<section class="card"><h3>📅 Dein KI-Trainingsplan</h3><div class="training-plan-text">' +
       rawText.split(/\r?\n/).filter(Boolean).map(line =>
         '<p style="white-space:pre-wrap;line-height:1.6;margin:8px 0">' + escape(line) + '</p>'
