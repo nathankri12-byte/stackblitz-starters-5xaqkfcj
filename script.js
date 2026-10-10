@@ -1593,7 +1593,7 @@ async function askGemini(
     showInChat &&
     isTrainingPlanRequest(userMessage)
   ) {
-    return generateTrainingPlan();
+    return generateTrainingPlan(userMessage);
   }
 
   if (
@@ -1906,7 +1906,7 @@ ${systemInstruction}
    DIRECT TRAINING PLAN
 ========================================================= */
 
-async function generateTrainingPlan() {
+async function generateTrainingPlan(customPrompt = "") {
   if (!supabaseClient || !currentUser) {
     alert("Bitte melde dich zuerst an.");
     return null;
@@ -1928,8 +1928,12 @@ async function generateTrainingPlan() {
 
   const profile = currentProfile || {};
 
+  const preferencesInput = document.getElementById("trainingPreferences");
+  const requestedPreferences = (customPrompt || preferencesInput?.value || "").trim();
+
   const prompt = `
-Erstelle einen vollständigen persönlichen Wochen-Trainingsplan.
+Erstelle einen vollständigen persönlichen Wochen-Trainingsplan. Beachte die Wünsche des Nutzers verbindlich.
+
 
 Profil:
 Name: ${profile.name || "unbekannt"}
@@ -1965,7 +1969,13 @@ SAMSTAG | LEICHTER TAG
 
 SONNTAG | RUHETAG
 
+Zusätzliche Wünsche des Nutzers (höchste Priorität, soweit sicher und sinnvoll):
+${requestedPreferences || "Keine zusätzlichen Wünsche angegeben."}
+
 Regeln:
+- Setze ausdrücklich genannte Muskelgruppen und Übungen konkret im Plan um; erwähne sie nicht nur allgemein.
+- Wenn Muskelgruppen priorisiert werden, ordne ihnen passende Übungen zu und prüfe, dass sie tatsächlich im Wochenplan vorkommen.
+- Halte die ausdrücklich gewünschte Anzahl an Trainingstagen ein, sofern sie angegeben wurde; plane an anderen Tagen Ruhe oder leichte Erholung.
 - Verwende nur Übungen, die am angegebenen Trainingsort möglich sind.
 - Für Übungen mit Wiederholungen verwende WIEDERHOLUNGEN.
 - Für Übungen wie Plank verwende DAUER, z.B. 30 Sekunden.
