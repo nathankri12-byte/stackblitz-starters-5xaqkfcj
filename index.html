@@ -1393,7 +1393,13 @@
                 placeholder="z. B. Brust und Trizeps priorisieren, 3 Trainingstage pro Woche, Anfänger, nur Geräte im Fitnessstudio"
                 style="width:100%; box-sizing:border-box; resize:vertical"
               ></textarea>
-              <p class="card-description">Deine Wünsche werden beim Erstellen des Plans berücksichtigt. Du kannst sie auch direkt im KI-Chat nennen.</p>
+              <p class="card-description">Trage deine Wünsche ein und tippe darunter auf den Button. Damit wird der Plan neu erstellt bzw. angepasst.</p>
+              <button
+                type="button"
+                class="primary-btn"
+                style="margin-top:12px"
+                onclick="generateTrainingPlan()"
+              >🤖 Plan erstellen / anpassen</button>
             </div>
 
             <div
@@ -1402,16 +1408,8 @@
             >
 
               <p class="card-description">
-                Noch kein Trainingsplan vorhanden.
+                Noch kein Trainingsplan vorhanden. Gib oben deine Wünsche ein und erstelle deinen Plan.
               </p>
-
-              <button
-  class="secondary-btn"
-  style="margin-top:14px"
-  onclick="generateTrainingPlan()"
->
-  🤖 Plan mit KI erstellen
-</button>
 
             </div>
 
