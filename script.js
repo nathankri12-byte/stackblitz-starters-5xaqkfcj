@@ -2360,37 +2360,85 @@ function getTrainingDateForDay(dayName, referenceDate = new Date()) {
 function renderTrainingPlan(text) {
   const container = document.getElementById("trainingPlan");
   if (!container) return;
-  if (!text || !text.trim()) {
+
+  const rawText = String(text || "").trim();
+  if (!rawText) {
     container.innerHTML = '<p class="card-description">Noch kein Trainingsplan vorhanden.</p>';
     return;
   }
 
   const days = [];
   let currentDay = null;
-  for (const line of text.split(/\r?\n/).map(value => value.trim()).filter(Boolean)) {
-    const match = line.match(/^(MONTAG|DIENSTAG|MITTWOCH|DONNERSTAG|FREITAG|SAMSTAG|SONNTAG)\s*\|\s*(.+)$/i);
-    if (match) {
-      currentDay = { name: match[1].toUpperCase(), focus: match[2].trim(), exercises: [] };
-      days.push(currentDay);
-    } else if (/^ÜBUNG\s*:/i.test(line)) {
-      if (!currentDay) {
-        currentDay = { name: "TRAINING", focus: "Deine Übungen", exercises: [] };
-        days.push(currentDay);
-      }
-      const parts = line.replace(/^ÜBUNG\s*:\s*/i, "").split("|");
-      if (parts[0].trim()) currentDay.exercises.push({ name: parts[0].trim(), details: parts.slice(1).map(value => value.trim()) });
-    }
-  }
+  const dayNames = "MONTAG|DIENSTAG|MITTWOCH|DONNERSTAG|FREITAG|SAMSTAG|SONNTAG";
+  const dayHeading = new RegExp(
+    "^\\s*(?:#{1,6}\\s*)?(?:\\*{1,2})?(" + dayNames + ")(?:\\*{1,2})?\\s*(?:\\||[-–—:]|\\s+)?\\s*(.*?)(?:\\*{1,2})?\\s*$",
+    "i"
+  );
 
-  if (!days.length) {
-    container.innerHTML = '<div class="card"><h3>Trainingsplan konnte nicht erkannt werden</h3><p class="card-description">Bitte erstelle den Plan erneut.</p><button class="secondary-btn" onclick="generateTrainingPlan()">🔄 Plan erneut erstellen</button></div>';
-    console.warn("Unbekanntes Trainingsplan-Format:", text);
-    return;
+  for (const originalLine of rawText.split(/\r?\n/)) {
+    const line = originalLine.trim().replace(/^[-*•]+\\s*/, "").replace(/^\\*{1,2}|\\*{1,2}$/g, "");
+    if (!line) continue;
+
+    const heading = line.match(dayHeading);
+    if (heading) {
+      currentDay = {
+        name: heading[1].toUpperCase(),
+        focus: (heading[2] || "").replace(/^\\s*[|:–—-]\\s*/, "").trim() || "Trainingsplan",
+        exercises: []
+      };
+      days.push(currentDay);
+      continue;
+    }
+
+    if (/^(?:RUHETAG|REST DAY|ERHOLUNG)(?:\\b|$)/i.test(line)) {
+      if (!currentDay) {
+        currentDay = { name: "ERHOLUNG", focus: "Regeneration", exercises: [] };
+        days.push(currentDay);
+      } else {
+        currentDay.focus = line.replace(/[.!]$/, "");
+      }
+      continue;
+    }
+
+    if (!currentDay) continue;
+
+    let exerciseLine = line;
+    if (/^ÜBUNG\\s*:/i.test(exerciseLine)) {
+      exerciseLine = exerciseLine.replace(/^ÜBUNG\\s*:\\s*/i, "");
+    } else if (/^(?:[-•*]\\s*)/.test(originalLine.trim())) {
+      exerciseLine = originalLine.trim().replace(/^[-•*]\\s*/, "");
+    } else if (/^\\d+[.)]\\s+/.test(exerciseLine)) {
+      exerciseLine = exerciseLine.replace(/^\\d+[.)]\\s+/, "");
+    } else {
+      continue;
+    }
+
+    const parts = exerciseLine.split("|").map(value => value.trim()).filter(Boolean);
+    const name = (parts.shift() || "").replace(/\\*{1,2}/g, "").trim();
+    if (!name || /^(RUHETAG|REST DAY|ERHOLUNG)$/i.test(name)) continue;
+
+    const detailText = parts.join(" | ");
+    const details = detailText
+      ? [detailText]
+      : [];
+    currentDay.exercises.push({ name, details });
   }
 
   const escape = value => String(value ?? "").replace(/[&<>"']/g, char => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
   })[char]);
+
+  if (!days.length) {
+    // Selbst wenn die KI vom gewünschten Format abweicht, zeigen wir den
+    // vollständigen Plan auf der Trainingsseite statt ihn zu verwerfen.
+    container.innerHTML = '<section class="card"><h3>📅 Dein KI-Trainingsplan</h3><div class="training-plan-text">' +
+      rawText.split(/\r?\n/).filter(Boolean).map(line =>
+        '<p style="white-space:pre-wrap;line-height:1.6;margin:8px 0">' + escape(line) + '</p>'
+      ).join("") +
+      '</div><button type="button" class="secondary-btn" style="margin-top:12px" onclick="generateTrainingPlan()">🔄 Plan neu erstellen</button></section>';
+    console.warn("Trainingsplan wurde als Text angezeigt, da kein Tagesformat erkannt wurde.");
+    return;
+  }
 
   container.innerHTML = '<div class="training-days">' + days.map(day =>
     '<section class="card training-day-card"><div class="section-header"><div><h3>📅 ' + escape(day.name) +
