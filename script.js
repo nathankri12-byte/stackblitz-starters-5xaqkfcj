@@ -1948,26 +1948,12 @@ Der Nutzer ist minderjährig.
 Erstelle einen altersgerechten, sicheren und realistischen Wochenplan.
 
 WICHTIG:
-Der Plan muss exakt nach diesem Format aufgebaut sein:
-
-MONTAG | SCHWERPUNKT
+Gib den Wochenplan von Montag bis Sonntag aus. Verwende pro Tag genau eine passende Überschrift, zum Beispiel:
+MONTAG | BRUST UND TRIZEPS
 ÜBUNG: Name der Übung | SÄTZE: 3 | WIEDERHOLUNGEN: 10 | DAUER: -
-ÜBUNG: Name der Übung | SÄTZE: 3 | WIEDERHOLUNGEN: 12 | DAUER: -
-
 DIENSTAG | RUHETAG
 
-MITTWOCH | SCHWERPUNKT
-ÜBUNG: Name der Übung | SÄTZE: 3 | WIEDERHOLUNGEN: 10 | DAUER: -
-
-DONNERSTAG | RUHETAG
-
-FREITAG | SCHWERPUNKT
-ÜBUNG: Name der Übung | SÄTZE: 3 | WIEDERHOLUNGEN: 10 | DAUER: -
-
-SAMSTAG | LEICHTER TAG
-ÜBUNG: Name der Übung | SÄTZE: 2 | WIEDERHOLUNGEN: 10 | DAUER: -
-
-SONNTAG | RUHETAG
+Nutze für Trainingstage konkrete Übungen, Sätze und Wiederholungen. Markiere Erholungstage als RUHETAG und plane keine Übungen an diesen Tagen. Die Anzahl der Trainingstage muss einem ausdrücklich genannten Nutzerwunsch entsprechen. Wenn keine Anzahl genannt wird, wähle eine realistische, altersgerechte Anzahl mit ausreichender Regeneration.
 
 Zusätzliche Wünsche des Nutzers (höchste Priorität, soweit sicher und sinnvoll):
 ${requestedPreferences || "Keine zusätzlichen Wünsche angegeben."}
