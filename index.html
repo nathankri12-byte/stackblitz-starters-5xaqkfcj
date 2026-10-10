@@ -828,6 +828,293 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* MOBILE POLISH — responsive layout without changing app behavior */
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    img, svg, canvas, video {
+      max-width: 100%;
+    }
+
+    @media (max-width: 760px) {
+      #app {
+        min-height: 100dvh;
+      }
+
+      .main {
+        width: 100%;
+        min-width: 0;
+        margin-left: 0;
+        padding: 14px 14px calc(94px + env(safe-area-inset-bottom));
+      }
+
+      .mobile-header {
+        position: sticky;
+        top: 0;
+        z-index: 15;
+        margin: -14px -14px 20px;
+        padding: 12px 14px;
+        min-height: 58px;
+        background: rgba(8, 11, 16, .94);
+        border-bottom: 1px solid rgba(38, 49, 61, .72);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+      }
+
+      .mobile-header strong {
+        font-size: 16px;
+        letter-spacing: -.35px;
+      }
+
+      .mobile-header .secondary-btn {
+        width: 42px;
+        height: 42px;
+        padding: 0;
+        display: grid;
+        place-items: center;
+        border-radius: 14px;
+      }
+
+      .topbar {
+        margin-bottom: 18px;
+      }
+
+      .topbar h2 {
+        font-size: clamp(23px, 6vw, 28px);
+        line-height: 1.15;
+        letter-spacing: -.6px;
+        overflow-wrap: anywhere;
+      }
+
+      .topbar p {
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .user-pill {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        font-size: 12px;
+        padding: 8px 11px;
+      }
+
+      .hero {
+        padding: 21px 18px;
+        border-radius: 20px;
+      }
+
+      .hero h1 {
+        font-size: clamp(24px, 6.4vw, 29px);
+        line-height: 1.12;
+      }
+
+      .hero p {
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      .grid {
+        gap: 12px;
+      }
+
+      .grid-2,
+      .grid-3,
+      .ai-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .card {
+        min-width: 0;
+        padding: 17px;
+        border-radius: 18px;
+      }
+
+      .card h3 {
+        font-size: 17px;
+        line-height: 1.35;
+      }
+
+      .card-description {
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      .stat-card {
+        min-height: 0;
+      }
+
+      .stat-value {
+        font-size: 26px;
+      }
+
+      .primary-btn,
+      .secondary-btn {
+        min-height: 46px;
+        line-height: 1.25;
+      }
+
+      .field input,
+      .field select,
+      .field textarea,
+      .ai-input-area textarea {
+        font-size: 16px;
+        min-width: 0;
+      }
+
+      .field textarea {
+        min-height: 110px;
+      }
+
+      .mobile-nav {
+        height: calc(68px + env(safe-area-inset-bottom));
+        padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+        gap: 2px;
+        justify-content: space-around;
+        background: rgba(10, 14, 19, .96);
+        border-top: 1px solid rgba(70, 84, 102, .65);
+        box-shadow: 0 -8px 28px rgba(0, 0, 0, .2);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+      }
+
+      .mobile-nav button {
+        flex: 1 1 0;
+        min-width: 0;
+        min-height: 48px;
+        padding: 5px 1px;
+        border-radius: 12px;
+        font-size: 10px;
+        line-height: 1.15;
+        white-space: nowrap;
+        gap: 4px;
+      }
+
+      .mobile-nav button span {
+        font-size: 19px;
+        line-height: 1.1;
+      }
+
+      .mobile-nav button.active {
+        color: #fff;
+        background: rgba(124, 92, 255, .18);
+      }
+
+      .ai-card {
+        min-height: 0;
+      }
+
+      .ai-chat {
+        min-height: 220px;
+        max-height: 48dvh;
+        padding: 14px 0;
+      }
+
+      .ai-message {
+        max-width: 92%;
+        overflow-wrap: anywhere;
+      }
+
+      .ai-input-area {
+        align-items: stretch;
+        gap: 7px;
+      }
+
+      .ai-input-area textarea {
+        width: 0;
+        height: 50px;
+        padding: 12px;
+      }
+
+      .ai-send {
+        flex: 0 0 48px;
+        width: 48px;
+        min-height: 48px;
+      }
+
+      .quick-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .weight-form {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .weight-form .primary-btn {
+        width: 100% !important;
+      }
+
+      .training-metrics,
+      .training-progress-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .training-exercise-card {
+        padding: 14px;
+      }
+
+      .training-exercise-heading {
+        gap: 9px;
+      }
+
+      .exercise-actions {
+        flex-direction: column;
+      }
+
+      .exercise-actions a,
+      .exercise-actions button {
+        width: 100%;
+        min-height: 44px;
+      }
+
+      .weight-chart-scroll {
+        max-width: 100%;
+      }
+
+      table {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+      }
+
+      pre, code {
+        overflow-wrap: anywhere;
+        white-space: pre-wrap;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .main {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+
+      .mobile-header {
+        margin-left: -10px;
+        margin-right: -10px;
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+
+      .card {
+        padding: 14px;
+      }
+
+      .mobile-nav button {
+        font-size: 9px;
+      }
+
+      .mobile-nav button span {
+        font-size: 18px;
+      }
+    }
+
   </style>
 </head>
 
