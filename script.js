@@ -291,7 +291,7 @@ async function loginUser() {
     currentUser =
       data.user;
 
-    await createProfileIfMissing();
+    // loadApp erstellt/prüft das Profil zentral; kein doppelter Aufruf hier.
     await loadApp();
 
   } catch (error) {
@@ -350,113 +350,46 @@ async function createProfile(
   name,
   email
 ) {
-  if (!supabaseClient || !userId) {
-    return;
-  }
+  if (!supabaseClient || !userId) return;
+
+  const profileData = {
+    user_id: userId,
+    Name: name || "User",
+    email: email || ""
+  };
 
   try {
-    const profileData = {
-      user_id: userId,
-      Name: name || "User",
-      email: email || ""
-    };
-
     /*
-      Erst prüfen, ob bereits ein Profil existiert.
-      Dadurch benötigen wir für den Code keinen
-      UNIQUE-Constraint auf user_id.
+      user_id besitzt in Supabase einen UNIQUE-Index.
+      upsert + ignoreDuplicates verhindert doppelte Profile,
+      auch wenn Registrierung und App-Start gleichzeitig laufen.
     */
+    const { error } = await supabaseClient
+      .from("profiles")
+      .upsert(profileData, {
+        onConflict: "user_id",
+        ignoreDuplicates: true
+      });
 
-    const {
-      data: existingProfile,
-      error: selectError
-    } =
-      await supabaseClient
-        .from("profiles")
-        .select("id")
-        .eq("user_id", userId)
-        .limit(1)
-        .maybeSingle();
-
-    if (selectError) {
-      console.error(
-        "Profilprüfung fehlgeschlagen:",
-        selectError
-      );
-      return;
+    if (error) {
+      console.error("Profil konnte nicht erstellt werden:", error);
     }
-
-    if (existingProfile) {
-      return;
-    }
-
-    const {
-      error: insertError
-    } =
-      await supabaseClient
-        .from("profiles")
-        .insert(profileData);
-
-    if (insertError) {
-      console.error(
-        "Profil konnte nicht erstellt werden:",
-        insertError
-      );
-    }
-
   } catch (error) {
-    console.error(error);
+    console.error("Profil konnte nicht erstellt werden:", error);
   }
 }
 
 
 async function createProfileIfMissing() {
-  if (
-    !currentUser ||
-    !supabaseClient
-  ) {
-    return;
-  }
+  if (!currentUser || !supabaseClient) return;
 
-  try {
-    const {
-      data,
-      error
-    } =
-      await supabaseClient
-        .from("profiles")
-        .select("*")
-        .eq("user_id", currentUser.id)
-        .limit(1)
-        .maybeSingle();
-
-    if (error) {
-      console.error(
-        "Profilprüfung fehlgeschlagen:",
-        error
-      );
-      return;
-    }
-
-    if (!data) {
-      await createProfile(
-        currentUser.id,
-
-        currentUser
-          .user_metadata
-          ?.name ||
-          currentUser
-            .email
-            ?.split("@")[0] ||
-          "User",
-
-        currentUser.email || ""
-      );
-    }
-
-  } catch (error) {
-    console.error(error);
-  }
+  await createProfile(
+    currentUser.id,
+    currentUser.user_metadata?.name ||
+      currentUser.email?.split("@")[0] ||
+      "User",
+    currentUser.email || ""
+  );
 }
 
 
@@ -727,86 +660,18 @@ async function saveProfile() {
   try {
 
     /*
-      Wir aktualisieren über user_id,
-      NICHT über id.
+      Ein einziger Datensatz pro user_id:
+      upsert aktualisiert das bestehende Profil oder legt es an,
+      ohne einen zweiten Datensatz zu erzeugen.
     */
-
-    const {
-      data,
-      error
-    } =
-      await supabaseClient
-        .from("profiles")
-        .update(profileData)
-        .eq(
-          "user_id",
-          currentUser.id
-        )
-        .select()
-        .limit(1)
-        .maybeSingle();
+    const { error } = await supabaseClient
+      .from("profiles")
+      .upsert(profileData, { onConflict: "user_id" });
 
     if (error) {
-      console.error(
-        "Profil-Update fehlgeschlagen:",
-        error
-      );
-
-      /*
-        Falls noch kein Profil existiert,
-        versuchen wir INSERT.
-      */
-
-      const {
-        error: insertError
-      } =
-        await supabaseClient
-          .from("profiles")
-          .insert(profileData);
-
-      if (insertError) {
-
-        console.error(
-          "Profil konnte nicht gespeichert werden:",
-          insertError
-        );
-
-        alert(
-          "Profil konnte nicht gespeichert werden:\n\n" +
-          insertError.message
-        );
-
-        return;
-      }
-
-    } else if (!data) {
-
-      /*
-        Kein Datensatz wurde aktualisiert.
-        Deshalb INSERT versuchen.
-      */
-
-      const {
-        error: insertError
-      } =
-        await supabaseClient
-          .from("profiles")
-          .insert(profileData);
-
-      if (insertError) {
-
-        console.error(
-          "Profil konnte nicht angelegt werden:",
-          insertError
-        );
-
-        alert(
-          "Profil konnte nicht gespeichert werden:\n\n" +
-          insertError.message
-        );
-
-        return;
-      }
+      console.error("Profil konnte nicht gespeichert werden:", error);
+      alert("Profil konnte nicht gespeichert werden:\n\n" + error.message);
+      return;
     }
 
     await loadProfile();
