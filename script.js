@@ -1033,6 +1033,50 @@ function updateDashboard() {
   }
 
   updateAIUserInfo();
+  updateDashboardWorkout();
+}
+
+function updateDashboardWorkout() {
+  const element = document.getElementById("dashboardWorkout");
+  if (!element) return;
+
+  const plan = (localStorage.getItem("fitness_ai_training_plan") || "").trim();
+  if (!plan) {
+    element.textContent = "Noch kein Trainingsplan erstellt.";
+    return;
+  }
+
+  const weekdayNames = ["SONNTAG", "MONTAG", "DIENSTAG", "MITTWOCH", "DONNERSTAG", "FREITAG", "SAMSTAG"];
+  const todayName = weekdayNames[new Date().getDay()];
+  const lines = plan.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+  const headingRegex = /^\s*(?:#{1,6}\s*)?(?:\*{1,2})?(MONTAG|DIENSTAG|MITTWOCH|DONNERSTAG|FREITAG|SAMSTAG|SONNTAG)(?:\*{1,2})?\s*(?:\||[-–—:]|\s+)?\s*(.*?)\s*$/i;
+  const startIndex = lines.findIndex(line => {
+    const match = line.match(headingRegex);
+    return match && match[1].toUpperCase() === todayName;
+  });
+
+  if (startIndex === -1) {
+    element.innerHTML = '<p>Trainingsplan vorhanden.</p><button class="secondary-btn" type="button" onclick="showTab(\'training\')">Trainingsplan öffnen</button>';
+    return;
+  }
+
+  const heading = lines[startIndex].match(headingRegex);
+  const focus = (heading?.[2] || "").replace(/^\s*[|:–—-]\s*/, "").trim();
+  const workoutLines = [];
+  for (let i = startIndex + 1; i < lines.length; i++) {
+    if (headingRegex.test(lines[i])) break;
+    if (/^ÜBUNG\s*:/i.test(lines[i])) workoutLines.push(lines[i].replace(/^ÜBUNG\s*:\s*/i, ""));
+    else if (/^(?:RUHETAG|REST DAY|ERHOLUNG)\b/i.test(lines[i])) {
+      workoutLines.length = 0;
+      workoutLines.push("Heute ist ein Ruhetag – Zeit zur Erholung.");
+      break;
+    }
+  }
+
+  const safe = value => String(value).replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+  element.innerHTML = '<p><strong>' + safe(focus || todayName) + '</strong></p>' +
+    (workoutLines.length ? '<ul>' + workoutLines.map(line => '<li>' + safe(line) + '</li>').join("") + '</ul>' : '<p>Dein Plan ist gespeichert. Öffne Training für alle Details.</p>') +
+    '<button class="secondary-btn" type="button" onclick="showTab(\'training\')">Trainingsplan öffnen</button>';
 }
 
 
@@ -2429,7 +2473,7 @@ function renderTrainingPlan(text) {
       rawText.split(/\r?\n/).filter(Boolean).map(line =>
         '<p style="white-space:pre-wrap;line-height:1.6;margin:8px 0">' + escape(line) + '</p>'
       ).join("") +
-      '</div><button type="button" class="secondary-btn" style="margin-top:12px" onclick="generateTrainingPlan()">🔄 Plan neu erstellen</button></section>';
+      '</div></section>';
     console.warn("Trainingsplan wurde als Text angezeigt, da kein Tagesformat erkannt wurde.");
     return;
   }
@@ -2455,6 +2499,7 @@ function renderTrainingPlan(text) {
   ).join("") + '</div>';
 
   void loadSavedTrainingEntries();
+  updateDashboardWorkout();
 }
 
 function readTrainingNumber(input, label, integer = false) {
