@@ -1115,6 +1115,157 @@
       }
     }
 
+
+    /* VISUAL REFINEMENT — app-like mobile experience */
+    @media (max-width: 760px) {
+      body {
+        background:
+          radial-gradient(ellipse at 85% 0%, rgba(124,92,255,.13), transparent 34%),
+          #080b10;
+      }
+
+      .page.active {
+        animation: mobilePageIn .18s ease-out;
+      }
+
+      @keyframes mobilePageIn {
+        from { opacity: .7; transform: translateY(3px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .topbar > div:first-child {
+        min-width: 0;
+      }
+
+      .topbar .user-pill {
+        max-width: 100%;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 100% 0%, rgba(124,92,255,.3), transparent 48%),
+          linear-gradient(145deg, #19162b, #111821 78%);
+        border-color: rgba(154,130,255,.32);
+        box-shadow: 0 12px 32px rgba(0,0,0,.16);
+      }
+
+      .hero h1 {
+        max-width: 14ch;
+      }
+
+      .hero .primary-btn {
+        max-width: none !important;
+        width: 100%;
+        min-height: 48px;
+      }
+
+      #dashboard > .grid.grid-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      #dashboard > .grid.grid-3 .stat-card {
+        padding: 15px;
+        overflow-wrap: anywhere;
+      }
+
+      #dashboard > .grid.grid-3 .stat-card:last-child {
+        grid-column: 1 / -1;
+      }
+
+      #dashboard > .grid.grid-3 .stat-label {
+        font-size: 11px;
+        letter-spacing: .45px;
+      }
+
+      #dashboard > .grid.grid-3 .stat-value {
+        font-size: clamp(20px, 5.5vw, 25px);
+        line-height: 1.2;
+      }
+
+      .section-header {
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .section-header > * {
+        min-width: 0;
+      }
+
+      .section-header .secondary-btn {
+        flex: 0 0 auto;
+      }
+
+      .card,
+      .hero {
+        box-shadow: 0 8px 24px rgba(0,0,0,.12);
+      }
+
+      .primary-btn {
+        box-shadow: 0 6px 18px rgba(124,92,255,.18);
+      }
+
+      .primary-btn:active,
+      .secondary-btn:active,
+      .mobile-nav button:active {
+        transform: scale(.985);
+      }
+
+      .mobile-nav button {
+        transition: background .16s ease, color .16s ease, transform .16s ease;
+      }
+
+      .mobile-nav button.active {
+        box-shadow: inset 0 0 0 1px rgba(154,130,255,.16);
+      }
+
+      .ai-header {
+        gap: 11px;
+      }
+
+      .ai-avatar {
+        flex: 0 0 44px;
+      }
+
+      .ai-chat {
+        overscroll-behavior: contain;
+      }
+
+      .auth-card {
+        padding: 21px;
+      }
+
+      .logo {
+        margin-bottom: 24px;
+      }
+
+      .logo h1 {
+        font-size: clamp(25px, 7vw, 30px);
+      }
+
+      .auth-container {
+        max-width: 440px;
+      }
+    }
+
+    @media (min-width: 761px) and (max-width: 1100px) {
+      .main {
+        padding: 24px;
+      }
+
+      .grid-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .training-metrics,
+      .training-progress-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
   </style>
 </head>
 
