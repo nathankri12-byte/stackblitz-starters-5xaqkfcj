@@ -2067,7 +2067,7 @@ VERBINDLICHE REGELN:
   }
 
   // Reject obviously incomplete/generic responses rather than silently treating them as a plan.
-  const dayHeadings = (answer.match(/(?:^|\\n)\\s*(?:#{1,6}\\s*)?(?:\\*{1,2})?(MONTAG|DIENSTAG|MITTWOCH|DONNERSTAG|FREITAG|SAMSTAG|SONNTAG)\\b/gim) || []).length;
+  const dayHeadings = (answer.match(/(?:^|\n)\s*(?:#{1,6}\s*)?(?:\*{1,2})?(MONTAG|DIENSTAG|MITTWOCH|DONNERSTAG|FREITAG|SAMSTAG|SONNTAG)\b/gim) || []).length;
   if (dayHeadings < 5) {
     if (container) {
       container.innerHTML = '<div class="card"><p class="card-description">Die KI hat keinen vollständigen Wochenplan geliefert. Ich speichere diese Antwort nicht als Trainingsplan, damit kein unpassender Standardplan angezeigt wird.</p><button type="button" class="secondary-btn" onclick="generateTrainingPlan()">Erneut versuchen</button></div>';
