@@ -1337,7 +1337,7 @@ body{background:#090a08}
 .dashboard-showcase{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(220px,.75fr);gap:12px;margin-bottom:14px}
 .workout-progress-card{display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,#1a1e14,#11130e);border:1px solid var(--border);border-radius:22px;padding:18px}
 .workout-progress-card h3{margin:0 0 7px;font-size:17px}.workout-progress-card p{color:var(--muted);font-size:13px;line-height:1.5}
-.progress-ring{width:72px;height:72px;flex:0 0 72px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--accent) 75%,#303526 0);position:relative}
+.progress-ring{width:72px;height:72px;flex:0 0 72px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--accent) 0%,#303526 0);position:relative}
 .progress-ring:before{content:"";position:absolute;inset:7px;background:#141710;border-radius:50%}.progress-ring strong{position:relative;font-size:17px}
 .dashboard-metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:18px}
 .metric-tile{min-height:130px;border-radius:21px;padding:15px;position:relative;overflow:hidden;background:linear-gradient(145deg,#191c15,#11130f);border:1px solid var(--border)}
@@ -1370,6 +1370,9 @@ body{background:#090a08}
 
   
 /* PROFESSIONAL NAVIGATION, SETTINGS AND IMAGE TREATMENT */
+.profile-avatar{display:grid;place-items:center;overflow:hidden;background:linear-gradient(135deg,#252d1b,#11140d);border:1px solid var(--border)}
+.profile-avatar:after{content:"FP";font-weight:800;letter-spacing:-1px;color:var(--accent);font-size:23px}
+.program-chip span{display:block;width:42px;height:42px;overflow:hidden;border-radius:12px;margin:0 auto 8px;background:#292e21}.program-chip span img{width:100%;height:100%;object-fit:cover;display:block}
 .mobile-more-menu{position:fixed;right:12px;bottom:76px;z-index:40;display:grid;min-width:190px;padding:8px;background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 15px 50px rgba(0,0,0,.4)}
 .mobile-more-menu[hidden]{display:none}
 .mobile-more-menu button{border:0;background:transparent;color:var(--text);text-align:left;padding:12px;border-radius:10px}
@@ -1616,17 +1619,17 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 
 
         <div class="dashboard-showcase">
-          <div class="workout-progress-card"><div><h3>Workout Progress!</h3><p id="workoutProgressText">Dein Trainingsfortschritt auf einen Blick.</p><p style="color:var(--accent);font-weight:700;margin-top:9px">Weiter so! ↗</p></div><div class="progress-ring"><strong id="workoutProgressPercent">75%</strong></div></div>
+          <div class="workout-progress-card"><div><h3>Workout Progress!</h3><p id="workoutProgressText">Noch kein Trainingsfortschritt erfasst.</p><p style="color:var(--accent);font-weight:700;margin-top:9px">Weiter so! ↗</p></div><div class="progress-ring"><strong id="workoutProgressPercent">0%</strong></div></div>
           <div class="workout-progress-card"><div><h3>Dein Tagesziel</h3><p>Trainiere regelmäßig und bleib in Bewegung.</p><button class="secondary-btn" style="margin-top:12px" onclick="showTab('training')">Training öffnen →</button></div></div>
         </div>
         <div class="dashboard-metric-grid">
-          <div class="metric-tile lime"><span class="metric-icon"></span><div class="metric-ring">kcal</div><div class="metric-label">CALORIES</div><strong>— kCal</strong><small>Noch nicht erfasst</small></div>
-          <div class="metric-tile"><span class="metric-icon"></span><div class="metric-label">STEPS</div><strong>—</strong><small>Schritte nicht verbunden</small></div>
-          <div class="metric-tile"><span class="metric-icon"></span><div class="metric-label">SLEEP</div><strong>— / 8 h</strong><small>Schlaf nicht erfasst</small></div>
+          <div class="metric-tile lime"><span class="metric-icon">◉</span><div class="metric-ring">kcal</div><div class="metric-label">CALORIES</div><strong>— kCal</strong><small>Noch nicht erfasst</small></div>
+          <div class="metric-tile"><span class="metric-icon">↗</span><div class="metric-label">STEPS</div><strong>—</strong><small>Schritte nicht verbunden</small></div>
+          <div class="metric-tile"><span class="metric-icon">◔</span><div class="metric-label">SLEEP</div><strong>— / 8 h</strong><small>Schlaf nicht erfasst</small></div>
           <div class="metric-tile photo-tile"><div class="metric-label">MAKE IT COUNT</div><strong>One more rep.</strong><small>One step at a time.</small></div>
         </div>
         <h3 style="margin:4px 0 10px">Programs</h3>
-        <div class="program-strip"><button class="program-chip" onclick="showTab('training')"><span></span>Jog</button><button class="program-chip" onclick="showTab('training')"><span></span>Yoga</button><button class="program-chip" onclick="showTab('training')"><span></span>Cycling</button><button class="program-chip" onclick="showTab('training')"><span>️</span>Workout</button></div>
+        <div class="program-strip"><button class="program-chip" onclick="showTab('training')"><span><img src="https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=160&q=80" alt="" loading="lazy"></span>Jog</button><button class="program-chip" onclick="showTab('training')"><span><img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=160&q=80" alt="" loading="lazy"></span>Yoga</button><button class="program-chip" onclick="showTab('training')"><span><img src="https://images.unsplash.com/photo-1558611848-73f7eb4001a1?auto=format&fit=crop&w=160&q=80" alt="" loading="lazy"></span>Cycling</button><button class="program-chip" onclick="showTab('training')"><span><img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=160&q=80" alt="" loading="lazy"></span>Workout</button></div>
 
         <div class="hero">
 
@@ -1689,7 +1692,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
           <div class="card">
 
             <div class="section-header">
-              <h3>️ Heute</h3>
+              <h3> Heute</h3>
               <button
                 class="secondary-btn"
                 onclick="showTab('training')"
@@ -1828,7 +1831,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
             <div class="quick-actions">
 
               <button onclick="useAIQuickPrompt('Erstelle mir einen vollständigen Trainingsplan für mich.')">
-                ️ Trainingsplan erstellen
+                 Trainingsplan erstellen
               </button>
 
               <button onclick="useAIQuickPrompt('Was sollte ich heute trainieren?')">
@@ -1882,7 +1885,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 
         <div class="topbar">
           <div>
-            <h2>️ Training</h2>
+            <h2> Training</h2>
             <p>Dein individueller Trainingsbereich</p>
           </div>
 
@@ -1916,7 +1919,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
               >
                 <option value="">Auswählen</option>
                 <option value="Zuhause"> Zuhause</option>
-                <option value="Fitnessstudio">️ Fitnessstudio</option>
+                <option value="Fitnessstudio"> Fitnessstudio</option>
               </select>
 
             </div>
@@ -2100,7 +2103,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 
             <div class="section-header">
               <div>
-                <h3>️ Mein Mahlzeitenplan</h3>
+                <h3> Mein Mahlzeitenplan</h3>
                 <p class="card-description">
                   Dein aktueller KI-Ernährungsplan.
                 </p>
@@ -2155,7 +2158,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 
           <div class="card">
 
-            <h3>️ Gewicht eintragen</h3>
+            <h3> Gewicht eintragen</h3>
 
             <p class="card-description">
               Trage dein Gewicht mit Datum ein, um deinen Verlauf
@@ -2243,7 +2246,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
         <div class="card" style="margin-top:18px">
           <div class="section-header">
             <div>
-              <h3>️ Trainingsfortschritt pro Übung</h3>
+              <h3> Trainingsfortschritt pro Übung</h3>
               <p class="card-description">Deine gespeicherten Gewichte, Wiederholungen und Zeiten im Verlauf.</p>
             </div>
           </div>
@@ -2359,7 +2362,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
         <div class="topbar">
 
           <div>
-            <h2>️ Profil</h2>
+            <h2> Profil</h2>
             <p>Deine persönlichen FITNESS-AI-Einstellungen.</p>
           </div>
 
@@ -2518,7 +2521,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
         <div class="topbar">
 
           <div>
-            <h2>️ Admin</h2>
+            <h2> Admin</h2>
             <p>Feedback und Rückmeldungen der Nutzer.</p>
           </div>
 
