@@ -1755,6 +1755,40 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 }
 .timer-preset-delete span:last-child { display:inline !important; }
 
+
+/* FIX: Keep the full app and navigation scrollable on iPad and desktop. */
+html {
+  min-height: 100%;
+  overflow-y: auto !important;
+}
+body {
+  height: auto !important;
+  min-height: 100dvh;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+#app {
+  min-height: 100dvh;
+}
+.sidebar {
+  max-height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+.settings-content {
+  min-height: 0;
+  max-height: none;
+  overflow: visible;
+}
+@media (max-width: 760px) {
+  .main {
+    min-height: 100dvh;
+    padding-bottom: calc(100px + env(safe-area-inset-bottom));
+  }
+}
+
 </style>
 </head>
 
@@ -2965,7 +2999,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 
 
   <!-- Deine JavaScript-Datei -->
-  <script src="script.js?v=20261012-ipad-timer-delete-6"></script>
+  <script src="script.js?v=20261012-personal-plan-scroll-fix-7"></script>
 
   <script>
     if ("serviceWorker" in navigator && location.protocol === "https:") {
