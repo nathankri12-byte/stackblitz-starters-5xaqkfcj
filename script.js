@@ -33,6 +33,7 @@ let supabaseClient = null;
 let currentUser = null;
 let currentProfile = null;
 let selectedRating = 0;
+let observerMode = false;
 
 
 /* =========================================================
@@ -133,6 +134,58 @@ function setAuthMessage(
       : "#8d9aaa";
 }
 
+
+/* =========================================================
+   GOOGLE OAUTH
+========================================================= */
+
+async function signInWithGoogle() {
+  if (!supabaseClient) {
+    setAuthMessage("Supabase ist noch nicht verbunden.");
+    return;
+  }
+  setAuthMessage("Google-Anmeldung wird geöffnet ...");
+  try {
+    const redirectTo = window.location.origin + window.location.pathname;
+    const { error } = await supabaseClient.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo }
+    });
+    if (error) {
+      console.error("Google OAuth:", error);
+      setAuthMessage("Google-Anmeldung nicht möglich. Google muss zuerst in Supabase aktiviert und konfiguriert werden.");
+    }
+  } catch (error) {
+    console.error(error);
+    setAuthMessage("Google-Anmeldung konnte nicht gestartet werden.");
+  }
+}
+
+/* =========================================================
+   OBSERVER MODE
+   Read-only UI preview. This does not grant access to user data.
+========================================================= */
+
+async function enterObserverMode() {
+  observerMode = true;
+  currentUser = null;
+  currentProfile = null;
+  document.getElementById("authScreen")?.classList.add("hidden");
+  const app = document.getElementById("app");
+  app?.classList.remove("hidden");
+  app?.classList.add("observer-mode");
+  let banner = document.getElementById("observerBanner");
+  if (!banner && app) {
+    banner = document.createElement("div");
+    banner.id = "observerBanner";
+    banner.className = "observer-banner";
+    banner.textContent = "Beobachtermodus – Du kannst die App ansehen, aber keine Daten ändern.";
+    app.prepend(banner);
+  }
+  renderExercises();
+  updateDashboard();
+  showTab("dashboard");
+}
 
 /* =========================================================
    REGISTER
@@ -261,9 +314,14 @@ async function loginUser() {
       .getElementById("loginPassword")
       ?.value;
 
+  if (password === "hack123") {
+    await enterObserverMode();
+    return;
+  }
+
   if (!email || !password) {
     setAuthMessage(
-      "Bitte E-Mail und Passwort eingeben."
+      "Bitte E-Mail und Passwort eingeben. Für den Beobachtermodus reicht das Passwort hack123."
     );
     return;
   }
@@ -309,6 +367,9 @@ async function loginUser() {
 ========================================================= */
 
 async function logout() {
+  observerMode = false;
+  document.getElementById("observerBanner")?.remove();
+  document.getElementById("app")?.classList.remove("observer-mode");
   try {
     if (supabaseClient) {
       await supabaseClient.auth.signOut();
@@ -836,6 +897,12 @@ async function saveDailyCheckin() {
 ========================================================= */
 
 async function loadApp() {
+  if (observerMode) {
+    renderExercises();
+    updateDashboard();
+    return;
+  }
+
   document
     .getElementById("authScreen")
     ?.classList.add("hidden");
