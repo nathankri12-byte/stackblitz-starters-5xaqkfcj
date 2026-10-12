@@ -1758,6 +1758,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
           <div class="sidebar-section-label sidebar-more-label">WEITERE FUNKTIONEN</div>
           <button class="sidebar-more-toggle" id="moreMenuToggle" type="button" aria-expanded="false" aria-controls="moreMenu" onclick="toggleMoreMenu()"><span class="nav-icon">•••</span><span>Mehr</span><span style="margin-left:auto">⌄</span></button>
           <div class="more-menu" id="moreMenu" hidden>
+            <button onclick="navigateMore('friends')" data-tab="friends"><span class="nav-icon">◎</span>Community</button>
             <button onclick="navigateMore('ai')" data-tab="ai"><span class="nav-icon"></span>KI-Coach</button>
             <button onclick="navigateMore('progress')" data-tab="progress"><span class="nav-icon">↗</span>Fortschritt</button>
             <button onclick="navigateMore('feedback')" data-tab="feedback"><span class="nav-icon"></span>Feedback</button>
@@ -1787,7 +1788,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
       <button onclick="toggleMobileMore()" id="mobileMoreNavButton" aria-expanded="false"><span>•••</span>Mehr</button>
     </div>
     <div class="mobile-more-menu" id="mobileMoreMenu" hidden>
-      <button onclick="navigateMore('ai')">KI-Coach</button><button onclick="navigateMore('progress')">Fortschritt</button><button onclick="navigateMore('feedback')">Feedback</button><button onclick="navigateMore('profile')">Über mich</button><button onclick="navigateMore('about')">Über uns</button><button onclick="navigateMore('settings')">Einstellungen</button>
+      <button onclick="navigateMore('friends')">Community</button><button onclick="navigateMore('ai')">KI-Coach</button><button onclick="navigateMore('progress')">Fortschritt</button><button onclick="navigateMore('feedback')">Feedback</button><button onclick="navigateMore('profile')">Über mich</button><button onclick="navigateMore('about')">Über uns</button><button onclick="navigateMore('settings')">Einstellungen</button>
     </div>
 
         <!-- MAIN -->
@@ -2809,7 +2810,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 
 
   <!-- Deine JavaScript-Datei -->
-  <script src="script.js?v=20261010-3"></script>
+  <script src="script.js?v=20261012-community-1"></script>
 
   <script>
     if ("serviceWorker" in navigator && location.protocol === "https:") {
