@@ -17,8 +17,9 @@
     const url = new URL(base + path);
     if (url.protocol !== "https:") throw new Error("Die Studio-Schnittstelle muss HTTPS verwenden.");
     const headers = {"Accept":"application/json", ...(options.headers || {})};
-    if (window.supabaseClient?.auth) {
-      const {data} = await window.supabaseClient.auth.getSession();
+    const authClient = typeof supabaseClient !== "undefined" ? supabaseClient : window.supabaseClient;
+    if (authClient?.auth) {
+      const {data} = await authClient.auth.getSession();
       if (data?.session?.access_token) headers.Authorization = "Bearer " + data.session.access_token;
     }
     const response = await fetch(url, {...options, headers});
