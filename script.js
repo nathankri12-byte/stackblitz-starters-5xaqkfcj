@@ -3872,7 +3872,7 @@ function renderCustomTimerPresets(){
  const box=document.getElementById("customTimerPresets");if(!box)return;
  box.innerHTML=allCustomTimerPresets().map(p=>{
   const active=p.id===customTimerActiveId;
-  return '<div class="timer-preset '+(active?"active":"")+'"><button type="button" class="timer-preset" style="border:0;flex:1" onclick="selectCustomTimer(\''+escapeTimerText(p.id)+'\')"><span class="timer-preset-icon">'+(p.id.includes("plank")?"Ⅱ":p.id.includes("stretch")?"":"◷")+'</span><span class="timer-preset-copy"><strong>'+escapeTimerText(p.name)+'</strong><small>'+formatCustomTimer(p.seconds)+'</small></span></button>'+(p.builtin?"":'<button type="button" class="timer-preset-delete" aria-label="Timer löschen" onclick="deleteCustomTimerPreset(\''+escapeTimerText(p.id)+'\')">×</button>')+'</div>';
+  return '<div class="timer-preset '+(active?"active":"")+'"><button type="button" class="timer-preset" style="border:0;flex:1" onclick="selectCustomTimer(\''+escapeTimerText(p.id)+'\')"><span class="timer-preset-icon">'+(p.id.includes("plank")?"Ⅱ":p.id.includes("stretch")?"":"◷")+'</span><span class="timer-preset-copy"><strong>'+escapeTimerText(p.name)+'</strong><small>'+formatCustomTimer(p.seconds)+'</small></span></button>'+(p.builtin?"":'<button type="button" class="timer-preset-delete" aria-label="Timer löschen" onclick="deleteCustomTimerPreset(\''+escapeTimerText(p.id)+'\')"><span aria-hidden="true">×</span><span>Löschen</span></button>')+'</div>';
  }).join("");
 }
 function stopCustomTimerInterval(){
