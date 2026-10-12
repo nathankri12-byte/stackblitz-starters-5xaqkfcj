@@ -3832,6 +3832,119 @@ async function deleteCommunityPost(postId){
  await loadCommunity();
 }
 
+
+/* CUSTOM ACTIVITY TIMERS — presets are saved on this device */
+const CUSTOM_TIMERS_KEY = "fitnessAiPro.customTimers.v1";
+let customTimerPresets = [];
+let customTimerActiveId = "builtin-plank-rest";
+let customTimerDuration = 60;
+let customTimerRemaining = 60;
+let customTimerInterval = null;
+let customTimerEndsAt = 0;
+let customTimerRunning = false;
+function allCustomTimerPresets(){
+ const builtins=[
+  {id:"builtin-plank-rest",name:"Pause zwischen Planks",seconds:60,builtin:true},
+  {id:"builtin-plank",name:"Plank halten",seconds:30,builtin:true},
+  {id:"builtin-stretch",name:"Dehnen",seconds:45,builtin:true},
+  {id:"builtin-water",name:"Kurze Erholung",seconds:90,builtin:true}
+ ];
+ return [...builtins,...customTimerPresets];
+}
+function loadCustomTimerPresets(){
+ try{customTimerPresets=JSON.parse(localStorage.getItem(CUSTOM_TIMERS_KEY)||"[]");if(!Array.isArray(customTimerPresets))customTimerPresets=[];}catch(e){customTimerPresets=[];}
+ renderCustomTimerPresets();
+ selectCustomTimer(customTimerActiveId,false);
+}
+function escapeTimerText(value){
+ return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function formatCustomTimer(seconds){
+ const n=Math.max(0,Math.floor(Number(seconds)||0));
+ return String(Math.floor(n/60)).padStart(2,"0")+":"+String(n%60).padStart(2,"0");
+}
+function renderCustomTimerPresets(){
+ const box=document.getElementById("customTimerPresets");if(!box)return;
+ box.innerHTML=allCustomTimerPresets().map(p=>{
+  const active=p.id===customTimerActiveId;
+  return '<div class="timer-preset '+(active?"active":"")+'"><button type="button" class="timer-preset" style="border:0;flex:1" onclick="selectCustomTimer(\''+escapeTimerText(p.id)+'\')"><span class="timer-preset-icon">'+(p.id.includes("plank")?"Ⅱ":p.id.includes("stretch")?"↗":"◷")+'</span><span class="timer-preset-copy"><strong>'+escapeTimerText(p.name)+'</strong><small>'+formatCustomTimer(p.seconds)+'</small></span></button>'+(p.builtin?"":'<button type="button" class="timer-preset-delete" aria-label="Timer löschen" onclick="deleteCustomTimerPreset(\''+escapeTimerText(p.id)+'\')">×</button>')+'</div>';
+ }).join("");
+}
+function stopCustomTimerInterval(){
+ if(customTimerInterval){clearInterval(customTimerInterval);customTimerInterval=null;}
+ customTimerRunning=false;customTimerEndsAt=0;
+}
+function updateCustomTimerDisplay(){
+ const display=document.getElementById("customTimerDisplay");
+ const bar=document.getElementById("customTimerProgress");
+ const start=document.getElementById("customTimerStart");
+ if(display)display.textContent=formatCustomTimer(customTimerRemaining);
+ if(bar)bar.style.width=(customTimerDuration?Math.max(0,Math.min(100,customTimerRemaining/customTimerDuration*100)):0)+"%";
+ if(start)start.textContent=customTimerRunning?"Pause":"Start";
+}
+function selectCustomTimer(id,rerender=true){
+ const preset=allCustomTimerPresets().find(p=>p.id===id);if(!preset)return;
+ stopCustomTimerInterval();customTimerActiveId=preset.id;customTimerDuration=preset.seconds;customTimerRemaining=preset.seconds;
+ const name=document.getElementById("customTimerName");
+ const status=document.getElementById("customTimerStatus");
+ if(name)name.textContent=preset.name;
+ if(status)status.textContent="Bereit, wenn du es bist.";
+ updateCustomTimerDisplay();
+ if(rerender)renderCustomTimerPresets();
+}
+function toggleCustomTimer(){
+ const status=document.getElementById("customTimerStatus");
+ if(customTimerRunning){
+  customTimerRemaining=Math.max(0,Math.ceil((customTimerEndsAt-Date.now())/1000));
+  stopCustomTimerInterval();if(status)status.textContent="Timer pausiert.";updateCustomTimerDisplay();return;
+ }
+ if(customTimerRemaining<=0)customTimerRemaining=customTimerDuration;
+ if(customTimerRemaining<=0){if(status)status.textContent="Bitte stelle eine Zeit größer als 0 ein.";return;}
+ customTimerRunning=true;customTimerEndsAt=Date.now()+customTimerRemaining*1000;
+ if(status)status.textContent="Läuft …";updateCustomTimerDisplay();
+ customTimerInterval=setInterval(()=>{
+  customTimerRemaining=Math.max(0,Math.ceil((customTimerEndsAt-Date.now())/1000));updateCustomTimerDisplay();
+  if(customTimerRemaining<=0){
+   stopCustomTimerInterval();updateCustomTimerDisplay();if(status)status.textContent="Zeit ist um.";
+   try{if("vibrate" in navigator)navigator.vibrate([180,80,180]);}catch(e){}
+  }
+ },200);
+}
+function resetCustomTimer(){
+ stopCustomTimerInterval();customTimerRemaining=customTimerDuration;
+ const status=document.getElementById("customTimerStatus");if(status)status.textContent="Timer zurückgesetzt.";
+ updateCustomTimerDisplay();
+}
+function saveCustomTimerPreset(){
+ const name=document.getElementById("customTimerLabel")?.value.trim()||"";
+ const minutes=Number(document.getElementById("customTimerMinutes")?.value);
+ const seconds=Number(document.getElementById("customTimerSeconds")?.value);
+ const status=document.getElementById("customTimerFormStatus");
+ const total=minutes*60+seconds;
+ if(!name||name.length>50||!Number.isFinite(total)||total<1||total>10800||!Number.isInteger(minutes)||!Number.isInteger(seconds)||minutes<0||seconds<0||seconds>59){
+  if(status)status.textContent="Bitte Name und eine gültige Zeit zwischen 1 Sekunde und 3 Stunden eingeben.";return;
+ }
+ const preset={id:"custom-"+Date.now()+"-"+Math.random().toString(36).slice(2,7),name,seconds:total};
+ customTimerPresets.push(preset);localStorage.setItem(CUSTOM_TIMERS_KEY,JSON.stringify(customTimerPresets));
+ const form=document.getElementById("customTimerForm");if(form)form.reset();
+ const mins=document.getElementById("customTimerMinutes"),secs=document.getElementById("customTimerSeconds");
+ if(mins)mins.value="1";if(secs)secs.value="0";if(status)status.textContent="Timer gespeichert.";
+ customTimerActiveId=preset.id;renderCustomTimerPresets();selectCustomTimer(preset.id,false);
+}
+function deleteCustomTimerPreset(id){
+ if(!customTimerPresets.some(p=>p.id===id))return;
+ if(!confirm("Diesen eigenen Timer löschen?"))return;
+ customTimerPresets=customTimerPresets.filter(p=>p.id!==id);
+ localStorage.setItem(CUSTOM_TIMERS_KEY,JSON.stringify(customTimerPresets));
+ if(customTimerActiveId===id)customTimerActiveId="builtin-plank-rest";
+ loadCustomTimerPresets();
+}
+function showSettingsSection(name){
+ document.querySelectorAll("[data-settings-target]").forEach(button=>button.classList.toggle("active",button.dataset.settingsTarget===name));
+ document.querySelectorAll("[data-settings-panel]").forEach(panel=>panel.classList.toggle("active",panel.dataset.settingsPanel===name));
+}
+
+document.addEventListener("DOMContentLoaded", loadCustomTimerPresets);
 document.addEventListener(
   "DOMContentLoaded",
   init
