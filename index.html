@@ -1880,6 +1880,40 @@ body {
 }
 
 </style>
+
+  <style>
+    #music.page{max-width:1100px;margin:0 auto}
+    #music .topbar{margin-bottom:20px}
+    #music .eyebrow{font-size:11px;letter-spacing:2px;color:var(--accent);font-weight:800;margin-bottom:8px}
+    #music .muted{color:var(--muted);margin-top:7px}
+    .music-hero{display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:190px;margin-bottom:16px;padding:28px;background:linear-gradient(115deg,rgba(217,255,63,.12),rgba(18,24,32,.95) 55%);overflow:hidden}
+    .music-hero-copy{max-width:650px}.music-kicker{font-size:11px;letter-spacing:2px;color:var(--accent);font-weight:800}.music-hero h3{font-size:clamp(25px,4vw,38px);margin:10px 0}.music-hero p{color:var(--muted);line-height:1.6;max-width:560px}
+    .music-note{font-size:110px;line-height:1;color:var(--accent);opacity:.8;padding:0 20px}
+    .music-layout{display:grid;grid-template-columns:minmax(260px,.8fr) minmax(0,1.2fr);gap:16px}
+    .music-controls h3,.music-player-heading h3,.music-help h3{font-size:18px;margin-bottom:16px}
+    .music-provider-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
+    .music-provider{border:1px solid var(--border);background:var(--card2);color:var(--text);border-radius:10px;padding:12px;font-weight:700}
+    .music-provider.active{border-color:var(--accent);color:var(--accent);background:rgba(217,255,63,.08)}
+    .music-label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px}
+    .music-input{width:100%;padding:13px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);outline:none}
+    .music-input:focus{border-color:var(--accent)}
+    .music-load{width:100%;margin-top:12px}
+    .music-status{font-size:13px;color:var(--muted);line-height:1.5;margin-top:12px;min-height:20px}
+    .music-tip{display:flex;flex-direction:column;gap:5px;padding:13px;margin-top:18px;border-radius:10px;background:rgba(255,255,255,.035);font-size:12px;line-height:1.5;color:var(--muted)}
+    .music-tip strong{color:var(--text)}
+    .music-player-card{min-width:0}
+    .music-player-heading{display:flex;align-items:center;justify-content:space-between}
+    .music-player-heading h3{margin-bottom:0}
+    .music-live-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px rgba(217,255,63,.65)}
+    .music-empty{min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--muted);text-align:center}
+    .music-empty span{font-size:52px;color:var(--accent)}
+    .music-embed-wrap{margin-top:18px;width:100%;overflow:hidden;border-radius:12px}
+    #musicEmbed{display:block;width:100%;height:352px;border:0;background:var(--bg2);border-radius:12px}
+    .music-external{display:inline-block;margin-top:12px;color:var(--accent);font-size:13px;text-decoration:none}
+    .music-help{margin-top:16px}.music-help ol{padding-left:22px;color:var(--muted);line-height:1.8}.music-help p{font-size:12px;color:var(--muted);line-height:1.6;margin-top:14px}
+    @media(max-width:760px){.music-layout{grid-template-columns:1fr}.music-hero{padding:22px}.music-note{font-size:70px;padding:0}.music-hero p{font-size:14px}#musicEmbed{height:352px}}
+  </style>
+
 </head>
 
 <body>
@@ -2024,6 +2058,7 @@ body {
             <button onclick="navigateMore('profile')" data-tab="profile"><span class="nav-icon">○</span>Über mich / Profil</button>
             <button onclick="navigateMore('about')" data-tab="about"><span class="nav-icon">ⓘ</span>Über uns</button>
             <button onclick="navigateMore('settings')" data-tab="settings"><span class="nav-icon"></span>Einstellungen</button>
+            <button onclick="navigateMore('music')" data-tab="music"><span class="nav-icon">♫</span>Musik</button>
             <button id="adminNavButton" class="hidden" onclick="navigateMore('admin')" data-tab="admin"><span class="nav-icon">▤</span>Admin</button>
           </div>
         </div>
@@ -2047,7 +2082,7 @@ body {
       <button onclick="toggleMobileMore()" id="mobileMoreNavButton" aria-expanded="false"><span>•••</span>Mehr</button>
     </div>
     <div class="mobile-more-menu" id="mobileMoreMenu" hidden>
-      <button onclick="navigateMore('friends')">Community / Kanäle</button><button onclick="navigateMore('timer')">Timer</button><button onclick="navigateMore('ai')">KI-Coach</button><button onclick="navigateMore('progress')">Fortschritt</button><button onclick="navigateMore('feedback')">Feedback</button><button onclick="navigateMore('profile')">Über mich</button><button onclick="navigateMore('about')">Über uns</button><button onclick="navigateMore('settings')">Einstellungen</button><button id="mobileAdminNavButton" class="hidden" onclick="navigateMore('admin')">Admin</button>
+      <button onclick="navigateMore('friends')">Community / Kanäle</button><button onclick="navigateMore('timer')">Timer</button><button onclick="navigateMore('ai')">KI-Coach</button><button onclick="navigateMore('progress')">Fortschritt</button><button onclick="navigateMore('feedback')">Feedback</button><button onclick="navigateMore('profile')">Über mich</button><button onclick="navigateMore('about')">Über uns</button><button onclick="navigateMore('settings')">Einstellungen</button><button onclick="navigateMore('music')">Musik</button><button id="mobileAdminNavButton" class="hidden" onclick="navigateMore('admin')">Admin</button>
     </div>
 
         <!-- MAIN -->
@@ -3109,13 +3144,45 @@ body {
         </div>
       </section>
 
+    
+      <!-- MUSIC -->
+      <section id="music" class="page">
+        <div class="topbar"><div><p class="eyebrow">DEIN SOUNDTRACK</p><h2>Musik</h2><p class="muted">Deine Trainingsmusik direkt in FITNESS AI PRO.</p></div></div>
+        <div class="music-hero card">
+          <div class="music-hero-copy"><span class="music-kicker">FOCUS MODE</span><h3>Finde deinen Rhythmus.</h3><p>Öffne Playlists von Spotify oder Apple Music hier im Player. Melde dich beim jeweiligen Dienst an, wenn du dazu aufgefordert wirst.</p></div>
+          <div class="music-note" aria-hidden="true">♫</div>
+        </div>
+        <div class="music-layout">
+          <div class="card music-controls">
+            <h3>Player auswählen</h3>
+            <div class="music-provider-tabs" role="group" aria-label="Musikdienst">
+              <button type="button" class="music-provider active" data-music-provider="spotify">Spotify</button>
+              <button type="button" class="music-provider" data-music-provider="apple">Apple Music</button>
+            </div>
+            <label class="music-label" for="musicUrl">Playlist-, Album- oder Titel-Link</label>
+            <input id="musicUrl" class="music-input" type="url" placeholder="Link von Spotify oder Apple Music einfügen" autocomplete="url">
+            <button id="loadMusicButton" class="primary-btn music-load" type="button">Im Player öffnen</button>
+            <p id="musicStatus" class="music-status" role="status" aria-live="polite">Wähle einen Dienst und füge einen Link ein.</p>
+            <div class="music-tip"><strong>Hinweis</strong><span>Die Wiedergabe und Titel-Auswahl hängen vom Anbieter, deinem Konto und dessen Einbettungsregeln ab.</span></div>
+          </div>
+          <div class="card music-player-card">
+            <div class="music-player-heading"><div><p class="eyebrow">NOW PLAYING</p><h3>Dein Player</h3></div><span class="music-live-dot"></span></div>
+            <div id="musicEmpty" class="music-empty"><span>♫</span><p>Dein Player wartet auf einen Musik-Link.</p></div>
+            <div id="musicEmbedWrap" class="music-embed-wrap hidden"><iframe id="musicEmbed" title="Musikplayer" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+            <a id="musicOpenExternal" class="music-external hidden" href="#" target="_blank" rel="noopener noreferrer">Im Musikdienst öffnen ↗</a>
+          </div>
+        </div>
+        <div class="card music-help"><h3>So funktioniert es</h3><ol><li>Öffne Spotify oder Apple Music und kopiere den Link zu einer Playlist, einem Album oder Titel.</li><li>Wähle hier denselben Dienst und füge den Link ein.</li><li>Tippe auf „Im Player öffnen“ und starte die Wiedergabe im eingebetteten Player.</li></ol><p>Eine vollständige Kontoverknüpfung mit eigener OAuth-Anmeldung ist noch nicht aktiviert; dafür werden Entwickler-Konfigurationen der Musikdienste benötigt.</p></div>
+      </section>
+
     </main>
 
   </div>
 
 
   <!-- Deine JavaScript-Datei -->
-  <script src="script.js?v=20261012-google-observer-2"></script>
+  <script src="script.js?v=20261012-music-1"></script>
+  <script src="music.js?v=20261012-1"></script>
 
   <script>
     if ("serviceWorker" in navigator && location.protocol === "https:") {
