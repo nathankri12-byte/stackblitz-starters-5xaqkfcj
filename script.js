@@ -3357,24 +3357,20 @@ function isCurrentUserAdmin() {
 
 async function checkAdmin() {
 
-  const button =
-    document.getElementById(
-      "adminNavButton"
-    );
+  const buttons = [
+    document.getElementById("adminNavButton"),
+    document.getElementById("mobileAdminNavButton")
+  ].filter(Boolean);
 
-  if (
-    !button ||
-    !currentUser
-  ) {
+  if (!buttons.length || !currentUser) {
     return;
   }
 
   const isAdmin = isCurrentUserAdmin();
 
-  button.classList.toggle(
-    "hidden",
-    !isAdmin
-  );
+  buttons.forEach(button => {
+    button.classList.toggle("hidden", !isAdmin);
+  });
 }
 
 
