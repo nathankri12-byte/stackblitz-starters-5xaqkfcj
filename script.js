@@ -1,5 +1,5 @@
 "use strict";
-console.log("✅ script.js wurde geladen");
+console.log(" script.js wurde geladen");
 /* =========================================================
    FITNESS AI PRO
    ========================================================= */
@@ -51,12 +51,12 @@ function initSupabase() {
       SUPABASE_PUBLISHABLE_KEY
     );
 
-    console.log("✅ Supabase verbunden.");
+    console.log(" Supabase verbunden.");
     return true;
 
   } catch (error) {
     console.error(
-      "❌ Supabase konnte nicht initialisiert werden:",
+      " Supabase konnte nicht initialisiert werden:",
       error
     );
 
@@ -224,7 +224,7 @@ async function registerUser() {
     }
 
     setAuthMessage(
-      "Fast geschafft! 📧 Bitte bestätige deine E-Mail-Adresse. Danach kannst du dich anmelden.",
+      "Fast geschafft!  Bitte bestätige deine E-Mail-Adresse. Danach kannst du dich anmelden.",
       true
     );
 
@@ -681,7 +681,7 @@ async function saveProfile() {
     setInlineStatus("profileStatus", "Profil erfolgreich gespeichert.", true);
 
     console.log(
-      "✅ Profil gespeichert."
+      " Profil gespeichert."
     );
 
   } catch (error) {
@@ -1387,13 +1387,13 @@ function renderExercises() {
                   target="_blank"
                   rel="noopener"
                 >
-                  🎥 Video
+                   Video
                 </a>
 
                 <button
                   onclick="useAIQuickPrompt('Erkläre mir die richtige Technik für ${escapeHTML(exercise.name)}.')"
                 >
-                  🤖 KI
+                   KI
                 </button>
 
               </div>
@@ -1440,7 +1440,7 @@ function setupAIInput() {
     document.getElementById("aiSendButton");
 
   if (!input) {
-    console.warn("⚠️ aiInput wurde nicht gefunden.");
+    console.warn(" aiInput wurde nicht gefunden.");
     return;
   }
 
@@ -1475,7 +1475,7 @@ function setupAIInput() {
     });
   }
 
-  console.log("✅ KI-Eingabe bereit.");
+  console.log(" KI-Eingabe bereit.");
 }
 /* =========================================================
    BUILD AI CONTEXT
@@ -1558,7 +1558,7 @@ function addAIMessage(role, text) {
   const chat = document.getElementById("aiChat");
 
   if (!chat) {
-    console.error("❌ aiChat wurde nicht gefunden.");
+    console.error(" aiChat wurde nicht gefunden.");
     return null;
   }
 
@@ -1583,7 +1583,7 @@ function updateLastAIMessage(text) {
   const chat = document.getElementById("aiChat");
 
   if (!chat) {
-    console.error("❌ aiChat wurde nicht gefunden.");
+    console.error(" aiChat wurde nicht gefunden.");
     return;
   }
 
@@ -1661,7 +1661,7 @@ async function askGemini(
     if (showInChat) {
       addAIMessage(
         "assistant",
-        "❌ Supabase ist nicht verbunden."
+        " Supabase ist nicht verbunden."
       );
     }
 
@@ -1673,7 +1673,7 @@ async function askGemini(
     if (showInChat) {
       addAIMessage(
         "assistant",
-        "❌ Bitte melde dich zuerst an."
+        " Bitte melde dich zuerst an."
       );
     }
 
@@ -1693,7 +1693,7 @@ async function askGemini(
 
     addAIMessage(
       "assistant",
-      "⏳ Die KI denkt gerade …"
+      " Die KI denkt gerade …"
     );
 
     if (input) {
@@ -1768,7 +1768,7 @@ ${systemInstruction}
   try {
 
     console.log(
-      "🚀 Anfrage an smooth-handler..."
+      " Anfrage an smooth-handler..."
     );
 
     /*
@@ -1911,7 +1911,7 @@ ${systemInstruction}
     }
 
     console.log(
-      "✅ Antwort von smooth-handler erhalten."
+      " Antwort von smooth-handler erhalten."
     );
 
     if (showInChat) {
@@ -1933,7 +1933,7 @@ ${systemInstruction}
   } catch (error) {
 
     console.error(
-      "❌ KI-FEHLER:",
+      " KI-FEHLER:",
       error
     );
 
@@ -1945,7 +1945,7 @@ ${systemInstruction}
 
       updateLastAIMessage(
         formatAIText(
-          `❌ KI-Fehler\n\n${readableError}`
+          ` KI-Fehler\n\n${readableError}`
         )
       );
     }
@@ -1973,7 +1973,7 @@ async function generateTrainingPlan(customPrompt = "") {
     container.innerHTML = `
       <div class="card">
         <p class="card-description">
-          ⏳ Dein persönlicher Trainingsplan wird gerade erstellt …
+           Dein persönlicher Trainingsplan wird gerade erstellt …
         </p>
       </div>
     `;
@@ -2036,7 +2036,7 @@ Regeln:
       container.innerHTML = `
         <div class="card">
           <p class="card-description">
-            ❌ Der Trainingsplan konnte nicht erstellt werden.
+             Der Trainingsplan konnte nicht erstellt werden.
             Bitte versuche es erneut.
           </p>
         </div>
@@ -2090,7 +2090,7 @@ async function generateMealPlan(
     container.innerHTML = `
       <div class="card">
         <p class="card-description">
-          ⏳ Dein persönlicher Essensplan wird gerade erstellt …
+           Dein persönlicher Essensplan wird gerade erstellt …
         </p>
       </div>
     `;
@@ -2158,7 +2158,7 @@ Antworte ausschließlich mit dem Essensplan und der Einkaufsliste.
       container.innerHTML = `
         <div class="card">
           <p class="card-description">
-            ❌ Der Essensplan konnte nicht erstellt werden.
+             Der Essensplan konnte nicht erstellt werden.
             Bitte versuche es erneut.
           </p>
         </div>
@@ -2478,7 +2478,7 @@ function renderTrainingPlan(text) {
 
   if (!days.length) {
     // Wenn die KI vom gewünschten Format abweicht, trotzdem den ganzen Plan anzeigen.
-    container.innerHTML = '<section class="card"><h3>📅 Dein KI-Trainingsplan</h3><div class="training-plan-text">' +
+    container.innerHTML = '<section class="card"><h3> Dein KI-Trainingsplan</h3><div class="training-plan-text">' +
       rawText.split(/\r?\n/).filter(Boolean).map(line =>
         '<p style="white-space:pre-wrap;line-height:1.6;margin:8px 0">' + escape(line) + '</p>'
       ).join("") +
@@ -2488,7 +2488,7 @@ function renderTrainingPlan(text) {
   }
 
   container.innerHTML = '<div class="training-days">' + days.map(day =>
-    '<section class="card training-day-card"><div class="section-header"><div><h3>📅 ' + escape(day.name) +
+    '<section class="card training-day-card"><div class="section-header"><div><h3> ' + escape(day.name) +
     '</h3><p class="card-description">' + escape(day.focus) + '</p></div><span class="tag">' + day.exercises.length + ' Übungen</span></div>' +
     (day.exercises.length
       ? '<div class="training-exercises">' + day.exercises.map(exercise =>
@@ -3109,7 +3109,7 @@ async function sendFeedback() {
 
     if (status) {
       status.textContent =
-        "❌ Bitte melde dich zuerst an.";
+        " Bitte melde dich zuerst an.";
     }
 
     return;
@@ -3160,7 +3160,7 @@ async function sendFeedback() {
     if (error) {
 
       console.error(
-        "❌ Feedback-Fehler:",
+        " Feedback-Fehler:",
         error
       );
 
@@ -3169,7 +3169,7 @@ async function sendFeedback() {
           "#ff6b6b";
 
         status.textContent =
-          `❌ Feedback konnte nicht gespeichert werden: ${error.message}`;
+          ` Feedback konnte nicht gespeichert werden: ${error.message}`;
       }
 
       return;
@@ -3187,7 +3187,7 @@ async function sendFeedback() {
     if (status) {
 
       status.textContent =
-        "✅ Vielen Dank für dein Feedback!";
+        " Vielen Dank für dein Feedback!";
 
       status.style.color =
         "#35d07f";
@@ -3204,7 +3204,7 @@ async function sendFeedback() {
 
     if (status) {
       status.textContent =
-        "❌ Beim Senden ist ein Fehler aufgetreten.";
+        " Beim Senden ist ein Fehler aufgetreten.";
     }
   }
 }
@@ -3760,7 +3760,7 @@ function renderCommunityFeed(){
   const comments=communityState.comments.filter(c=>c.post_id===post.id);
   const image=post.image_url||"";
   const commentHtml=comments.map(c=>'<div class="community-comment"><div class="community-avatar" style="width:28px;height:28px;flex-basis:28px;font-size:9px">'+communityEscape(communityInitials(map.get(c.user_id)?.display_name||"FP"))+'</div><div><strong>'+communityEscape(map.get(c.user_id)?.display_name||"Mitglied")+'</strong><span>'+communityEscape(c.body)+'</span></div></div>').join("");
-  return '<article class="card community-post" data-post-id="'+communityEscape(post.id)+'"><div class="community-post-head"><div class="community-avatar">'+communityEscape(communityInitials(name))+'</div><div class="community-post-author"><strong>'+communityEscape(name)+'</strong><small>'+communityEscape(communityDate(post.created_at))+'</small></div>'+(mine?'<button class="community-post-menu" type="button" aria-label="Beitrag löschen" title="Beitrag löschen" onclick="deleteCommunityPost(\''+communityEscape(post.id)+'\')">×</button>':'')+'</div>'+(post.body?'<div class="community-post-body">'+communityEscape(post.body)+'</div>':'')+(image?'<img class="community-post-image" src="'+communityEscape(image)+'" alt="Bild zum Community-Beitrag" loading="lazy">':'')+'<div class="community-post-stats">'+(communityState.likeCounts.get(post.id)||0)+' Likes · '+comments.length+' Kommentare</div><div class="community-post-actions"><button type="button" class="'+(liked?"liked":"")+'" onclick="toggleCommunityLike(\''+communityEscape(post.id)+'\')">'+(liked?"♥ Gefällt dir":"♡ Gefällt mir")+'</button><button type="button" onclick="document.getElementById(\'communityComment-'+communityEscape(post.id)+'\')?.focus()">▢ Kommentieren</button>'+(mine?"":'<button type="button" onclick="followCommunityUser(\''+communityEscape(post.user_id)+'\')">'+(communityState.following.has(post.user_id)?"✓ Abonniert":"+ Abonnieren")+'</button>')+'</div><div class="community-comments">'+(commentHtml||'<p class="community-muted">Noch keine Kommentare.</p>')+'<form class="community-comment-form" onsubmit="event.preventDefault();submitCommunityComment(\''+communityEscape(post.id)+'\',this)"><label class="sr-only" for="communityComment-'+communityEscape(post.id)+'">Kommentar schreiben</label><input id="communityComment-'+communityEscape(post.id)+'" name="comment" maxlength="500" placeholder="Schreibe einen Kommentar …" required><button type="submit">Senden</button></form></div></article>';
+  return '<article class="card community-post" data-post-id="'+communityEscape(post.id)+'"><div class="community-post-head"><div class="community-avatar">'+communityEscape(communityInitials(name))+'</div><div class="community-post-author"><strong>'+communityEscape(name)+'</strong><small>'+communityEscape(communityDate(post.created_at))+'</small></div>'+(mine?'<button class="community-post-menu" type="button" aria-label="Beitrag löschen" title="Beitrag löschen" onclick="deleteCommunityPost(\''+communityEscape(post.id)+'\')">×</button>':'')+'</div>'+(post.body?'<div class="community-post-body">'+communityEscape(post.body)+'</div>':'')+(image?'<img class="community-post-image" src="'+communityEscape(image)+'" alt="Bild zum Community-Beitrag" loading="lazy">':'')+'<div class="community-post-stats">'+(communityState.likeCounts.get(post.id)||0)+' Likes · '+comments.length+' Kommentare</div><div class="community-post-actions"><button type="button" class="'+(liked?"liked":"")+'" onclick="toggleCommunityLike(\''+communityEscape(post.id)+'\')">'+(liked?" Gefällt dir":" Gefällt mir")+'</button><button type="button" onclick="document.getElementById(\'communityComment-'+communityEscape(post.id)+'\')?.focus()">▢ Kommentieren</button>'+(mine?"":'<button type="button" onclick="followCommunityUser(\''+communityEscape(post.user_id)+'\')">'+(communityState.following.has(post.user_id)?"✓ Abonniert":"+ Abonnieren")+'</button>')+'</div><div class="community-comments">'+(commentHtml||'<p class="community-muted">Noch keine Kommentare.</p>')+'<form class="community-comment-form" onsubmit="event.preventDefault();submitCommunityComment(\''+communityEscape(post.id)+'\',this)"><label class="sr-only" for="communityComment-'+communityEscape(post.id)+'">Kommentar schreiben</label><input id="communityComment-'+communityEscape(post.id)+'" name="comment" maxlength="500" placeholder="Schreibe einen Kommentar …" required><button type="submit">Senden</button></form></div></article>';
  }).join("");
 }
 function renderCommunityPeople(){
@@ -3872,7 +3872,7 @@ function renderCustomTimerPresets(){
  const box=document.getElementById("customTimerPresets");if(!box)return;
  box.innerHTML=allCustomTimerPresets().map(p=>{
   const active=p.id===customTimerActiveId;
-  return '<div class="timer-preset '+(active?"active":"")+'"><button type="button" class="timer-preset" style="border:0;flex:1" onclick="selectCustomTimer(\''+escapeTimerText(p.id)+'\')"><span class="timer-preset-icon">'+(p.id.includes("plank")?"Ⅱ":p.id.includes("stretch")?"↗":"◷")+'</span><span class="timer-preset-copy"><strong>'+escapeTimerText(p.name)+'</strong><small>'+formatCustomTimer(p.seconds)+'</small></span></button>'+(p.builtin?"":'<button type="button" class="timer-preset-delete" aria-label="Timer löschen" onclick="deleteCustomTimerPreset(\''+escapeTimerText(p.id)+'\')">×</button>')+'</div>';
+  return '<div class="timer-preset '+(active?"active":"")+'"><button type="button" class="timer-preset" style="border:0;flex:1" onclick="selectCustomTimer(\''+escapeTimerText(p.id)+'\')"><span class="timer-preset-icon">'+(p.id.includes("plank")?"Ⅱ":p.id.includes("stretch")?"":"◷")+'</span><span class="timer-preset-copy"><strong>'+escapeTimerText(p.name)+'</strong><small>'+formatCustomTimer(p.seconds)+'</small></span></button>'+(p.builtin?"":'<button type="button" class="timer-preset-delete" aria-label="Timer löschen" onclick="deleteCustomTimerPreset(\''+escapeTimerText(p.id)+'\')">×</button>')+'</div>';
  }).join("");
 }
 function stopCustomTimerInterval(){
