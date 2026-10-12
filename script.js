@@ -863,6 +863,7 @@ async function loadApp() {
 
   await createProfileIfMissing();
   await loadProfile();
+  await ensureCommunityProfile();
   await loadDailyCheckin();
   await loadWeights();
   await loadTrainingProgress();
@@ -923,6 +924,9 @@ function showTab(tabName) {
 
   if (tabName === "dashboard") {
     loadDailyCheckin();
+  }
+  if (tabName === "friends") {
+    loadCommunity();
   }
 
   if (
@@ -3681,6 +3685,136 @@ async function init() {
 /* =========================================================
    START
 ========================================================= */
+
+
+/* COMMUNITY — echte Inhalte aus Supabase, keine Demo-Beiträge */
+const communityState = { feed:"all", profiles:[], posts:[], following:new Set(), likes:new Set(), comments:[] };
+function communityEscape(value){return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
+function communityInitials(name){const p=String(name||"FP").trim().split(/\s+/).filter(Boolean);return (p.length>1?p[0][0]+p[1][0]:(p[0]||"FP").slice(0,2)).toUpperCase();}
+function communityDate(value){const d=new Date(value);return Number.isNaN(d.getTime())?"":d.toLocaleString("de-DE",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});}
+function communityStatus(id,message,success=false){const el=document.getElementById(id);if(el){el.textContent=message||"";el.style.color=success?"var(--accent)":"var(--muted)";}}
+async function ensureCommunityProfile(){
+ if(!supabaseClient||!currentUser)return;
+ const name=currentProfile?.name||currentUser.user_metadata?.name||currentUser.email?.split("@")[0]||"Mitglied";
+ const {error}=await supabaseClient.from("community_profiles").upsert({user_id:currentUser.id,display_name:String(name).slice(0,40)},{onConflict:"user_id",ignoreDuplicates:true});
+ if(error)console.warn("Community-Profil konnte nicht initialisiert werden:",error.message);
+}
+async function loadCommunity(){
+ const feed=document.getElementById("communityFeed");if(!feed)return;
+ if(!supabaseClient||!currentUser){feed.innerHTML='<div class="card community-empty"><strong>Bitte anmelden</strong><p>Du musst angemeldet sein, um echte Beiträge zu sehen oder zu veröffentlichen.</p></div>';return;}
+ feed.innerHTML='<div class="card community-empty"><span class="community-loading-dot"></span><p>Gespeicherte Beiträge werden geladen …</p></div>';
+ try{
+  await ensureCommunityProfile();
+  const [pr,po,fo,li]=await Promise.all([
+   supabaseClient.from("community_profiles").select("user_id,display_name,bio,avatar_url,created_at").order("created_at",{ascending:true}).limit(300),
+   supabaseClient.from("community_posts").select("id,user_id,body,image_path,created_at,updated_at").order("created_at",{ascending:false}).limit(60),
+   supabaseClient.from("community_follows").select("following_id").eq("follower_id",currentUser.id),
+   supabaseClient.from("community_likes").select("post_id").eq("user_id",currentUser.id)
+  ]);
+  for(const r of [pr,po,fo,li])if(r.error)throw r.error;
+  communityState.profiles=pr.data||[];communityState.posts=po.data||[];
+  communityState.following=new Set((fo.data||[]).map(x=>x.following_id));
+  communityState.likes=new Set((li.data||[]).map(x=>x.post_id));
+  const ids=communityState.posts.map(p=>p.id);
+  if(ids.length){const {data,error}=await supabaseClient.from("community_comments").select("id,post_id,user_id,body,created_at").in("post_id",ids).order("created_at",{ascending:true}).limit(180);if(error)throw error;communityState.comments=data||[];}else communityState.comments=[];
+  const own=communityState.profiles.find(p=>p.user_id===currentUser.id);
+  if(own){
+   const n=document.getElementById("communityDisplayName"),b=document.getElementById("communityBio"),a=document.getElementById("communityMyAvatar");
+   if(n&&document.activeElement!==n)n.value=own.display_name||"";
+   if(b&&document.activeElement!==b)b.value=own.bio||"";
+   if(a)a.textContent=communityInitials(own.display_name);
+  }
+  renderCommunityPeople();renderCommunityFeed();
+ }catch(error){
+  console.error("Community konnte nicht geladen werden:",error);
+  feed.innerHTML='<div class="card community-empty"><strong>Community konnte nicht geladen werden.</strong><p>Die Daten konnten gerade nicht abgerufen werden. Bitte prüfe deine Verbindung und versuche es erneut.</p><button class="secondary-btn" type="button" onclick="loadCommunity()">Erneut versuchen</button></div>';
+ }
+}
+function setCommunityFeed(mode){communityState.feed=mode==="following"?"following":"all";document.querySelectorAll("[data-community-feed]").forEach(b=>b.classList.toggle("active",b.dataset.communityFeed===communityState.feed));renderCommunityFeed();}
+function communityProfileMap(){return new Map(communityState.profiles.map(p=>[p.user_id,p]));}
+function renderCommunityFeed(){
+ const feed=document.getElementById("communityFeed");if(!feed)return;
+ const map=communityProfileMap();let posts=communityState.posts;
+ if(communityState.feed==="following")posts=posts.filter(p=>communityState.following.has(p.user_id));
+ if(!posts.length){const f=communityState.feed==="following";feed.innerHTML='<div class="card community-empty"><strong>'+(f?"Noch keine Beiträge von Leuten, denen du folgst.":"Noch keine Beiträge")+'</strong><p>'+(f?"Folge Mitgliedern, um ihre Beiträge hier zu sehen.":"Sei das erste Mitglied, das einen Beitrag teilt. Hier erscheinen nur erfolgreich gespeicherte Beiträge.")+'</p></div>';return;}
+ feed.innerHTML=posts.map(post=>{
+  const p=map.get(post.user_id),name=p?.display_name||"Community-Mitglied",mine=post.user_id===currentUser?.id,liked=communityState.likes.has(post.id);
+  const comments=communityState.comments.filter(c=>c.post_id===post.id);
+  const image=post.image_path?supabaseClient.storage.from("community-images").getPublicUrl(post.image_path).data.publicUrl:"";
+  const commentHtml=comments.map(c=>'<div class="community-comment"><div class="community-avatar" style="width:28px;height:28px;flex-basis:28px;font-size:9px">'+communityEscape(communityInitials(map.get(c.user_id)?.display_name||"FP"))+'</div><div><strong>'+communityEscape(map.get(c.user_id)?.display_name||"Mitglied")+'</strong><span>'+communityEscape(c.body)+'</span></div></div>').join("");
+  return '<article class="card community-post" data-post-id="'+communityEscape(post.id)+'"><div class="community-post-head"><div class="community-avatar">'+communityEscape(communityInitials(name))+'</div><div class="community-post-author"><strong>'+communityEscape(name)+'</strong><small>'+communityEscape(communityDate(post.created_at))+'</small></div>'+(mine?'<button class="community-post-menu" type="button" aria-label="Beitrag löschen" title="Beitrag löschen" onclick="deleteCommunityPost(\''+communityEscape(post.id)+'\')">×</button>':'')+'</div>'+(post.body?'<div class="community-post-body">'+communityEscape(post.body)+'</div>':'')+(image?'<img class="community-post-image" src="'+communityEscape(image)+'" alt="Bild zum Community-Beitrag" loading="lazy">':'')+'<div class="community-post-stats">'+comments.length+' Kommentare</div><div class="community-post-actions"><button type="button" class="'+(liked?"liked":"")+'" onclick="toggleCommunityLike(\''+communityEscape(post.id)+'\')">'+(liked?"♥ Gefällt dir":"♡ Gefällt mir")+'</button><button type="button" onclick="document.getElementById(\'communityComment-'+communityEscape(post.id)+'\')?.focus()">▢ Kommentieren</button>'+(mine?"":'<button type="button" onclick="followCommunityUser(\''+communityEscape(post.user_id)+'\')">'+(communityState.following.has(post.user_id)?"✓ Folge ich":"+ Folgen")+'</button>')+'</div><div class="community-comments">'+(commentHtml||'<p class="community-muted">Noch keine Kommentare.</p>')+'<form class="community-comment-form" onsubmit="event.preventDefault();submitCommunityComment(\''+communityEscape(post.id)+'\',this)"><label class="sr-only" for="communityComment-'+communityEscape(post.id)+'">Kommentar schreiben</label><input id="communityComment-'+communityEscape(post.id)+'" name="comment" maxlength="500" placeholder="Schreibe einen Kommentar …" required><button type="submit">Senden</button></form></div></article>';
+ }).join("");
+}
+function renderCommunityPeople(){
+ const box=document.getElementById("communityPeople");if(!box)return;
+ const people=communityState.profiles.filter(p=>p.user_id!==currentUser?.id),count=document.getElementById("communityMemberCount");
+ if(count)count.textContent=String(communityState.profiles.length);
+ if(!people.length){box.innerHTML='<p class="community-muted">Noch keine weiteren Mitglieder. Sobald sich andere Nutzer anmelden, werden sie hier angezeigt.</p>';return;}
+ box.innerHTML=people.map(p=>{const yes=communityState.following.has(p.user_id);return '<div class="community-person"><div class="community-avatar" style="width:36px;height:36px;flex-basis:36px;font-size:11px">'+communityEscape(communityInitials(p.display_name))+'</div><div class="community-person-info"><strong>'+communityEscape(p.display_name||"Mitglied")+'</strong><small>'+communityEscape(p.bio||"Teil der Fitness-Community")+'</small></div><button type="button" class="community-follow-btn '+(yes?"following":"")+'" onclick="followCommunityUser(\''+communityEscape(p.user_id)+'\')">'+(yes?"Folge ich":"Folgen")+'</button></div>';}).join("");
+}
+async function saveCommunityProfile(){
+ if(!supabaseClient||!currentUser){communityStatus("communityProfileStatus","Bitte melde dich zuerst an.");return;}
+ const name=document.getElementById("communityDisplayName")?.value.trim()||"",bio=document.getElementById("communityBio")?.value.trim()||"";
+ if(!name||name.length>40||bio.length>180){communityStatus("communityProfileStatus","Bitte gib einen Anzeigenamen (1–40 Zeichen) und eine Bio mit höchstens 180 Zeichen ein.");return;}
+ const {error}=await supabaseClient.from("community_profiles").upsert({user_id:currentUser.id,display_name:name,bio,updated_at:new Date().toISOString()},{onConflict:"user_id"});
+ if(error){console.error(error);communityStatus("communityProfileStatus","Profil konnte nicht gespeichert werden. Bitte erneut versuchen.");return;}
+ communityStatus("communityProfileStatus","Community-Profil gespeichert.",true);await loadCommunity();
+}
+let communitySelectedImage=null,communityPreviewUrl=null;
+function previewCommunityImage(event){
+ const file=event?.target?.files?.[0]||null,preview=document.getElementById("communityImagePreview"),status=document.getElementById("communityPostStatus");
+ communitySelectedImage=null;if(communityPreviewUrl)URL.revokeObjectURL(communityPreviewUrl);communityPreviewUrl=null;
+ if(preview){preview.innerHTML="";preview.hidden=true;}if(!file)return;
+ if(!["image/jpeg","image/png","image/webp"].includes(file.type)){if(status)status.textContent="Bitte wähle ein JPG-, PNG- oder WebP-Bild.";event.target.value="";return;}
+ if(file.size>5*1024*1024){if(status)status.textContent="Das Bild ist größer als 5 MB. Bitte verkleinere es.";event.target.value="";return;}
+ communitySelectedImage=file;communityPreviewUrl=URL.createObjectURL(file);
+ if(preview){const img=document.createElement("img");img.src=communityPreviewUrl;img.alt="Vorschau des ausgewählten Bildes";const remove=document.createElement("button");remove.type="button";remove.textContent="Bild entfernen";remove.onclick=clearCommunityImage;preview.append(img,remove);preview.hidden=false;}
+ if(status)status.textContent="";
+}
+function clearCommunityImage(){communitySelectedImage=null;if(communityPreviewUrl)URL.revokeObjectURL(communityPreviewUrl);communityPreviewUrl=null;const i=document.getElementById("communityImageInput"),p=document.getElementById("communityImagePreview");if(i)i.value="";if(p){p.innerHTML="";p.hidden=true;}}
+async function publishCommunityPost(){
+ const text=document.getElementById("communityPostText")?.value.trim()||"",status="communityPostStatus",button=document.getElementById("communityPublishBtn");
+ if(!supabaseClient||!currentUser){communityStatus(status,"Bitte melde dich an, bevor du etwas veröffentlichst.");return;}
+ if(!text&&!communitySelectedImage){communityStatus(status,"Schreibe etwas oder füge ein Bild hinzu.");return;}
+ if(text.length>1200){communityStatus(status,"Dein Beitrag darf höchstens 1.200 Zeichen enthalten.");return;}
+ if(button){button.disabled=true;button.textContent="Wird veröffentlicht …";}communityStatus(status,"Beitrag wird gespeichert …",true);
+ let imagePath=null;
+ try{
+  if(communitySelectedImage){const file=communitySelectedImage,ext=({"image/jpeg":"jpg","image/png":"png","image/webp":"webp"})[file.type];imagePath=currentUser.id+"/"+Date.now()+"-"+crypto.randomUUID()+"."+ext;
+   const {error}=await supabaseClient.storage.from("community-images").upload(imagePath,file,{contentType:file.type,cacheControl:"3600",upsert:false});if(error)throw error;}
+  const {error}=await supabaseClient.from("community_posts").insert({user_id:currentUser.id,body:text,image_path:imagePath});
+  if(error){if(imagePath)await supabaseClient.storage.from("community-images").remove([imagePath]);throw error;}
+  const el=document.getElementById("communityPostText");if(el)el.value="";clearCommunityImage();communityStatus(status,"Beitrag erfolgreich veröffentlicht.",true);await loadCommunity();
+ }catch(error){console.error("Community-Beitrag konnte nicht gespeichert werden:",error);communityStatus(status,"Nicht veröffentlicht: Der Beitrag konnte nicht gespeichert werden. Bitte erneut versuchen.");}
+ finally{if(button){button.disabled=false;button.textContent="Beitrag veröffentlichen";}}
+}
+async function toggleCommunityLike(postId){
+ if(!supabaseClient||!currentUser)return;const yes=communityState.likes.has(postId);
+ const result=yes?await supabaseClient.from("community_likes").delete().eq("post_id",postId).eq("user_id",currentUser.id):await supabaseClient.from("community_likes").insert({post_id:postId,user_id:currentUser.id});
+ if(result.error){console.error("Like konnte nicht gespeichert werden:",result.error);alert("Das Like konnte nicht gespeichert werden. Bitte erneut versuchen.");return;}
+ if(yes)communityState.likes.delete(postId);else communityState.likes.add(postId);renderCommunityFeed();
+}
+async function followCommunityUser(userId){
+ if(!supabaseClient||!currentUser||!userId||userId===currentUser.id)return;const yes=communityState.following.has(userId);
+ const result=yes?await supabaseClient.from("community_follows").delete().eq("follower_id",currentUser.id).eq("following_id",userId):await supabaseClient.from("community_follows").insert({follower_id:currentUser.id,following_id:userId});
+ if(result.error){console.error("Follow-Aktion fehlgeschlagen:",result.error);alert("Das Folgen konnte nicht gespeichert werden. Bitte erneut versuchen.");return;}
+ if(yes)communityState.following.delete(userId);else communityState.following.add(userId);renderCommunityPeople();renderCommunityFeed();
+}
+async function submitCommunityComment(postId,form){
+ if(!supabaseClient||!currentUser)return;const input=form?.elements?.comment,body=input?.value.trim()||"";if(!body||body.length>500)return;
+ const button=form.querySelector("button[type='submit']");if(button){button.disabled=true;button.textContent="…";}
+ const {error}=await supabaseClient.from("community_comments").insert({post_id:postId,user_id:currentUser.id,body});
+ if(error){console.error("Kommentar konnte nicht gespeichert werden:",error);alert("Der Kommentar wurde nicht gespeichert. Bitte erneut versuchen.");if(button){button.disabled=false;button.textContent="Senden";}return;}
+ await loadCommunity();
+}
+async function deleteCommunityPost(postId){
+ if(!supabaseClient||!currentUser)return;const post=communityState.posts.find(p=>p.id===postId);if(!post||post.user_id!==currentUser.id)return;
+ if(!confirm("Diesen Beitrag wirklich löschen?"))return;
+ const {error}=await supabaseClient.from("community_posts").delete().eq("id",postId).eq("user_id",currentUser.id);
+ if(error){console.error("Beitrag konnte nicht gelöscht werden:",error);alert("Der Beitrag konnte nicht gelöscht werden. Bitte erneut versuchen.");return;}
+ if(post.image_path){const {error:imageError}=await supabaseClient.storage.from("community-images").remove([post.image_path]);if(imageError)console.warn("Beitragsbild konnte nicht entfernt werden:",imageError.message);}
+ await loadCommunity();
+}
 
 document.addEventListener(
   "DOMContentLoaded",
