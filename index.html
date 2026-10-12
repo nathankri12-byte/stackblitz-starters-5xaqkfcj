@@ -1428,6 +1428,107 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
  .settings-row select,.settings-row input[type="text"]{width:100%;max-width:none}
 }
 
+  
+    /* FINAL DESIGN SYSTEM — all interactive highlights follow the selected accent */
+    :root {
+      --accent-ink: #07111f;
+      --accent-soft: color-mix(in srgb, var(--accent) 13%, transparent);
+      --accent-border: color-mix(in srgb, var(--accent) 38%, var(--border));
+    }
+    .primary-btn,
+    .ai-send,
+    .settings-color[aria-pressed="true"] {
+      background: var(--accent) !important;
+      color: var(--accent-ink) !important;
+      border-color: var(--accent) !important;
+      box-shadow: 0 5px 18px color-mix(in srgb, var(--accent) 16%, transparent);
+    }
+    .primary-btn:hover, .ai-send:hover { filter: brightness(1.06); }
+    .logo-icon, .sidebar-logo span, .ai-avatar, .profile-avatar {
+      background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 72%, #101827)) !important;
+      color: var(--accent-ink) !important;
+      box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 15%, transparent);
+    }
+    .nav button:hover, .nav button.active,
+    .more-menu button:hover, .mobile-more-menu button:hover,
+    .mobile-nav button.active {
+      background: var(--accent-soft) !important;
+      color: var(--accent) !important;
+      box-shadow: inset 3px 0 0 var(--accent);
+    }
+    .nav button.active .nav-icon { color: var(--accent) !important; }
+    .field input:focus, .field select:focus, .field textarea:focus,
+    .ai-input-area textarea:focus, .training-metrics input:focus {
+      border-color: var(--accent) !important;
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 13%, transparent);
+    }
+    .meal-card { border-left-color: var(--accent) !important; }
+    .meal-time, .shopping-list li::before,
+    .weight-chart-dot, .training-metric-chart circle { color: var(--accent) !important; }
+    .weight-chart-dot, .training-metric-chart circle { fill: var(--accent) !important; }
+    .training-exercise-checkbox { accent-color: var(--accent) !important; }
+    .rating button.selected {
+      background: var(--accent-soft) !important;
+      border-color: var(--accent) !important;
+      color: var(--accent) !important;
+    }
+    .ai-message.user {
+      background: var(--accent) !important;
+      color: var(--accent-ink) !important;
+      border: 1px solid var(--accent-border);
+    }
+    .hero {
+      background:
+        radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 48%),
+        linear-gradient(135deg, var(--card2), var(--bg2)) !important;
+      border-color: var(--accent-border) !important;
+    }
+    .sidebar {
+      background: color-mix(in srgb, var(--bg) 94%, #000) !important;
+      box-shadow: 10px 0 35px rgba(0,0,0,.08);
+    }
+    .sidebar-section-label {
+      margin: 2px 10px 9px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.25px;
+    }
+    .sidebar-more-label { margin-top: 18px; margin-bottom: 7px; }
+    .sidebar .nav { gap: 4px; }
+    .nav button, .sidebar-more-toggle, .more-menu button {
+      min-height: 44px;
+      transition: background .16s ease, color .16s ease, transform .16s ease;
+    }
+    .nav button:hover, .sidebar-more-toggle:hover { transform: translateX(2px); }
+    .sidebar-logo { padding-bottom: 27px; letter-spacing: -.25px; }
+    .sidebar-more { margin-top: 2px; }
+    .sidebar-more-toggle { border: 1px solid transparent; }
+    .sidebar-more-toggle[aria-expanded="true"] {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: var(--accent-border);
+    }
+    .secondary-btn {
+      transition: border-color .16s ease, background .16s ease, transform .16s ease;
+    }
+    .secondary-btn:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .settings-color { outline-offset: 3px; }
+    .settings-color[aria-pressed="true"] { outline: 2px solid var(--accent); }
+    body[data-theme="light"] .sidebar {
+      background: rgba(255,255,255,.96) !important;
+      box-shadow: 8px 0 30px rgba(20,30,20,.05);
+    }
+    body[data-theme="light"] .hero {
+      background: linear-gradient(135deg, #fff, color-mix(in srgb, var(--accent) 7%, #fff)) !important;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+
   </style>
 </head>
 
@@ -1551,11 +1652,13 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
         FITNESS AI PRO
       </div>
 
+      <div class="sidebar-section-label">DEIN BEREICH</div>
       <nav class="nav" aria-label="Hauptnavigation">
         <button class="active" onclick="showTab('dashboard')" data-tab="dashboard" data-quick="true"><span class="nav-icon">⌂</span><span id="quickLabel1">Dashboard</span></button>
         <button onclick="showTab('training')" data-tab="training" data-quick="true"><span class="nav-icon">▥</span><span id="quickLabel2">Training</span></button>
         <button onclick="showTab('nutrition')" data-tab="nutrition" data-quick="true"><span class="nav-icon">◒</span><span id="quickLabel3">Ernährung</span></button>
         <div class="sidebar-more">
+          <div class="sidebar-section-label sidebar-more-label">WEITERE FUNKTIONEN</div>
           <button class="sidebar-more-toggle" id="moreMenuToggle" type="button" aria-expanded="false" aria-controls="moreMenu" onclick="toggleMoreMenu()"><span class="nav-icon">•••</span><span>Mehr</span><span style="margin-left:auto">⌄</span></button>
           <div class="more-menu" id="moreMenu" hidden>
             <button onclick="navigateMore('ai')" data-tab="ai"><span class="nav-icon"></span>KI-Coach</button>
@@ -2568,6 +2671,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
       document.documentElement.style.setProperty("--accent",accent);
       document.documentElement.style.setProperty("--accent2",accent);
       document.documentElement.style.setProperty("--green",accent);
+      document.documentElement.style.setProperty("--accent-ink","#07111f");
       document.body.dataset.theme=theme;
       if(theme==="light"){
         document.documentElement.style.setProperty("--bg","#f2f4ef");document.documentElement.style.setProperty("--bg2","#ffffff");document.documentElement.style.setProperty("--card","#ffffff");document.documentElement.style.setProperty("--card2","#e9ede3");document.documentElement.style.setProperty("--border","#d8ddd1");document.documentElement.style.setProperty("--text","#171a13");document.documentElement.style.setProperty("--muted","#64695d");document.body.style.background="#f2f4ef";
@@ -2618,7 +2722,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
     }
     document.addEventListener("DOMContentLoaded",()=>{
       applyUiSettings();
-      document.querySelectorAll(".settings-color").forEach(b=>b.addEventListener("click",()=>{chosenAccent=b.dataset.accent;document.querySelectorAll(".settings-color").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));document.documentElement.style.setProperty("--accent",chosenAccent);document.documentElement.style.setProperty("--accent2",chosenAccent);}));
+      document.querySelectorAll(".settings-color").forEach(b=>b.addEventListener("click",()=>{chosenAccent=b.dataset.accent;document.querySelectorAll(".settings-color").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));document.documentElement.style.setProperty("--accent",chosenAccent);document.documentElement.style.setProperty("--accent2",chosenAccent);document.documentElement.style.setProperty("--green",chosenAccent);document.documentElement.style.setProperty("--accent-ink","#07111f");}));
     });
   </script>
 
