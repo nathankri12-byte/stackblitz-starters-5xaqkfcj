@@ -77,7 +77,13 @@
     empty.classList.add("hidden");
     external.href = result.external;
     external.classList.remove("hidden");
-    setStatus("Player geladen. Falls nötig, melde dich beim Musikdienst an und starte die Wiedergabe dort.");
+    const isSingleTrack = /\\/(track|song)\\//i.test(new URL(result.external).pathname);
+    external.textContent = provider === "spotify"
+      ? (isSingleTrack ? "Vollständig in Spotify abspielen ↗" : "Playlist vollständig in Spotify öffnen ↗")
+      : (isSingleTrack ? "Vollständig in Apple Music abspielen ↗" : "In Apple Music öffnen ↗");
+    setStatus(provider === "spotify"
+      ? "Hinweis: Der eingebettete Player kann je nach Konto nur eine Vorschau abspielen. Für den ganzen Song oben Spotify öffnen und dort die Wiedergabe starten."
+      : "Hinweis: Apple Music spielt eingebettet je nach Abo oft nur eine Vorschau. Für den ganzen Song oben Apple Music öffnen und dort die Wiedergabe starten.");
 
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ provider, url: input.value.trim() }));
