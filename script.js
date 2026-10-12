@@ -3568,7 +3568,9 @@ async function loadAllFeedback() {
       const name = String(profile.Name || "").trim();
       const email = String(profile.email || "").trim();
       if (uid && !profileByUser.has(uid) && name) profileByUser.set(uid, name);
-      if (email && name && !profileByEmail.has(email.toLowerCase())) profileByEmail.set(email.toLowerCase(), name);
+      if (email && name && (!profileByEmail.has(email.toLowerCase()) || profileByEmail.get(email.toLowerCase()) === email)) {
+        profileByEmail.set(email.toLowerCase(), name);
+      }
       if (email && !profileByEmail.has(email.toLowerCase())) profileByEmail.set(email.toLowerCase(), email);
     });
 
@@ -3610,7 +3612,7 @@ async function loadAllFeedback() {
               </div>
               ${isOwner
                 ? '<span class="admin-owner-badge">Hauptadmin · geschützt</span>'
-                : `<button type="button" class="admin-remove-btn" onclick="removeAdmin('${escapeHTML(email)}')">Entfernen</button>`}
+                : `<button type="button" class="admin-remove-btn" data-remove-admin="true" data-admin-email="${escapeHTML(email)}">Entfernen</button>`}
             </div>`;
         }).join("");
       }
@@ -3628,6 +3630,10 @@ async function loadAllFeedback() {
           ? createdDate.toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "short" })
           : "Datum unbekannt"
       };
+    });
+
+    adminList?.querySelectorAll("[data-remove-admin]").forEach(button => {
+      button.addEventListener("click", () => removeAdmin(button.dataset.adminEmail || ""));
     });
 
     const search = document.getElementById("adminFeedbackSearch");
