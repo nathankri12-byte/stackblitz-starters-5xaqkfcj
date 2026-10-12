@@ -1559,7 +1559,6 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
           <button class="sidebar-more-toggle" id="moreMenuToggle" type="button" aria-expanded="false" aria-controls="moreMenu" onclick="toggleMoreMenu()"><span class="nav-icon">•••</span><span>Mehr</span><span style="margin-left:auto">⌄</span></button>
           <div class="more-menu" id="moreMenu" hidden>
             <button onclick="navigateMore('ai')" data-tab="ai"><span class="nav-icon"></span>KI-Coach</button>
-            <button onclick="navigateMore('friends')" data-tab="friends"><span class="nav-icon">◎</span>Community</button>
             <button onclick="navigateMore('progress')" data-tab="progress"><span class="nav-icon">↗</span>Fortschritt</button>
             <button onclick="navigateMore('feedback')" data-tab="feedback"><span class="nav-icon"></span>Feedback</button>
             <button onclick="navigateMore('profile')" data-tab="profile"><span class="nav-icon">○</span>Über mich / Profil</button>
@@ -1587,7 +1586,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
       <button onclick="toggleMobileMore()" id="mobileMoreNavButton" aria-expanded="false"><span>•••</span>Mehr</button>
     </div>
     <div class="mobile-more-menu" id="mobileMoreMenu" hidden>
-      <button onclick="navigateMore('ai')">KI-Coach</button><button onclick="navigateMore('friends')">Community</button><button onclick="navigateMore('progress')">Fortschritt</button><button onclick="navigateMore('feedback')">Feedback</button><button onclick="navigateMore('profile')">Über mich</button><button onclick="navigateMore('settings')">Einstellungen</button>
+      <button onclick="navigateMore('ai')">KI-Coach</button><button onclick="navigateMore('progress')">Fortschritt</button><button onclick="navigateMore('feedback')">Feedback</button><button onclick="navigateMore('profile')">Über mich</button><button onclick="navigateMore('settings')">Einstellungen</button>
     </div>
 
         <!-- MAIN -->
@@ -1618,18 +1617,10 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
         </div>
 
 
-        <div class="dashboard-showcase">
-          <div class="workout-progress-card"><div><h3>Workout Progress!</h3><p id="workoutProgressText">Noch kein Trainingsfortschritt erfasst.</p><p style="color:var(--accent);font-weight:700;margin-top:9px">Weiter so! ↗</p></div><div class="progress-ring"><strong id="workoutProgressPercent">0%</strong></div></div>
-          <div class="workout-progress-card"><div><h3>Dein Tagesziel</h3><p>Trainiere regelmäßig und bleib in Bewegung.</p><button class="secondary-btn" style="margin-top:12px" onclick="showTab('training')">Training öffnen →</button></div></div>
+        <div class="card" style="margin-bottom:18px">
+          <h3>Deine Daten</h3>
+          <p class="card-description">Trainingspläne und Profilangaben kannst du hier in der App nutzen. Automatische Schritt-, Schlaf- und Kalorienmessung sowie Empfehlungen für Joggingstrecken sind derzeit nicht verbunden und werden deshalb nicht als Live-Daten angezeigt.</p>
         </div>
-        <div class="dashboard-metric-grid">
-          <div class="metric-tile lime"><span class="metric-icon">◉</span><div class="metric-ring">kcal</div><div class="metric-label">CALORIES</div><strong>— kCal</strong><small>Noch nicht erfasst</small></div>
-          <div class="metric-tile"><span class="metric-icon">↗</span><div class="metric-label">STEPS</div><strong>—</strong><small>Schritte nicht verbunden</small></div>
-          <div class="metric-tile"><span class="metric-icon">◔</span><div class="metric-label">SLEEP</div><strong>— / 8 h</strong><small>Schlaf nicht erfasst</small></div>
-          <div class="metric-tile photo-tile"><div class="metric-label">MAKE IT COUNT</div><strong>One more rep.</strong><small>One step at a time.</small></div>
-        </div>
-        <h3 style="margin:4px 0 10px">Programs</h3>
-        <div class="program-strip"><button class="program-chip" onclick="showTab('training')"><span><img src="https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=160&q=80" alt="" loading="lazy"></span>Jog</button><button class="program-chip" onclick="showTab('training')"><span><img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=160&q=80" alt="" loading="lazy"></span>Yoga</button><button class="program-chip" onclick="showTab('training')"><span><img src="https://images.unsplash.com/photo-1558611848-73f7eb4001a1?auto=format&fit=crop&w=160&q=80" alt="" loading="lazy"></span>Cycling</button><button class="program-chip" onclick="showTab('training')"><span><img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=160&q=80" alt="" loading="lazy"></span>Workout</button></div>
 
         <div class="hero">
 
@@ -1993,17 +1984,11 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 
       <!-- COMMUNITY / FRIENDS -->
       <section id="friends" class="page">
-        <div class="topbar"><div><h2>Friends</h2><p>Gemeinsam motiviert bleiben.</p></div></div>
-        <div class="friends-switch"><button class="active" type="button">Feed</button><button type="button" onclick="showTab('progress')">Progress</button></div>
-        <div class="card friend-post">
-          <div class="friend-post-head"><div class="friend-avatar">JW</div><div><strong>John Wick</strong><small>12 hours ago · Training</small></div><span style="margin-left:auto;color:var(--muted)">•••</span></div>
-          <p class="friend-quote">“It's gonna hurt so bad that you'll do it again and again because you know the work is worth it.”</p>
-          <img class="friend-photo" src="https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=1000&q=80" alt="Sportler beim Krafttraining" loading="lazy">
-          <div class="friend-post-actions"><span> 128 Likes</span><span>▢ 24 Kommentare</span><span style="margin-left:auto">↗ Teilen</span></div>
+        <div class="topbar"><div><h2>Community</h2><p>Gemeinsam motiviert bleiben.</p></div></div>
+        <div class="card">
+          <h3>Noch nicht verfügbar</h3>
+          <p class="card-description">Die Community ist noch nicht mit einem Backend verbunden. Deshalb zeigen wir hier keine erfundenen Profile, Beiträge, Likes, Kommentare oder Online-Zahlen an. Sobald echte Beiträge und Konten funktionieren, kann dieser Bereich freigeschaltet werden.</p>
         </div>
-        <div class="online-line"><strong style="color:var(--text)">28 ONLINE</strong><span class="online-dots"><i></i><i></i><i></i><span style="margin-left:8px">Freunde sind aktiv</span></span></div>
-        <div class="friend-compose"><input type="text" placeholder="Share your thoughts..." aria-label="Gedanken teilen"><button class="secondary-btn" type="button" aria-label="Foto"></button><button class="primary-btn" style="width:auto;margin:0" type="button" aria-label="Teilen"></button></div>
-        <p class="card-description" style="margin-top:10px">Community-Vorschau mit Beispieldaten. Beiträge und Likes sind noch nicht mit einem Community-Backend verbunden.</p>
       </section>
 
       <!-- =========================
@@ -2023,16 +2008,10 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 
 
 
-        <div class="card" style="margin-bottom:13px">
-          <div class="food-week"><div class="food-day">MON<strong>1</strong></div><div class="food-day">TUE<strong>2</strong></div><div class="food-day active">WED<strong>4</strong></div><div class="food-day">THU<strong>5</strong></div><div class="food-day">FRI<strong>6</strong></div><div class="food-day">SAT<strong>7</strong></div><div class="food-day">SUN<strong>8</strong></div></div>
-          <div class="macro-card"><div class="macro-side"><strong>— kcal</strong><small>Consumed</small></div><div class="macro-ring"><div><strong>—%</strong><small>Daily goal</small></div></div><div class="macro-side"><strong>— kcal</strong><small>Remaining</small></div></div>
-          <div class="macro-bars"><div class="macro-bar-row"><strong>P</strong><div class="macro-bar"><i style="width:0%"></i></div><span>Protein</span></div><div class="macro-bar-row"><strong>C</strong><div class="macro-bar"><i style="width:0%"></i></div><span>Carbs</span></div><div class="macro-bar-row"><strong>F</strong><div class="macro-bar"><i style="width:0%"></i></div><span>Fat</span></div></div>
-          <p class="card-description" style="margin-top:12px">Kalorien und Makros erscheinen hier, sobald du Mahlzeiten trackst.</p>
+        <div class="card" style="margin-bottom:18px">
+          <h3>Mahlzeiten-Tracking</h3>
+          <p class="card-description">Automatische Kalorien-, Makro-, Wasser- und Schlafmessung ist derzeit nicht verfügbar. Es werden hier keine Mahlzeiten oder Werte erfunden. Du kannst unten weiterhin mit der Ernährungs-KI einen Mahlzeitenplan erstellen und daraus eine Einkaufsliste ableiten.</p>
         </div>
-        <div class="food-tiles"><div class="food-tile"><small> SLEEP</small><strong>— / 8 h</strong><p class="card-description" style="margin-top:5px">Noch nicht erfasst</p></div><div class="food-tile lime"><small> WATER</small><strong>— / 5 Gläser</strong><p style="font-size:12px;margin-top:5px">Wasserziel</p></div></div>
-        <div class="daily-food-header">Breakfast · Daily Food</div>
-        <div class="food-photo-grid"><img src="https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=300&q=80" alt="Frühstück mit Toast" loading="lazy"><img src="https://images.unsplash.com/photo-1528207776546-365bb710ee93?auto=format&fit=crop&w=300&q=80" alt="Pfannkuchen" loading="lazy"><img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=300&q=80" alt="Gesunde Bowl" loading="lazy"><img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=300&q=80" alt="Ausgewogene Mahlzeit" loading="lazy"></div>
-        <div class="ask-ai-food"><div><strong>Ask AI</strong><small>Mach ein Foto deines Essens und lass Kalorien und Nährwerte einschätzen.</small></div><button type="button" onclick="document.getElementById('nutritionPrompt').focus()" aria-label="Ernährungs-KI öffnen"></button></div>
 
         <div class="grid grid-2">
 
