@@ -1656,6 +1656,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .community-channel-post-count{grid-column:2/4;color:var(--muted);font-size:10px;margin-top:-3px}
 .community-feed-header h3{font-size:20px}
 
+.community-top-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}@media(max-width:760px){.community-top-actions{margin-top:12px}.community-top-actions .secondary-btn{padding:9px 11px;font-size:12px}}
 </style>
 </head>
 
@@ -2260,7 +2261,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
       <section id="friends" class="page">
         <div class="topbar community-topbar">
           <div><span class="eyebrow">FITNESS AI COMMUNITY</span><h2>Community</h2><p>Entdecke Fitness-Kanäle, abonniere Menschen mit ähnlichen Zielen und teile deinen Fortschritt.</p></div>
-          <button class="secondary-btn" type="button" onclick="loadCommunity()">↻ Aktualisieren</button>
+          <div class="community-top-actions"><button class="secondary-btn" type="button" onclick="viewCommunityChannel(currentUser && currentUser.id)">Mein Kanal</button><button class="secondary-btn" type="button" onclick="loadCommunity()">↻ Aktualisieren</button></div>
         </div>
         <div class="community-layout">
           <div class="community-main-column">
