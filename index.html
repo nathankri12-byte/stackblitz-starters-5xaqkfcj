@@ -1744,6 +1744,17 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
   .community-post-menu { min-width:38px; }
 }
 
+
+/* iPad/mobile navigation: keep only the bottom More control to avoid duplicates */
+@media (max-width: 760px) {
+  .mobile-header-actions { display:none !important; }
+  .timer-preset { display:flex; align-items:center; gap:8px; width:100%; }
+  .timer-preset > button.timer-preset { min-width:0; width:auto; flex:1 1 auto !important; }
+  .timer-preset-delete { display:inline-flex !important; flex:0 0 auto; align-items:center; justify-content:center; gap:6px; width:auto; min-width:88px; padding:10px 12px !important; min-height:42px; border:1px solid rgba(255,90,80,.25) !important; border-radius:12px; color:#ffaaa3 !important; background:rgba(255,90,80,.08) !important; font-size:12px !important; white-space:nowrap; }
+  .timer-preset-delete:after { content:none !important; }
+}
+.timer-preset-delete span:last-child { display:inline !important; }
+
 </style>
 </head>
 
@@ -2954,7 +2965,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 
 
   <!-- Deine JavaScript-Datei -->
-  <script src="script.js?v=20261012-shortcuts-fix-5"></script>
+  <script src="script.js?v=20261012-ipad-timer-delete-6"></script>
 
   <script>
     if ("serviceWorker" in navigator && location.protocol === "https:") {
