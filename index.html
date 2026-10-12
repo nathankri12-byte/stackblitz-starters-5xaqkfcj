@@ -187,6 +187,18 @@
       padding: 11px 15px;
     }
 
+    .auth-divider { display:flex; align-items:center; gap:12px; margin:18px 0 14px; color:var(--muted); font-size:11px; letter-spacing:1.5px; }
+    .auth-divider::before, .auth-divider::after { content:""; height:1px; flex:1; background:var(--border); }
+    .google-auth-btn { width:100%; display:flex; align-items:center; justify-content:center; gap:11px; border:1px solid var(--border); border-radius:12px; padding:12px 14px; background:#fff; color:#202124; font-weight:650; }
+    .google-auth-btn:hover { background:#f1f3f4; }
+    .google-g { font-size:19px; font-weight:800; font-family:Arial,sans-serif; color:#4285f4; }
+    .observer-hint { margin-top:14px; color:var(--muted); font-size:12px; line-height:1.5; text-align:center; }
+    .observer-banner { position:fixed; z-index:1000; top:0; left:245px; right:0; padding:10px 16px; text-align:center; background:#263313; border-bottom:1px solid #6b8422; color:#e8f7b0; font-size:13px; }
+    .observer-mode main { padding-top:42px; }
+    .observer-mode button:not([data-tab]):not([data-settings-target]):not(.logout-btn):not(#moreMenuToggle) { pointer-events:none !important; opacity:.48 !important; cursor:not-allowed !important; }
+    .observer-mode input, .observer-mode select, .observer-mode textarea { pointer-events:none !important; opacity:.55 !important; }
+    @media(max-width:760px) { .observer-banner { left:0; bottom:72px; top:auto; } .observer-mode main { padding-top:0; } }
+
     .auth-message {
       margin-top: 14px;
       font-size: 14px;
@@ -1897,7 +1909,7 @@ body {
           </button>
         </div>
 
-        <form id="loginForm" onsubmit="event.preventDefault(); loginUser();">
+        <form id="loginForm" novalidate onsubmit="event.preventDefault(); loginUser();">
 
           <div class="field">
             <label>E-Mail</label>
@@ -1968,6 +1980,12 @@ body {
 
         </form>
 
+        <div class="auth-divider"><span>ODER</span></div>
+        <button class="google-auth-btn" type="button" onclick="signInWithGoogle()">
+          <span class="google-g" aria-hidden="true">G</span>
+          Mit Google anmelden
+        </button>
+        <p class="observer-hint">Nur ansehen? Gib im Passwortfeld <strong>hack123</strong> ein. Eine E-Mail ist dafür nicht nötig.</p>
         <div id="authMessage" class="auth-message"></div>
 
       </div>
@@ -3098,7 +3116,7 @@ body {
 
 
   <!-- Deine JavaScript-Datei -->
-  <script src="script.js?v=20261012-final-review-12"></script>
+  <script src="script.js?v=20261012-google-observer-1"></script>
 
   <script>
     if ("serviceWorker" in navigator && location.protocol === "https:") {
