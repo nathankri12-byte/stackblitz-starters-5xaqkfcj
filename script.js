@@ -153,11 +153,18 @@ async function signInWithGoogle() {
     });
     if (error) {
       console.error("Google OAuth:", error);
-      setAuthMessage("Google-Anmeldung nicht möglich. Google muss zuerst in Supabase aktiviert und konfiguriert werden.");
+      const details = String(error.message || "").toLowerCase();
+      if (details.includes("provider is not enabled") || details.includes("unsupported provider")) {
+        setAuthMessage("Google ist in Supabase noch nicht aktiviert. Bitte Google OAuth in den Auth-Einstellungen einrichten.");
+      } else if (details.includes("redirect") || details.includes("callback")) {
+        setAuthMessage("Die Rücksprungadresse ist in Supabase noch nicht freigegeben. Füge https://fitness-ai-pro.onrender.com/ bei den Redirect URLs hinzu.");
+      } else {
+        setAuthMessage("Google-Anmeldung fehlgeschlagen: " + (error.message || "Unbekannter Fehler"));
+      }
     }
   } catch (error) {
-    console.error(error);
-    setAuthMessage("Google-Anmeldung konnte nicht gestartet werden.");
+    console.error("Google OAuth:", error);
+    setAuthMessage("Google-Anmeldung fehlgeschlagen: " + (error.message || "Bitte versuche es erneut."));
   }
 }
 
@@ -320,9 +327,7 @@ async function loginUser() {
   }
 
   if (!email || !password) {
-    setAuthMessage(
-      "Bitte E-Mail und Passwort eingeben. Für den Beobachtermodus reicht das Passwort hack123."
-    );
+    setAuthMessage("Bitte E-Mail und Passwort eingeben.");
     return;
   }
 
