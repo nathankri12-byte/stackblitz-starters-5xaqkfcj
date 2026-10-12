@@ -127,7 +127,7 @@
       ["News & Angebote","/news","news","Keine aktuellen Studio-News verfügbar."]
     ];
     const results=await Promise.all(endpoints.map(async ([label,path,key,fallback])=>{
-      try { return {label,key,data:await request(path),error:""}; }
+      try { let data=await request(path); if (key==="courses" && data && !Array.isArray(data) && Array.isArray(data.courses)) data=data.courses; return {label,key,data,error:""}; }
       catch(error) { return {label,key,data:null,error:fallback}; }
     }));
     renderCards(results);
@@ -150,10 +150,22 @@
       let body="";
       if (item.error) body='<p style="color:var(--muted);font-size:13px;line-height:1.5">'+esc(item.error)+'</p>';
       else if (data==null) body='<p style="color:var(--muted);font-size:13px">Keine Daten vorhanden.</p>';
-      else if (Array.isArray(data)) body=data.length?'<ul style="padding-left:18px;line-height:1.8">'+data.slice(0,10).map(x=>'<li>'+esc(typeof x==="string"?x:(x.name||x.title||x.date||JSON.stringify(x)))+'</li>').join("")+'</ul>':'<p style="color:var(--muted);font-size:13px">Aktuell keine Einträge.</p>';
+      else if (Array.isArray(data)) body=data.length ? (item.key==="courses" ? data.slice(0,10).map(x=>'<div style="padding:10px 0;border-top:1px solid var(--border)"><strong>'+esc(x.name||x.title||"Kurs")+'</strong>'+(x.start_time?'<p style="font-size:12px;color:var(--muted)">'+esc(x.start_time)+'</p>':'')+(x.id!=null?'<button type="button" class="secondary-btn" data-book-course="'+esc(x.id)+'" style="margin-top:8px;padding:7px 10px">Kurs buchen</button>':'<p style="font-size:12px;color:var(--muted);margin-top:5px">Keine Buchungs-ID von der API geliefert.</p>')+'</div>').join("") : '<ul style="padding-left:18px;line-height:1.8">'+data.slice(0,10).map(x=>'<li>'+esc(typeof x==="string"?x:(x.name||x.title||x.date||JSON.stringify(x)))+'</li>').join("")+'</ul>') : '<p style="color:var(--muted);font-size:13px">Aktuell keine Einträge.</p>';
       else body='<pre style="white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.6 inherit;color:var(--muted)">'+esc(JSON.stringify(data,null,2))+'</pre>';
       return '<div style="padding:13px;border:1px solid var(--border);border-radius:12px"><strong style="display:block;margin-bottom:7px">'+esc(item.label)+'</strong>'+body+'</div>';
     }).join("");
+    box.querySelectorAll("[data-book-course]").forEach(button=>button.addEventListener("click", async ()=>{
+      if(!confirm("Kursbuchung an das verbundene Studio senden?")) return;
+      button.disabled=true; button.textContent="Wird gebucht …";
+      try {
+        const result=await request("/bookings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({course_id:button.dataset.bookCourse})});
+        button.textContent="Buchung übermittelt";
+        setStatus("Die Studio-Schnittstelle hat die Buchungsanfrage angenommen."+(result?.booking_id?" Buchungsnummer: "+result.booking_id:""),true);
+      } catch(error) {
+        button.disabled=false; button.textContent="Erneut versuchen";
+        setStatus("Buchung nicht bestätigt: "+error.message);
+      }
+    }));
     const badge=document.getElementById("studioConnectionBadge");
     if (badge && cfg.apiBase && !results) badge.textContent="Verbindung prüfen";
   }
