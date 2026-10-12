@@ -23,7 +23,7 @@ const SUPABASE_PUBLISHABLE_KEY =
 
 const GEMINI_FUNCTION = "smooth-handler";
 
-const ADMIN_EMAIL = "DEINE_ADMIN_EMAIL";
+const ADMIN_EMAIL = "nathankri12@gmail.com";
 
 /* =========================
    GLOBAL STATE
@@ -886,6 +886,12 @@ async function loadApp() {
 ========================================================= */
 
 function showTab(tabName) {
+  // Admin-Bereich auch bei direktem Aufruf nur für das festgelegte Konto öffnen.
+  if (tabName === "admin" && !isCurrentUserAdmin()) {
+    console.warn("Zugriff auf den Admin-Bereich verweigert.");
+    tabName = "dashboard";
+  }
+
   document
     .querySelectorAll(".page")
     .forEach(page => {
@@ -3340,6 +3346,15 @@ function renderMyFeedback(
    ADMIN
 ========================================================= */
 
+function isCurrentUserAdmin() {
+  return Boolean(
+    currentUser &&
+    typeof currentUser.email === "string" &&
+    currentUser.email.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase()
+  );
+}
+
+
 async function checkAdmin() {
 
   const button =
@@ -3354,13 +3369,7 @@ async function checkAdmin() {
     return;
   }
 
-  const isAdmin =
-    ADMIN_EMAIL !==
-      "DEINE_ADMIN_EMAIL" &&
-    currentUser.email
-      ?.toLowerCase() ===
-      ADMIN_EMAIL
-        .toLowerCase();
+  const isAdmin = isCurrentUserAdmin();
 
   button.classList.toggle(
     "hidden",
@@ -3383,13 +3392,7 @@ async function loadAllFeedback() {
     return;
   }
 
-  const isAdmin =
-    ADMIN_EMAIL !==
-      "DEINE_ADMIN_EMAIL" &&
-    currentUser.email
-      ?.toLowerCase() ===
-      ADMIN_EMAIL
-        .toLowerCase();
+  const isAdmin = isCurrentUserAdmin();
 
   if (!isAdmin) {
 
