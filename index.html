@@ -1645,6 +1645,17 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media(max-width:900px){.timer-layout{grid-template-columns:minmax(0,1fr)}.timer-create{border-left:0;border-top:1px solid var(--border);padding:24px 0 0}.timer-hero{min-height:400px}.settings-shell{grid-template-columns:180px minmax(0,1fr);gap:18px}}
 @media(max-width:760px){.hero{min-height:300px;padding:24px 20px;background-position:58% center!important}.dashboard-image-links{grid-template-columns:1fr;gap:8px}.dashboard-image-link{min-height:120px}#dashboard>.grid.grid-3{grid-template-columns:1fr 1fr;gap:6px}#dashboard>.grid.grid-3 .card{padding:10px 8px;border-left:0;border-bottom:1px solid var(--border)}.daily-checkin-heading{align-items:flex-start;flex-direction:column}.settings-shell{grid-template-columns:minmax(0,1fr);gap:12px}.settings-sidebar{position:static;border-right:0;border-bottom:1px solid var(--border);padding:0 0 10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.settings-sidebar-label{grid-column:1/-1;padding:4px 4px 8px}.settings-sidebar button{padding:11px 9px;font-size:12px}.settings-content .settings-section{padding-top:5px}.timer-hero{min-height:390px}.timer-hero-content{padding:25px 20px}.timer-display{letter-spacing:-2px}.timer-presets{grid-template-columns:minmax(0,1fr)}.timer-preset{padding:11px 4px}.timer-create{padding-top:22px}.community-layout{grid-template-columns:minmax(0,1fr)}.community-side-column{order:-1}}
 
+
+/* Finishing touches: flatter surfaces and channel-style creator rows */
+.card{background:transparent;border-color:transparent;box-shadow:none}
+.auth-card{background:rgba(18,24,32,.94);border:1px solid var(--border);box-shadow:0 25px 80px rgba(0,0,0,.25)}
+.ai-card{background:rgba(17,21,15,.72)}
+.exercise-card,.training-exercise-card,.community-profile-card{background:#141711}
+.community-channel-name{padding:0;border:0;background:transparent;color:var(--text);font-size:13px;font-weight:750;text-align:left;cursor:pointer}
+.community-channel-name:hover{color:var(--accent)}
+.community-channel-post-count{grid-column:2/4;color:var(--muted);font-size:10px;margin-top:-3px}
+.community-feed-header h3{font-size:20px}
+
 </style>
 </head>
 
