@@ -1326,6 +1326,48 @@ body {
   .training-metrics,.training-progress-grid { grid-template-columns:repeat(3,minmax(0,1fr));gap:8px; }
 }
 
+
+/* REFERENCE-INSPIRED FITNESS UI */
+:root{--bg:#090a08;--bg2:#10120e;--card:#151711;--card2:#1c2016;--border:#2b3024;--text:#f6f7f1;--muted:#a0a397;--accent:#dfff38;--accent2:#c9ed24;--green:#dfff38;--radius:22px}
+body{background:#090a08}
+.mobile-header{gap:10px}.mobile-header strong{letter-spacing:-.45px}
+.mobile-header-actions{display:flex;gap:7px}.mobile-header-actions button{width:36px;height:36px;border:1px solid var(--border);border-radius:12px;background:#171a12;color:var(--text);font-size:16px}
+#dashboard>.topbar h2{font-size:clamp(25px,4vw,34px);font-weight:800}
+#dashboard>.topbar .user-pill{border:0;background:transparent;padding:0;color:var(--accent);font-weight:700}
+.dashboard-showcase{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(220px,.75fr);gap:12px;margin-bottom:14px}
+.workout-progress-card{display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,#1a1e14,#11130e);border:1px solid var(--border);border-radius:22px;padding:18px}
+.workout-progress-card h3{margin:0 0 7px;font-size:17px}.workout-progress-card p{color:var(--muted);font-size:13px;line-height:1.5}
+.progress-ring{width:72px;height:72px;flex:0 0 72px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--accent) 75%,#303526 0);position:relative}
+.progress-ring:before{content:"";position:absolute;inset:7px;background:#141710;border-radius:50%}.progress-ring strong{position:relative;font-size:17px}
+.dashboard-metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:18px}
+.metric-tile{min-height:130px;border-radius:21px;padding:15px;position:relative;overflow:hidden;background:linear-gradient(145deg,#191c15,#11130f);border:1px solid var(--border)}
+.metric-icon{font-size:21px;display:block;margin-bottom:12px}.metric-label{font-size:11px;color:var(--muted);margin-bottom:7px}.metric-tile strong{font-size:23px;letter-spacing:-.6px}.metric-tile small{display:block;color:var(--muted);font-size:11px;margin-top:5px}
+.metric-tile.lime{background:var(--accent);border-color:var(--accent);color:#14170d}.metric-tile.lime .metric-label,.metric-tile.lime small{color:#343b18}
+.metric-ring{width:39px;height:39px;float:right;border-radius:50%;border:5px solid rgba(20,23,13,.22);border-top-color:currentColor;border-right-color:currentColor;display:grid;place-items:center;font-size:9px;font-weight:800}
+.metric-tile.photo-tile{display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(0deg,rgba(0,0,0,.8),rgba(0,0,0,.05)),url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=700&q=80') center/cover;border:0;color:#fff}
+.metric-tile.photo-tile .metric-label{color:#e4e4e4}
+.program-strip{display:flex;gap:9px;overflow-x:auto;padding:3px 0 13px;scrollbar-width:none}.program-strip::-webkit-scrollbar{display:none}
+.program-chip{min-width:78px;padding:12px 9px;border:1px solid var(--border);border-radius:16px;background:#151811;text-align:center;color:var(--text);font-size:12px}.program-chip span{display:block;font-size:21px;margin-bottom:6px}
+#dashboard>.hero,#dashboard>.grid.grid-3{display:none}
+#dashboard>.grid.grid-2{margin-top:0!important}
+#dashboard .card{border-radius:21px}
+.mobile-nav button.active{color:var(--accent);background:rgba(223,255,56,.09);box-shadow:inset 0 0 0 1px rgba(223,255,56,.14)}
+.friends-switch{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:5px;border-radius:15px;background:#11140e;margin-bottom:14px}
+.friends-switch button{border:0;border-radius:11px;padding:11px;background:transparent;color:var(--muted);font-weight:700}.friends-switch button.active{background:var(--accent);color:#171a0c}
+.friend-post{padding:0;overflow:hidden}.friend-post-head{display:flex;align-items:center;gap:11px;padding:16px 16px 10px}.friend-avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#2c3220;color:var(--accent);font-weight:800}.friend-post-head small{display:block;color:var(--muted);margin-top:4px}
+.friend-quote{color:#dfe2d8;line-height:1.5;padding:5px 16px 15px;font-size:14px}.friend-photo{width:100%;height:250px;object-fit:cover;display:block;filter:grayscale(1)}.friend-post-actions{display:flex;gap:17px;padding:13px 16px;color:var(--muted);font-size:13px}
+.online-line{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px;margin:19px 0 8px}.online-dots{display:flex;align-items:center}.online-dots i{display:block;width:22px;height:22px;border:2px solid #151811;border-radius:50%;background:#525b40;margin-left:-5px}
+.friend-compose{display:flex;gap:8px;align-items:center;margin-top:12px}.friend-compose input{min-width:0;flex:1;background:#10130e;border:1px solid var(--border);color:var(--text);border-radius:14px;padding:13px}
+.food-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin:12px 0 18px}.food-day{padding:9px 1px;border-radius:12px;text-align:center;color:var(--muted);font-size:10px}.food-day strong{display:grid;place-items:center;width:29px;height:29px;margin:7px auto 0;border-radius:50%;font-size:12px;color:var(--text)}
+.food-day.active{background:var(--accent);color:#202411;font-weight:800}.food-day.active strong{background:#202411;color:var(--accent)}
+.macro-card{display:grid;grid-template-columns:1fr 1.15fr 1fr;align-items:center;gap:6px}.macro-side{text-align:center}.macro-side strong{font-size:17px;display:block}.macro-side small{color:var(--muted);font-size:10px}
+.macro-ring{width:min(135px,100%);aspect-ratio:1;border-radius:50%;margin:auto;display:grid;place-items:center;background:conic-gradient(var(--accent) 0 44%,#8ea5ff 44% 72%,#ffbd65 72% 86%,#2a3022 86% 100%);position:relative}.macro-ring:before{content:"";position:absolute;inset:11px;background:#151811;border-radius:50%}.macro-ring div{position:relative;text-align:center}.macro-ring strong{display:block;font-size:18px}.macro-ring small{font-size:10px;color:var(--muted)}
+.macro-bars{display:grid;gap:11px;margin-top:18px}.macro-bar-row{display:grid;grid-template-columns:20px 1fr auto;gap:8px;align-items:center;font-size:11px}.macro-bar{height:7px;background:#2b3024;border-radius:99px;overflow:hidden}.macro-bar i{height:100%;display:block;background:var(--accent);border-radius:99px}.macro-bar-row:nth-child(2) .macro-bar i{background:#8ea5ff}.macro-bar-row:nth-child(3) .macro-bar i{background:#ffbd65}
+.food-tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.food-tile{border-radius:19px;padding:15px;background:#171a12;border:1px solid var(--border)}.food-tile.lime{background:var(--accent);color:#171a0b;border-color:var(--accent)}.food-tile small{display:block;color:var(--muted);font-size:11px;margin-bottom:9px}.food-tile.lime small{color:#3d451e}.food-tile strong{font-size:21px}
+.daily-food-header{background:var(--accent);color:#171a0b;border-radius:16px;padding:13px 15px;font-weight:800;margin:15px 0 9px}.food-photo-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.food-photo-grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:11px}
+.ask-ai-food{display:flex;align-items:center;gap:12px;margin-top:14px;padding:15px;border-radius:19px;background:var(--accent);color:#171a0b}.ask-ai-food>div{flex:1}.ask-ai-food strong{display:block;font-size:16px;margin-bottom:4px}.ask-ai-food small{font-size:11px;color:#41491f;line-height:1.4;display:block}.ask-ai-food button{border:0;background:#1b2010;color:var(--accent);border-radius:13px;width:42px;height:42px;font-size:18px}
+@media(max-width:760px){.dashboard-showcase{grid-template-columns:minmax(0,1fr);gap:9px}.workout-progress-card{padding:16px}.dashboard-metric-grid{gap:9px}.metric-tile{min-height:125px;padding:13px;border-radius:18px}.metric-tile strong{font-size:21px}.program-chip{min-width:72px}.macro-card{grid-template-columns:.8fr 1.1fr .8fr;gap:3px}.macro-side strong{font-size:14px}.macro-ring:before{inset:8px}.macro-ring strong{font-size:15px}.food-photo-grid{gap:5px}.food-photo-grid img{border-radius:8px}.friend-photo{height:225px}}
+
   </style>
 </head>
 
@@ -1456,6 +1498,8 @@ body {
           Dashboard
         </button>
 
+        <button onclick="showTab('friends')" data-tab="friends"><span class="nav-icon">👥</span>Friends</button>
+
         <button onclick="showTab('ai')" data-tab="ai">
           <span class="nav-icon">🤖</span>
           KI-Coach
@@ -1510,42 +1554,19 @@ body {
     <!-- MOBILE NAV -->
 
     <div class="mobile-nav">
-
-      <button class="active" onclick="showTab('dashboard')" data-tab="dashboard">
-        <span>🏠</span>
-        Home
-      </button>
-
-      <button onclick="showTab('ai')" data-tab="ai">
-        <span>🤖</span>
-        KI
-      </button>
-
-      <button onclick="showTab('training')" data-tab="training">
-        <span>🏋️</span>
-        Training
-      </button>
-
-      <button onclick="showTab('progress')" data-tab="progress">
-        <span>📈</span>
-        Fortschritt
-      </button>
-
-      <button onclick="showTab('feedback')" data-tab="feedback">
-        <span>💬</span>
-        Feedback
-      </button>
-
+      <button class="active" onclick="showTab('dashboard')" data-tab="dashboard"><span>⌂</span>Home</button>
+      <button onclick="showTab('friends')" data-tab="friends"><span>♧</span>Friends</button>
+      <button onclick="showTab('nutrition')" data-tab="nutrition"><span>◈</span>Food</button>
+      <button onclick="showTab('profile')" data-tab="profile"><span>●</span>Profile</button>
     </div>
 
-
-    <!-- MAIN -->
+        <!-- MAIN -->
 
     <main class="main">
 
       <div class="mobile-header">
         <strong>⚡ FITNESS AI PRO</strong>
-        <button class="secondary-btn" onclick="showTab('profile')">⚙️</button>
+        <div class="mobile-header-actions"><button type="button" aria-label="Shop">🛍</button><button type="button" aria-label="Benachrichtigungen">♧</button><button class="secondary-btn" onclick="showTab('profile')" aria-label="Profil">👤</button></div>
       </div>
 
 
@@ -1557,7 +1578,7 @@ body {
 
         <div class="topbar">
           <div>
-            <h2>Dashboard</h2>
+            <h2>Welcome Back!</h2>
             <p id="dashboardGreeting">Willkommen zurück.</p>
           </div>
 
@@ -1565,6 +1586,20 @@ body {
             -
           </div>
         </div>
+
+
+        <div class="dashboard-showcase">
+          <div class="workout-progress-card"><div><h3>Workout Progress!</h3><p id="workoutProgressText">Dein Trainingsfortschritt auf einen Blick.</p><p style="color:var(--accent);font-weight:700;margin-top:9px">Weiter so! ↗</p></div><div class="progress-ring"><strong id="workoutProgressPercent">75%</strong></div></div>
+          <div class="workout-progress-card"><div><h3>Dein Tagesziel</h3><p>Trainiere regelmäßig und bleib in Bewegung.</p><button class="secondary-btn" style="margin-top:12px" onclick="showTab('training')">Training öffnen →</button></div></div>
+        </div>
+        <div class="dashboard-metric-grid">
+          <div class="metric-tile lime"><span class="metric-icon">🔥</span><div class="metric-ring">kcal</div><div class="metric-label">CALORIES</div><strong>— kCal</strong><small>Noch nicht erfasst</small></div>
+          <div class="metric-tile"><span class="metric-icon">👟</span><div class="metric-label">STEPS</div><strong>—</strong><small>Schritte nicht verbunden</small></div>
+          <div class="metric-tile"><span class="metric-icon">🌙</span><div class="metric-label">SLEEP</div><strong>— / 8 h</strong><small>Schlaf nicht erfasst</small></div>
+          <div class="metric-tile photo-tile"><div class="metric-label">MAKE IT COUNT</div><strong>One more rep.</strong><small>One step at a time.</small></div>
+        </div>
+        <h3 style="margin:4px 0 10px">Programs</h3>
+        <div class="program-strip"><button class="program-chip" onclick="showTab('training')"><span>🏃</span>Jog</button><button class="program-chip" onclick="showTab('training')"><span>🧘</span>Yoga</button><button class="program-chip" onclick="showTab('training')"><span>🚴</span>Cycling</button><button class="program-chip" onclick="showTab('training')"><span>🏋️</span>Workout</button></div>
 
         <div class="hero">
 
@@ -1925,6 +1960,22 @@ body {
       </section>
 
 
+
+      <!-- COMMUNITY / FRIENDS -->
+      <section id="friends" class="page">
+        <div class="topbar"><div><h2>Friends</h2><p>Gemeinsam motiviert bleiben.</p></div></div>
+        <div class="friends-switch"><button class="active" type="button">Feed</button><button type="button" onclick="showTab('progress')">Progress</button></div>
+        <div class="card friend-post">
+          <div class="friend-post-head"><div class="friend-avatar">JW</div><div><strong>John Wick</strong><small>12 hours ago · Training</small></div><span style="margin-left:auto;color:var(--muted)">•••</span></div>
+          <p class="friend-quote">“It's gonna hurt so bad that you'll do it again and again because you know the work is worth it.”</p>
+          <img class="friend-photo" src="https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=1000&q=80" alt="Sportler beim Krafttraining" loading="lazy">
+          <div class="friend-post-actions"><span>♡ 128 Likes</span><span>▢ 24 Kommentare</span><span style="margin-left:auto">↗ Teilen</span></div>
+        </div>
+        <div class="online-line"><strong style="color:var(--text)">28 ONLINE</strong><span class="online-dots"><i></i><i></i><i></i><span style="margin-left:8px">Freunde sind aktiv</span></span></div>
+        <div class="friend-compose"><input type="text" placeholder="Share your thoughts..." aria-label="Gedanken teilen"><button class="secondary-btn" type="button" aria-label="Foto">📷</button><button class="primary-btn" style="width:auto;margin:0" type="button" aria-label="Teilen">➤</button></div>
+        <p class="card-description" style="margin-top:10px">Community-Vorschau mit Beispieldaten. Beiträge und Likes sind noch nicht mit einem Community-Backend verbunden.</p>
+      </section>
+
       <!-- =========================
            NUTRITION
       ========================== -->
@@ -1940,6 +1991,18 @@ body {
 
         </div>
 
+
+
+        <div class="card" style="margin-bottom:13px">
+          <div class="food-week"><div class="food-day">MON<strong>1</strong></div><div class="food-day">TUE<strong>2</strong></div><div class="food-day active">WED<strong>4</strong></div><div class="food-day">THU<strong>5</strong></div><div class="food-day">FRI<strong>6</strong></div><div class="food-day">SAT<strong>7</strong></div><div class="food-day">SUN<strong>8</strong></div></div>
+          <div class="macro-card"><div class="macro-side"><strong>— kcal</strong><small>Consumed</small></div><div class="macro-ring"><div><strong>—%</strong><small>Daily goal</small></div></div><div class="macro-side"><strong>— kcal</strong><small>Remaining</small></div></div>
+          <div class="macro-bars"><div class="macro-bar-row"><strong>P</strong><div class="macro-bar"><i style="width:0%"></i></div><span>Protein</span></div><div class="macro-bar-row"><strong>C</strong><div class="macro-bar"><i style="width:0%"></i></div><span>Carbs</span></div><div class="macro-bar-row"><strong>F</strong><div class="macro-bar"><i style="width:0%"></i></div><span>Fat</span></div></div>
+          <p class="card-description" style="margin-top:12px">Kalorien und Makros erscheinen hier, sobald du Mahlzeiten trackst.</p>
+        </div>
+        <div class="food-tiles"><div class="food-tile"><small>🌙 SLEEP</small><strong>— / 8 h</strong><p class="card-description" style="margin-top:5px">Noch nicht erfasst</p></div><div class="food-tile lime"><small>💧 WATER</small><strong>— / 5 Gläser</strong><p style="font-size:12px;margin-top:5px">Wasserziel</p></div></div>
+        <div class="daily-food-header">Breakfast · Daily Food</div>
+        <div class="food-photo-grid"><img src="https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=300&q=80" alt="Frühstück mit Toast" loading="lazy"><img src="https://images.unsplash.com/photo-1528207776546-365bb710ee93?auto=format&fit=crop&w=300&q=80" alt="Pfannkuchen" loading="lazy"><img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=300&q=80" alt="Gesunde Bowl" loading="lazy"><img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=300&q=80" alt="Ausgewogene Mahlzeit" loading="lazy"></div>
+        <div class="ask-ai-food"><div><strong>Ask AI</strong><small>Mach ein Foto deines Essens und lass Kalorien und Nährwerte einschätzen.</small></div><button type="button" onclick="document.getElementById('nutritionPrompt').focus()" aria-label="Ernährungs-KI öffnen">📷</button></div>
 
         <div class="grid grid-2">
 
