@@ -1965,94 +1965,120 @@ async function generateTrainingPlan(customPrompt = "") {
     return null;
   }
 
-  showTab("training");
-
   const container = document.getElementById("trainingPlan");
+  const preferencesInput = document.getElementById("trainingPreferences");
+  const requestedPreferences = String(customPrompt || preferencesInput?.value || "").trim();
 
-  if (container) {
-    container.innerHTML = `
-      <div class="card">
-        <p class="card-description">
-           Dein persönlicher Trainingsplan wird gerade erstellt …
-        </p>
-      </div>
-    `;
+  // Aktuelle Formularwerte haben Vorrang vor eventuell veralteten Profilwerten.
+  const savedProfile = currentProfile || {};
+  const profile = {
+    ...savedProfile,
+    name: document.getElementById("profileNameInput")?.value?.trim() || savedProfile.name || "",
+    age: document.getElementById("profileAge")?.value !== undefined && document.getElementById("profileAge")?.value !== ""
+      ? Number(document.getElementById("profileAge").value) : savedProfile.age,
+    height: document.getElementById("profileHeight")?.value !== undefined && document.getElementById("profileHeight")?.value !== ""
+      ? Number(document.getElementById("profileHeight").value) : savedProfile.height,
+    goal: document.getElementById("goal")?.value || savedProfile.goal || "",
+    training_location: document.getElementById("trainingLocation")?.value || savedProfile.training_location || ""
+  };
+
+  // Nicht stillschweigend einen allgemeinen Plan erstellen, wenn die nötigen Angaben fehlen.
+  const missing = [];
+  if (!profile.age || !Number.isFinite(Number(profile.age))) missing.push("dein Alter im Profil");
+  if (!profile.height || !Number.isFinite(Number(profile.height))) missing.push("deine Körpergröße im Profil");
+  if (!profile.goal) missing.push("dein Trainingsziel");
+  if (!profile.training_location) missing.push("deinen Trainingsort");
+
+  if (missing.length) {
+    showTab("training");
+    if (container) {
+      container.innerHTML = '<div class="card"><h3>Dein Plan braucht noch Angaben</h3><p class="card-description">Damit ich keinen Standardplan erstelle, ergänze bitte zuerst: ' +
+        missing.map(value => value.replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]))).join(", ") +
+        '.</p></div>';
+    }
+    return null;
   }
 
-  const profile = currentProfile || {};
+  // Die Auswahl direkt vor der KI-Anfrage speichern, damit keine alten Werte verwendet werden.
+  try {
+    const profileUpdate = {
+      user_id: currentUser.id,
+      Name: profile.name || "User",
+      Age: Number(profile.age),
+      Height: Number(profile.height),
+      Goal: profile.goal,
+      training_location: profile.training_location,
+      Diet: profile.diet || "",
+      email: currentUser.email || ""
+    };
+    const { error } = await supabaseClient.from("profiles").upsert(profileUpdate, { onConflict: "user_id" });
+    if (error) console.error("Trainingsprofil konnte nicht synchronisiert werden:", error);
+    currentProfile = { ...savedProfile, ...profile };
+    updateAIUserInfo();
+  } catch (error) {
+    console.error("Trainingsprofil konnte nicht synchronisiert werden:", error);
+  }
 
-  const preferencesInput = document.getElementById("trainingPreferences");
-  const requestedPreferences = (customPrompt || preferencesInput?.value || "").trim();
+  showTab("training");
+
+  if (container) {
+    container.innerHTML = '<div class="card"><p class="card-description">Dein persönlicher Trainingsplan wird anhand deiner Angaben erstellt …</p></div>';
+  }
 
   const prompt = `
-Erstelle einen vollständigen persönlichen Wochen-Trainingsplan. Beachte die Wünsche des Nutzers verbindlich.
+Du bist ein persönlicher Trainingsplaner. Erstelle einen WIRKLICH INDIVIDUELLEN, vollständigen Wochenplan für genau diesen Nutzer. Ein allgemeiner Standardplan ist ausdrücklich nicht erlaubt. Nutze alle folgenden Daten aktiv und mache die Entscheidungen im Trainingsplan sichtbar.
 
+PERSÖNLICHES PROFIL:
+Name: ${profile.name || "nicht angegeben"}
+Alter: ${profile.age} Jahre
+Größe: ${profile.height} cm
+Gewicht: ${profile.weight || "nicht angegeben"} kg
+Trainingsziel: ${profile.goal}
+Trainingsort: ${profile.training_location}
+Ernährungsweise: ${profile.diet || "nicht angegeben"}
 
-Profil:
-Name: ${profile.name || "unbekannt"}
-Alter: ${profile.age || "unbekannt"}
-Größe: ${profile.height || "unbekannt"} cm
-Gewicht: ${profile.weight || "unbekannt"} kg
-Ziel: ${profile.goal || "unbekannt"}
-Trainingsort: ${profile.training_location || "unbekannt"}
+PERSÖNLICHE WÜNSCHE, die konkret im Plan umgesetzt werden müssen:
+${requestedPreferences || "Keine zusätzlichen Wünsche. Passe den Plan dennoch konkret an Ziel, Alter und Trainingsort an."}
 
-Der Nutzer ist minderjährig.
-
-Erstelle einen altersgerechten, sicheren und realistischen Wochenplan.
-
-WICHTIG:
-Gib den Wochenplan von Montag bis Sonntag aus. Verwende pro Tag genau eine passende Überschrift, zum Beispiel:
-MONTAG | BRUST UND TRIZEPS
-ÜBUNG: Name der Übung | SÄTZE: 3 | WIEDERHOLUNGEN: 10 | DAUER: -
-DIENSTAG | RUHETAG
-
-Nutze für Trainingstage konkrete Übungen, Sätze und Wiederholungen. Markiere Erholungstage als RUHETAG und plane keine Übungen an diesen Tagen. Die Anzahl der Trainingstage muss einem ausdrücklich genannten Nutzerwunsch entsprechen. Wenn keine Anzahl genannt wird, wähle eine realistische, altersgerechte Anzahl mit ausreichender Regeneration.
-
-Zusätzliche Wünsche des Nutzers (höchste Priorität, soweit sicher und sinnvoll):
-${requestedPreferences || "Keine zusätzlichen Wünsche angegeben."}
-
-Regeln:
-- Setze ausdrücklich genannte Muskelgruppen und Übungen konkret im Plan um; erwähne sie nicht nur allgemein.
-- Wenn Muskelgruppen priorisiert werden, ordne ihnen passende Übungen zu und prüfe, dass sie tatsächlich im Wochenplan vorkommen.
-- Halte die ausdrücklich gewünschte Anzahl an Trainingstagen ein, sofern sie angegeben wurde; plane an anderen Tagen Ruhe oder leichte Erholung.
-- Verwende nur Übungen, die am angegebenen Trainingsort möglich sind.
-- Für Übungen mit Wiederholungen verwende WIEDERHOLUNGEN.
-- Für Übungen wie Plank verwende DAUER, z.B. 30 Sekunden.
-- Keine extremen Gewichte.
-- Keine gefährlichen oder extremen Trainingsmethoden.
-- Plane ausreichend Erholung ein.
-- Keine Crash-Diäten.
-- Pro Trainingstag maximal 6 Übungen.
-- Jeder Trainingstag soll einen klaren Schwerpunkt haben.
-- Gib ausschließlich den Trainingsplan aus.
-- Keine Einleitung.
-- Keine Erklärung außerhalb des Plans.
-  `.trim();
+VERBINDLICHE REGELN:
+- Erstelle sieben Abschnitte von MONTAG bis SONNTAG.
+- Erfinde keine fehlenden Profilangaben und gib keinen austauschbaren Beispiel- oder Standardplan aus.
+- Passe Übungsauswahl, Trainingsaufteilung, Belastung und Erholung an das angegebene Ziel, Alter und den Trainingsort an.
+- Bei Trainingsort „Zuhause“: nur Übungen mit Körpergewicht und/oder typischerweise verfügbaren Haushaltsmitteln; keine Geräte voraussetzen, die nicht genannt wurden.
+- Bei Trainingsort „Fitnessstudio“: nutze passende Studio-Geräte und freie Gewichte, aber nur altersgerechte, kontrollierbare Belastungen.
+- Berücksichtige ausdrücklich genannte Muskelgruppen, Trainingstage, verfügbare Ausrüstung, Einschränkungen und Erfahrungslevel. Die Wünsche müssen sich in den konkreten Übungen und der Wochenaufteilung wiederfinden.
+- Wenn eine bestimmte Zahl an Trainingstagen gewünscht wird, halte sie exakt ein. An allen anderen Tagen Ruhe oder leichte Erholung.
+- Wenn keine Anzahl genannt wird, wähle eine realistische Anzahl mit ausreichender Regeneration.
+- Der Nutzer ist minderjährig: keine Maximalversuche, keine extremen Gewichte, keine gefährlichen Methoden; Technik und Betreuung haben Vorrang.
+- Maximal 6 Übungen pro Trainingstag.
+- Format pro Tag: „MONTAG | konkreter Schwerpunkt“ oder „MONTAG | RUHETAG“.
+- Jede Übung in einer eigenen Zeile im Format: „ÜBUNG: Name | SÄTZE: 3 | WIEDERHOLUNGEN: 8–12“ oder bei Zeitübungen „ÜBUNG: Name | SÄTZE: 3 | DAUER: 30 Sekunden“.
+- Nenne keine Übungen, die am ausgewählten Trainingsort nicht möglich sind.
+- Gib ausschließlich den Wochenplan aus, ohne Einleitung und ohne allgemeine Fitness-Tipps.
+`.trim();
 
   const answer = await askGemini(prompt, { showInChat: false });
 
   if (!answer) {
     if (container) {
-      container.innerHTML = `
-        <div class="card">
-          <p class="card-description">
-             Der Trainingsplan konnte nicht erstellt werden.
-            Bitte versuche es erneut.
-          </p>
-        </div>
-      `;
+      container.innerHTML = '<div class="card"><p class="card-description">Dein individueller Trainingsplan konnte gerade nicht erstellt werden. Es wurde kein Standardplan eingesetzt. Bitte prüfe die Verbindung und versuche es erneut.</p><button type="button" class="secondary-btn" onclick="generateTrainingPlan()">Erneut versuchen</button></div>';
     }
     return null;
   }
 
+  // Reject obviously incomplete/generic responses rather than silently treating them as a plan.
+  const dayHeadings = (answer.match(/(?:^|\\n)\\s*(?:#{1,6}\\s*)?(?:\\*{1,2})?(MONTAG|DIENSTAG|MITTWOCH|DONNERSTAG|FREITAG|SAMSTAG|SONNTAG)\\b/gim) || []).length;
+  if (dayHeadings < 5) {
+    if (container) {
+      container.innerHTML = '<div class="card"><p class="card-description">Die KI hat keinen vollständigen Wochenplan geliefert. Ich speichere diese Antwort nicht als Trainingsplan, damit kein unpassender Standardplan angezeigt wird.</p><button type="button" class="secondary-btn" onclick="generateTrainingPlan()">Erneut versuchen</button></div>';
+    }
+    console.warn("KI-Antwort verworfen: zu wenige erkennbare Wochentage.");
+    return null;
+  }
+
   localStorage.setItem("fitness_ai_training_plan", answer);
-  localStorage.setItem(
-    "fitness_ai_training_plan_updated",
-    new Date().toISOString()
-  );
-
+  localStorage.setItem("fitness_ai_training_plan_updated", new Date().toISOString());
   renderTrainingPlan(answer);
-
   return answer;
 }
 
