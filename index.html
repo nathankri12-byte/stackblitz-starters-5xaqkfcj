@@ -1674,7 +1674,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
   .main { width:100%; min-width:0; padding:14px 16px calc(92px + env(safe-area-inset-bottom)); }
   .mobile-header { position:sticky; top:0; z-index:25; margin:-14px -16px 20px; padding:12px 16px; min-height:56px; background:rgba(9,10,8,.92); backdrop-filter:blur(18px); border-bottom:1px solid rgba(130,140,120,.12); }
   .mobile-header-actions button { width:40px; height:40px; border-radius:50%; }
-  .mobile-header-actions button:first-child:before { content:"⚙"; font-size:17px; }
+  .mobile-header-actions button:first-child:before { content:""; font-size:17px; }
   .mobile-header-actions button:last-child { font-size:0; }
   .mobile-header-actions button:last-child:before { content:"•••"; font-size:18px; letter-spacing:1px; }
   .mobile-nav { position:fixed; z-index:45; left:0; right:0; bottom:0; padding:7px 5px calc(7px + env(safe-area-inset-bottom)); min-height:64px; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); box-sizing:border-box; }
@@ -1879,7 +1879,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
             <button onclick="navigateMore('friends')" data-tab="friends"><span class="nav-icon">◎</span>Community</button>
             <button onclick="navigateMore('timer')" data-tab="timer"><span class="nav-icon">◷</span>Timer</button>
             <button onclick="navigateMore('ai')" data-tab="ai"><span class="nav-icon"></span>KI-Coach</button>
-            <button onclick="navigateMore('progress')" data-tab="progress"><span class="nav-icon">↗</span>Fortschritt</button>
+            <button onclick="navigateMore('progress')" data-tab="progress"><span class="nav-icon"></span>Fortschritt</button>
             <button onclick="navigateMore('feedback')" data-tab="feedback"><span class="nav-icon"></span>Feedback</button>
             <button onclick="navigateMore('profile')" data-tab="profile"><span class="nav-icon">○</span>Über mich / Profil</button>
             <button onclick="navigateMore('about')" data-tab="about"><span class="nav-icon">ⓘ</span>Über uns</button>
@@ -2892,7 +2892,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 
       <section id="settings" class="page">
         <div class="topbar"><div><h2>Einstellungen</h2><p>Gestalte deine App und verwalte deine Schnellzugriffe.</p></div></div>
-        <div class="settings-shell"><nav class="settings-sidebar" aria-label="Einstellungsbereiche"><span class="settings-sidebar-label">PERSÖNLICH ANPASSEN</span><button type="button" class="active" data-settings-target="appearance" onclick="showSettingsSection('appearance')"><span>◐</span> Darstellung</button><button type="button" data-settings-target="shortcuts" onclick="showSettingsSection('shortcuts')"><span>⌘</span> Schnellzugriffe</button><button type="button" data-settings-target="account" onclick="showSettingsSection('account')"><span>○</span> Mein Konto</button><button type="button" data-settings-target="support" onclick="showSettingsSection('support')"><span>↗</span> Hilfe &amp; Feedback</button></nav><div class="settings-content">
+        <div class="settings-shell"><nav class="settings-sidebar" aria-label="Einstellungsbereiche"><span class="settings-sidebar-label">PERSÖNLICH ANPASSEN</span><button type="button" class="active" data-settings-target="appearance" onclick="showSettingsSection('appearance')"><span>◐</span> Darstellung</button><button type="button" data-settings-target="shortcuts" onclick="showSettingsSection('shortcuts')"><span>⌘</span> Schnellzugriffe</button><button type="button" data-settings-target="account" onclick="showSettingsSection('account')"><span>○</span> Mein Konto</button><button type="button" data-settings-target="support" onclick="showSettingsSection('support')"><span></span> Hilfe &amp; Feedback</button></nav><div class="settings-content">
           <div class="card settings-section active" data-settings-panel="appearance">
             <h3>Darstellung</h3><p class="card-description" style="margin-top:6px">Passe Farben und Erscheinungsbild an. Die Auswahl wird auf diesem Gerät gespeichert.</p>
             <div class="settings-row"><div><label for="themeMode">Design</label><p>Wähle deinen bevorzugten Modus.</p></div><select id="themeMode"><option value="dark">Dark Mode</option><option value="midnight">Midnight</option><option value="light">Light Mode</option></select></div>
@@ -2954,7 +2954,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 
 
   <!-- Deine JavaScript-Datei -->
-  <script src="script.js?v=20261012-mobile-polish-3"></script>
+  <script src="script.js?v=20261012-clean-ui-4"></script>
 
   <script>
     if ("serviceWorker" in navigator && location.protocol === "https:") {
@@ -2998,7 +2998,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
         const buttons=[...nav.querySelectorAll(":scope > button[data-quick='true']")];
         buttons.forEach(b=>b.remove());
         const more=nav.querySelector(".sidebar-more");
-        quick.forEach((key,i)=>{const b=document.createElement("button");b.dataset.tab=key;b.dataset.quick="true";b.onclick=()=>showTab(key);b.innerHTML='<span class="nav-icon">'+({dashboard:"⌂",ai:"✳",training:"▥",nutrition:"◒",progress:"↗",friends:"◎",feedback:"✉",profile:"○"}[key]||"•")+'</span><span>'+FIT_QUICK_LABELS[key]+'</span>';if(i===0)b.classList.add("active");nav.insertBefore(b,more);});
+        quick.forEach((key,i)=>{const b=document.createElement("button");b.dataset.tab=key;b.dataset.quick="true";b.onclick=()=>showTab(key);b.innerHTML='<span class="nav-icon">'+({dashboard:"⌂",ai:"",training:"▥",nutrition:"◒",progress:"",friends:"◎",feedback:"",profile:"○"}[key]||"•")+'</span><span>'+FIT_QUICK_LABELS[key]+'</span>';if(i===0)b.classList.add("active");nav.insertBefore(b,more);});
       }
     }
     function toggleMoreMenu(){
