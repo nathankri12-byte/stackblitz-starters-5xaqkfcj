@@ -1368,6 +1368,63 @@ body{background:#090a08}
 .ask-ai-food{display:flex;align-items:center;gap:12px;margin-top:14px;padding:15px;border-radius:19px;background:var(--accent);color:#171a0b}.ask-ai-food>div{flex:1}.ask-ai-food strong{display:block;font-size:16px;margin-bottom:4px}.ask-ai-food small{font-size:11px;color:#41491f;line-height:1.4;display:block}.ask-ai-food button{border:0;background:#1b2010;color:var(--accent);border-radius:13px;width:42px;height:42px;font-size:18px}
 @media(max-width:760px){.dashboard-showcase{grid-template-columns:minmax(0,1fr);gap:9px}.workout-progress-card{padding:16px}.dashboard-metric-grid{gap:9px}.metric-tile{min-height:125px;padding:13px;border-radius:18px}.metric-tile strong{font-size:21px}.program-chip{min-width:72px}.macro-card{grid-template-columns:.8fr 1.1fr .8fr;gap:3px}.macro-side strong{font-size:14px}.macro-ring:before{inset:8px}.macro-ring strong{font-size:15px}.food-photo-grid{gap:5px}.food-photo-grid img{border-radius:8px}.friend-photo{height:225px}}
 
+  
+/* PROFESSIONAL NAVIGATION, SETTINGS AND IMAGE TREATMENT */
+.mobile-more-menu{position:fixed;right:12px;bottom:76px;z-index:40;display:grid;min-width:190px;padding:8px;background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 15px 50px rgba(0,0,0,.4)}
+.mobile-more-menu[hidden]{display:none}
+.mobile-more-menu button{border:0;background:transparent;color:var(--text);text-align:left;padding:12px;border-radius:10px}
+.mobile-more-menu button:hover{background:var(--card2);color:var(--accent)}
+:root{--accent:#dfff38;--accent2:#c9ed24;--bg:#090a08;--bg2:#10120e;--card:#151711;--card2:#1c2016;--border:#2b3024;--muted:#a0a397;--radius:20px}
+body{background:radial-gradient(ellipse at 82% -12%,rgba(223,255,56,.09),transparent 34%),var(--bg)}
+.sidebar{background:rgba(9,11,8,.98);border-right-color:var(--border);padding-top:24px}
+.sidebar-logo{letter-spacing:-.35px;font-size:15px;padding-bottom:27px}
+.sidebar-logo span{font-size:0;background:var(--accent);box-shadow:0 6px 25px rgba(223,255,56,.12)}
+.sidebar-logo span:after{content:"F";font-size:18px;font-weight:900;color:#111}
+.nav{gap:7px}
+.nav button{padding:12px 13px;border-radius:13px;font-size:13px;transition:background .18s,color .18s}
+.nav button:hover,.nav button.active{background:rgba(223,255,56,.09);color:var(--accent)}
+.nav-icon{font-size:15px;width:21px;display:inline-flex;justify-content:center}
+.nav button .nav-icon{font-family:Arial,sans-serif}
+.sidebar-more{margin-top:8px;border-top:1px solid var(--border);padding-top:12px}
+.sidebar-more-toggle{width:100%;display:flex;align-items:center;gap:12px;padding:12px 13px;border:1px solid transparent;border-radius:13px;background:transparent;color:var(--muted);text-align:left;font-size:13px}
+.sidebar-more-toggle:hover,.sidebar-more-toggle[aria-expanded="true"]{color:var(--text);background:var(--card2);border-color:var(--border)}
+.more-menu{display:grid;gap:4px;padding:7px 0 0 10px}
+.more-menu[hidden]{display:none}
+.more-menu button{display:flex;gap:10px;align-items:center;width:100%;border:0;border-radius:11px;padding:10px 12px;background:transparent;color:var(--muted);text-align:left;font-size:12px}
+.more-menu button:hover,.more-menu button.active{color:var(--accent);background:rgba(223,255,56,.07)}
+.sidebar-bottom{border-top:1px solid var(--border);padding-top:12px}
+.logout-btn{border-radius:12px!important}
+.mobile-header-actions{display:flex;gap:8px}
+.mobile-header-actions button{width:37px;height:37px;border:1px solid var(--border);border-radius:12px;background:var(--card);color:var(--text)}
+.mobile-header-actions button:hover{border-color:var(--accent);color:var(--accent)}
+.settings-section{margin-bottom:16px}
+.settings-row{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:15px 0;border-bottom:1px solid var(--border)}
+.settings-row:last-child{border-bottom:0}
+.settings-row label,.settings-label{font-size:13px;font-weight:650}
+.settings-row p{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.5}
+.settings-row select,.settings-row input[type="text"]{max-width:210px;width:45%;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:11px;padding:10px}
+.settings-colors{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.settings-color{width:34px;height:34px;border-radius:50%;border:3px solid transparent;outline:1px solid var(--border)}
+.settings-color[aria-pressed="true"]{outline:2px solid var(--text);outline-offset:3px}
+.settings-check{display:flex;align-items:center;gap:10px;padding:12px 0;color:var(--text);font-size:13px}
+.settings-check input{accent-color:var(--accent);width:17px;height:17px}
+.settings-message{font-size:12px;color:var(--accent);min-height:18px;margin-top:10px}
+.page .card,.page .metric-tile{border-radius:21px}
+.page img{object-position:center}
+a,.link-button{color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+@media(max-width:760px){
+ .sidebar{display:none}
+ .mobile-header{gap:10px}
+ .mobile-header strong{font-size:15px!important}
+ .main{padding:15px;padding-bottom:88px}
+ .mobile-nav{grid-template-columns:repeat(4,minmax(0,1fr));background:rgba(10,12,9,.97);border-top:1px solid var(--border);backdrop-filter:blur(18px)}
+ .mobile-nav button{font-size:10px;color:var(--muted)}
+ .mobile-nav button span{font-size:17px}
+ .settings-row{align-items:flex-start;flex-direction:column;gap:9px}
+ .settings-row select,.settings-row input[type="text"]{width:100%;max-width:none}
+}
+
   </style>
 </head>
 
@@ -1381,7 +1438,7 @@ body{background:#090a08}
     <div class="auth-container">
 
       <div class="logo">
-        <div class="logo-icon">⚡</div>
+        <div class="logo-icon"></div>
         <h1>FITNESS AI PRO</h1>
         <p>Dein persönlicher KI-Fitness-Coach</p>
       </div>
@@ -1487,59 +1544,26 @@ body{background:#090a08}
     <aside class="sidebar">
 
       <div class="sidebar-logo">
-        <span>⚡</span>
+        <span></span>
         FITNESS AI PRO
       </div>
 
-      <nav class="nav">
-
-        <button class="active" onclick="showTab('dashboard')" data-tab="dashboard">
-          <span class="nav-icon">🏠</span>
-          Dashboard
-        </button>
-
-        <button onclick="showTab('friends')" data-tab="friends"><span class="nav-icon">👥</span>Friends</button>
-
-        <button onclick="showTab('ai')" data-tab="ai">
-          <span class="nav-icon">🤖</span>
-          KI-Coach
-        </button>
-
-        <button onclick="showTab('training')" data-tab="training">
-          <span class="nav-icon">🏋️</span>
-          Training
-        </button>
-
-        <button onclick="showTab('nutrition')" data-tab="nutrition">
-          <span class="nav-icon">🍎</span>
-          Ernährung
-        </button>
-
-        <button onclick="showTab('progress')" data-tab="progress">
-          <span class="nav-icon">📈</span>
-          Fortschritt
-        </button>
-
-        <button onclick="showTab('feedback')" data-tab="feedback">
-          <span class="nav-icon">💬</span>
-          Feedback
-        </button>
-
-        <button onclick="showTab('profile')" data-tab="profile">
-          <span class="nav-icon">⚙️</span>
-          Profil
-        </button>
-
-        <button
-          id="adminNavButton"
-          class="hidden"
-          onclick="showTab('admin')"
-          data-tab="admin"
-        >
-          <span class="nav-icon">🛠️</span>
-          Admin
-        </button>
-
+      <nav class="nav" aria-label="Hauptnavigation">
+        <button class="active" onclick="showTab('dashboard')" data-tab="dashboard"><span class="nav-icon">⌂</span><span id="quickLabel1">Dashboard</span></button>
+        <button onclick="showTab('training')" data-tab="training"><span class="nav-icon">▥</span><span id="quickLabel2">Training</span></button>
+        <button onclick="showTab('nutrition')" data-tab="nutrition"><span class="nav-icon">◒</span><span id="quickLabel3">Ernährung</span></button>
+        <div class="sidebar-more">
+          <button class="sidebar-more-toggle" id="moreMenuToggle" type="button" aria-expanded="false" aria-controls="moreMenu" onclick="toggleMoreMenu()"><span class="nav-icon">•••</span><span>Mehr</span><span style="margin-left:auto">⌄</span></button>
+          <div class="more-menu" id="moreMenu" hidden>
+            <button onclick="navigateMore('ai')" data-tab="ai"><span class="nav-icon"></span>KI-Coach</button>
+            <button onclick="navigateMore('friends')" data-tab="friends"><span class="nav-icon">◎</span>Community</button>
+            <button onclick="navigateMore('progress')" data-tab="progress"><span class="nav-icon">↗</span>Fortschritt</button>
+            <button onclick="navigateMore('feedback')" data-tab="feedback"><span class="nav-icon"></span>Feedback</button>
+            <button onclick="navigateMore('profile')" data-tab="profile"><span class="nav-icon">○</span>Über mich / Profil</button>
+            <button onclick="navigateMore('settings')" data-tab="settings"><span class="nav-icon"></span>Einstellungen</button>
+            <button id="adminNavButton" class="hidden" onclick="navigateMore('admin')" data-tab="admin"><span class="nav-icon">▤</span>Admin</button>
+          </div>
+        </div>
       </nav>
 
       <div class="sidebar-bottom">
@@ -1555,9 +1579,12 @@ body{background:#090a08}
 
     <div class="mobile-nav">
       <button class="active" onclick="showTab('dashboard')" data-tab="dashboard"><span>⌂</span>Home</button>
-      <button onclick="showTab('friends')" data-tab="friends"><span>♧</span>Friends</button>
-      <button onclick="showTab('nutrition')" data-tab="nutrition"><span>◈</span>Food</button>
-      <button onclick="showTab('profile')" data-tab="profile"><span>●</span>Profile</button>
+      <button onclick="showTab('training')" data-tab="training"><span>▥</span>Training</button>
+      <button onclick="showTab('nutrition')" data-tab="nutrition"><span>◒</span>Ernährung</button>
+      <button onclick="toggleMobileMore()" id="mobileMoreNavButton" aria-expanded="false"><span>•••</span>Mehr</button>
+    </div>
+    <div class="mobile-more-menu" id="mobileMoreMenu" hidden>
+      <button onclick="navigateMore('ai')">KI-Coach</button><button onclick="navigateMore('friends')">Community</button><button onclick="navigateMore('progress')">Fortschritt</button><button onclick="navigateMore('feedback')">Feedback</button><button onclick="navigateMore('profile')">Über mich</button><button onclick="navigateMore('settings')">Einstellungen</button>
     </div>
 
         <!-- MAIN -->
@@ -1565,8 +1592,8 @@ body{background:#090a08}
     <main class="main">
 
       <div class="mobile-header">
-        <strong>⚡ FITNESS AI PRO</strong>
-        <div class="mobile-header-actions"><button type="button" aria-label="Shop">🛍</button><button type="button" aria-label="Benachrichtigungen">♧</button><button class="secondary-btn" onclick="showTab('profile')" aria-label="Profil">👤</button></div>
+        <strong> FITNESS AI PRO</strong>
+        <div class="mobile-header-actions"><button type="button" onclick="showTab('settings')" aria-label="Einstellungen"></button><button type="button" onclick="toggleMobileMore()" aria-label="Weitere Seiten" aria-expanded="false" id="mobileMoreToggle">•••</button></div>
       </div>
 
 
@@ -1593,13 +1620,13 @@ body{background:#090a08}
           <div class="workout-progress-card"><div><h3>Dein Tagesziel</h3><p>Trainiere regelmäßig und bleib in Bewegung.</p><button class="secondary-btn" style="margin-top:12px" onclick="showTab('training')">Training öffnen →</button></div></div>
         </div>
         <div class="dashboard-metric-grid">
-          <div class="metric-tile lime"><span class="metric-icon">🔥</span><div class="metric-ring">kcal</div><div class="metric-label">CALORIES</div><strong>— kCal</strong><small>Noch nicht erfasst</small></div>
-          <div class="metric-tile"><span class="metric-icon">👟</span><div class="metric-label">STEPS</div><strong>—</strong><small>Schritte nicht verbunden</small></div>
-          <div class="metric-tile"><span class="metric-icon">🌙</span><div class="metric-label">SLEEP</div><strong>— / 8 h</strong><small>Schlaf nicht erfasst</small></div>
+          <div class="metric-tile lime"><span class="metric-icon"></span><div class="metric-ring">kcal</div><div class="metric-label">CALORIES</div><strong>— kCal</strong><small>Noch nicht erfasst</small></div>
+          <div class="metric-tile"><span class="metric-icon"></span><div class="metric-label">STEPS</div><strong>—</strong><small>Schritte nicht verbunden</small></div>
+          <div class="metric-tile"><span class="metric-icon"></span><div class="metric-label">SLEEP</div><strong>— / 8 h</strong><small>Schlaf nicht erfasst</small></div>
           <div class="metric-tile photo-tile"><div class="metric-label">MAKE IT COUNT</div><strong>One more rep.</strong><small>One step at a time.</small></div>
         </div>
         <h3 style="margin:4px 0 10px">Programs</h3>
-        <div class="program-strip"><button class="program-chip" onclick="showTab('training')"><span>🏃</span>Jog</button><button class="program-chip" onclick="showTab('training')"><span>🧘</span>Yoga</button><button class="program-chip" onclick="showTab('training')"><span>🚴</span>Cycling</button><button class="program-chip" onclick="showTab('training')"><span>🏋️</span>Workout</button></div>
+        <div class="program-strip"><button class="program-chip" onclick="showTab('training')"><span></span>Jog</button><button class="program-chip" onclick="showTab('training')"><span></span>Yoga</button><button class="program-chip" onclick="showTab('training')"><span></span>Cycling</button><button class="program-chip" onclick="showTab('training')"><span>️</span>Workout</button></div>
 
         <div class="hero">
 
@@ -1616,7 +1643,7 @@ body{background:#090a08}
             style="max-width:230px;margin-top:20px"
             onclick="showTab('ai')"
           >
-            🤖 KI-Coach öffnen
+             KI-Coach öffnen
           </button>
 
         </div>
@@ -1662,7 +1689,7 @@ body{background:#090a08}
           <div class="card">
 
             <div class="section-header">
-              <h3>🏋️ Heute</h3>
+              <h3>️ Heute</h3>
               <button
                 class="secondary-btn"
                 onclick="showTab('training')"
@@ -1690,7 +1717,7 @@ body{background:#090a08}
           <div class="card">
 
             <div class="section-header">
-              <h3>🤖 KI-Empfehlung</h3>
+              <h3> KI-Empfehlung</h3>
               <button
                 class="secondary-btn"
                 onclick="showTab('ai')"
@@ -1722,7 +1749,7 @@ body{background:#090a08}
 
         <div class="topbar">
           <div>
-            <h2>🤖 KI-Coach</h2>
+            <h2> KI-Coach</h2>
             <p>Dein persönlicher Fitness- und Ernährungsassistent</p>
           </div>
         </div>
@@ -1735,7 +1762,7 @@ body{background:#090a08}
             <div class="ai-header">
 
               <div class="ai-avatar">
-                🤖
+                
               </div>
 
               <div>
@@ -1749,7 +1776,7 @@ body{background:#090a08}
             <div id="aiChat" class="ai-chat">
 
               <div class="ai-message ai">
-                👋 Hey! Ich bin dein FITNESS AI Coach.
+                 Hey! Ich bin dein FITNESS AI Coach.
                 <br><br>
                 Du kannst mich zum Beispiel bitten:
                 <br><br>
@@ -1783,7 +1810,7 @@ body{background:#090a08}
     id="aiSendButton"
     aria-label="Nachricht senden"
   >
-    ➤
+    
   </button>
 
 </div>
@@ -1801,23 +1828,23 @@ body{background:#090a08}
             <div class="quick-actions">
 
               <button onclick="useAIQuickPrompt('Erstelle mir einen vollständigen Trainingsplan für mich.')">
-                🏋️ Trainingsplan erstellen
+                ️ Trainingsplan erstellen
               </button>
 
               <button onclick="useAIQuickPrompt('Was sollte ich heute trainieren?')">
-                🔥 Heutiges Training
+                 Heutiges Training
               </button>
 
               <button onclick="useAIQuickPrompt('Erstelle mir einen gesunden Mahlzeitenplan für eine Woche.')">
-                🍎 Mahlzeitenplan
+                 Mahlzeitenplan
               </button>
 
               <button onclick="useAIQuickPrompt('Erstelle mir eine Einkaufsliste passend zu meinem Mahlzeitenplan.')">
-                🛒 Einkaufsliste
+                 Einkaufsliste
               </button>
 
               <button onclick="useAIQuickPrompt('Optimiere meinen aktuellen Trainingsplan.')">
-                ⚡ Plan optimieren
+                 Plan optimieren
               </button>
 
             </div>
@@ -1855,7 +1882,7 @@ body{background:#090a08}
 
         <div class="topbar">
           <div>
-            <h2>🏋️ Training</h2>
+            <h2>️ Training</h2>
             <p>Dein individueller Trainingsbereich</p>
           </div>
 
@@ -1864,7 +1891,7 @@ body{background:#090a08}
             style="width:auto"
             onclick="showTab('ai')"
           >
-            🤖 Mit KI planen
+             Mit KI planen
           </button>
         </div>
 
@@ -1888,8 +1915,8 @@ body{background:#090a08}
                 onchange="saveProfile()"
               >
                 <option value="">Auswählen</option>
-                <option value="Zuhause">🏠 Zuhause</option>
-                <option value="Fitnessstudio">🏋️ Fitnessstudio</option>
+                <option value="Zuhause"> Zuhause</option>
+                <option value="Fitnessstudio">️ Fitnessstudio</option>
               </select>
 
             </div>
@@ -1918,7 +1945,7 @@ body{background:#090a08}
 
           <div class="card">
 
-            <h3>📅 Dein Trainingsplan</h3>
+            <h3> Dein Trainingsplan</h3>
 
             <p class="card-description">
               Dein KI-generierter Wochenplan wird hier angezeigt.
@@ -1938,7 +1965,7 @@ body{background:#090a08}
                 class="primary-btn"
                 style="margin-top:12px"
                 onclick="generateTrainingPlan()"
-              >🤖 Plan erstellen / anpassen</button>
+              > Plan erstellen / anpassen</button>
             </div>
 
             <div
@@ -1969,10 +1996,10 @@ body{background:#090a08}
           <div class="friend-post-head"><div class="friend-avatar">JW</div><div><strong>John Wick</strong><small>12 hours ago · Training</small></div><span style="margin-left:auto;color:var(--muted)">•••</span></div>
           <p class="friend-quote">“It's gonna hurt so bad that you'll do it again and again because you know the work is worth it.”</p>
           <img class="friend-photo" src="https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=1000&q=80" alt="Sportler beim Krafttraining" loading="lazy">
-          <div class="friend-post-actions"><span>♡ 128 Likes</span><span>▢ 24 Kommentare</span><span style="margin-left:auto">↗ Teilen</span></div>
+          <div class="friend-post-actions"><span> 128 Likes</span><span>▢ 24 Kommentare</span><span style="margin-left:auto">↗ Teilen</span></div>
         </div>
         <div class="online-line"><strong style="color:var(--text)">28 ONLINE</strong><span class="online-dots"><i></i><i></i><i></i><span style="margin-left:8px">Freunde sind aktiv</span></span></div>
-        <div class="friend-compose"><input type="text" placeholder="Share your thoughts..." aria-label="Gedanken teilen"><button class="secondary-btn" type="button" aria-label="Foto">📷</button><button class="primary-btn" style="width:auto;margin:0" type="button" aria-label="Teilen">➤</button></div>
+        <div class="friend-compose"><input type="text" placeholder="Share your thoughts..." aria-label="Gedanken teilen"><button class="secondary-btn" type="button" aria-label="Foto"></button><button class="primary-btn" style="width:auto;margin:0" type="button" aria-label="Teilen"></button></div>
         <p class="card-description" style="margin-top:10px">Community-Vorschau mit Beispieldaten. Beiträge und Likes sind noch nicht mit einem Community-Backend verbunden.</p>
       </section>
 
@@ -1985,7 +2012,7 @@ body{background:#090a08}
         <div class="topbar">
 
           <div>
-            <h2>🍎 Ernährung</h2>
+            <h2> Ernährung</h2>
             <p>Gesunde Ernährung mit Unterstützung deiner KI</p>
           </div>
 
@@ -1999,16 +2026,16 @@ body{background:#090a08}
           <div class="macro-bars"><div class="macro-bar-row"><strong>P</strong><div class="macro-bar"><i style="width:0%"></i></div><span>Protein</span></div><div class="macro-bar-row"><strong>C</strong><div class="macro-bar"><i style="width:0%"></i></div><span>Carbs</span></div><div class="macro-bar-row"><strong>F</strong><div class="macro-bar"><i style="width:0%"></i></div><span>Fat</span></div></div>
           <p class="card-description" style="margin-top:12px">Kalorien und Makros erscheinen hier, sobald du Mahlzeiten trackst.</p>
         </div>
-        <div class="food-tiles"><div class="food-tile"><small>🌙 SLEEP</small><strong>— / 8 h</strong><p class="card-description" style="margin-top:5px">Noch nicht erfasst</p></div><div class="food-tile lime"><small>💧 WATER</small><strong>— / 5 Gläser</strong><p style="font-size:12px;margin-top:5px">Wasserziel</p></div></div>
+        <div class="food-tiles"><div class="food-tile"><small> SLEEP</small><strong>— / 8 h</strong><p class="card-description" style="margin-top:5px">Noch nicht erfasst</p></div><div class="food-tile lime"><small> WATER</small><strong>— / 5 Gläser</strong><p style="font-size:12px;margin-top:5px">Wasserziel</p></div></div>
         <div class="daily-food-header">Breakfast · Daily Food</div>
         <div class="food-photo-grid"><img src="https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=300&q=80" alt="Frühstück mit Toast" loading="lazy"><img src="https://images.unsplash.com/photo-1528207776546-365bb710ee93?auto=format&fit=crop&w=300&q=80" alt="Pfannkuchen" loading="lazy"><img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=300&q=80" alt="Gesunde Bowl" loading="lazy"><img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=300&q=80" alt="Ausgewogene Mahlzeit" loading="lazy"></div>
-        <div class="ask-ai-food"><div><strong>Ask AI</strong><small>Mach ein Foto deines Essens und lass Kalorien und Nährwerte einschätzen.</small></div><button type="button" onclick="document.getElementById('nutritionPrompt').focus()" aria-label="Ernährungs-KI öffnen">📷</button></div>
+        <div class="ask-ai-food"><div><strong>Ask AI</strong><small>Mach ein Foto deines Essens und lass Kalorien und Nährwerte einschätzen.</small></div><button type="button" onclick="document.getElementById('nutritionPrompt').focus()" aria-label="Ernährungs-KI öffnen"></button></div>
 
         <div class="grid grid-2">
 
           <div class="card">
 
-            <h3>🤖 Ernährungs-KI</h3>
+            <h3> Ernährungs-KI</h3>
 
             <p class="card-description">
               Lass dir einen ausgewogenen Mahlzeitenplan erstellen
@@ -2030,7 +2057,7 @@ body{background:#090a08}
               class="primary-btn"
               onclick="askNutritionAI()"
             >
-              🍎 Plan erstellen
+               Plan erstellen
             </button>
 
           </div>
@@ -2038,7 +2065,7 @@ body{background:#090a08}
 
           <div class="card">
 
-            <h3>🛒 Einkaufsliste</h3>
+            <h3> Einkaufsliste</h3>
 
             <p class="card-description">
               Die Einkaufsliste wird automatisch aus deinem
@@ -2059,7 +2086,7 @@ body{background:#090a08}
               style="margin-top:15px"
               onclick="createShoppingList()"
             >
-              🛒 Einkaufsliste erstellen
+               Einkaufsliste erstellen
             </button>
 
           </div>
@@ -2073,7 +2100,7 @@ body{background:#090a08}
 
             <div class="section-header">
               <div>
-                <h3>🍽️ Mein Mahlzeitenplan</h3>
+                <h3>️ Mein Mahlzeitenplan</h3>
                 <p class="card-description">
                   Dein aktueller KI-Ernährungsplan.
                 </p>
@@ -2117,7 +2144,7 @@ body{background:#090a08}
         <div class="topbar">
 
           <div>
-            <h2>📈 Fortschritt</h2>
+            <h2> Fortschritt</h2>
             <p>Verfolge deine Entwicklung über die Zeit.</p>
           </div>
 
@@ -2128,7 +2155,7 @@ body{background:#090a08}
 
           <div class="card">
 
-            <h3>⚖️ Gewicht eintragen</h3>
+            <h3>️ Gewicht eintragen</h3>
 
             <p class="card-description">
               Trage dein Gewicht mit Datum ein, um deinen Verlauf
@@ -2181,7 +2208,7 @@ body{background:#090a08}
 
           <div class="card">
 
-            <h3>📊 Durchschnitt</h3>
+            <h3> Durchschnitt</h3>
 
             <p class="card-description">
               Durchschnitt aus deinen gespeicherten Einträgen.
@@ -2216,7 +2243,7 @@ body{background:#090a08}
         <div class="card" style="margin-top:18px">
           <div class="section-header">
             <div>
-              <h3>🏋️ Trainingsfortschritt pro Übung</h3>
+              <h3>️ Trainingsfortschritt pro Übung</h3>
               <p class="card-description">Deine gespeicherten Gewichte, Wiederholungen und Zeiten im Verlauf.</p>
             </div>
           </div>
@@ -2237,7 +2264,7 @@ body{background:#090a08}
         <div class="topbar">
 
           <div>
-            <h2>💬 Feedback</h2>
+            <h2> Feedback</h2>
             <p>Hilf uns, FITNESS AI PRO besser zu machen.</p>
           </div>
 
@@ -2303,7 +2330,7 @@ body{background:#090a08}
 
           <div class="card">
 
-            <h3>📋 Mein Feedback</h3>
+            <h3> Mein Feedback</h3>
 
             <p class="card-description">
               Hier kannst du deine bisherigen Rückmeldungen sehen.
@@ -2332,7 +2359,7 @@ body{background:#090a08}
         <div class="topbar">
 
           <div>
-            <h2>⚙️ Profil</h2>
+            <h2>️ Profil</h2>
             <p>Deine persönlichen FITNESS-AI-Einstellungen.</p>
           </div>
 
@@ -2344,7 +2371,7 @@ body{background:#090a08}
           <div class="card">
 
             <div class="profile-avatar">
-              👤
+              
             </div>
 
             <h3 id="profileName">
@@ -2454,6 +2481,34 @@ body{background:#090a08}
       </section>
 
 
+
+      <section id="settings" class="page">
+        <div class="topbar"><div><h2>Einstellungen</h2><p>Gestalte deine App und verwalte deine Schnellzugriffe.</p></div></div>
+        <div class="grid grid-2">
+          <div class="card settings-section">
+            <h3>Darstellung</h3><p class="card-description" style="margin-top:6px">Passe Farben und Erscheinungsbild an. Die Auswahl wird auf diesem Gerät gespeichert.</p>
+            <div class="settings-row"><div><label for="themeMode">Design</label><p>Wähle deinen bevorzugten Modus.</p></div><select id="themeMode"><option value="dark">Dark Mode</option><option value="midnight">Midnight</option><option value="light">Light Mode</option></select></div>
+            <div class="settings-row"><div><span class="settings-label">Akzentfarbe</span><p>Farbe für Buttons und Fortschritt.</p></div><div class="settings-colors"><button class="settings-color" type="button" data-accent="#dfff38" style="background:#dfff38" aria-label="Neon Lime" aria-pressed="true"></button><button class="settings-color" type="button" data-accent="#66e3a4" style="background:#66e3a4" aria-label="Mint" aria-pressed="false"></button><button class="settings-color" type="button" data-accent="#6aa8ff" style="background:#6aa8ff" aria-label="Blau" aria-pressed="false"></button><button class="settings-color" type="button" data-accent="#c5a1ff" style="background:#c5a1ff" aria-label="Violett" aria-pressed="false"></button></div></div>
+            <button class="primary-btn" type="button" onclick="saveAppSettings()">Einstellungen speichern</button><p id="settingsStatus" class="settings-message" role="status" aria-live="polite"></p>
+          </div>
+          <div class="card settings-section">
+            <h3>Schnellzugriffe</h3><p class="card-description" style="margin-top:6px">Lege fest, welche drei Bereiche dauerhaft links angezeigt werden.</p>
+            <div class="settings-row"><label for="quickAccess1">Schnellzugriff 1</label><select id="quickAccess1"><option value="dashboard">Dashboard</option><option value="ai">KI-Coach</option><option value="training">Training</option><option value="nutrition">Ernährung</option><option value="progress">Fortschritt</option><option value="friends">Community</option><option value="profile">Über mich / Profil</option></select></div>
+            <div class="settings-row"><label for="quickAccess2">Schnellzugriff 2</label><select id="quickAccess2"><option value="training">Training</option><option value="dashboard">Dashboard</option><option value="ai">KI-Coach</option><option value="nutrition">Ernährung</option><option value="progress">Fortschritt</option><option value="friends">Community</option><option value="profile">Über mich / Profil</option></select></div>
+            <div class="settings-row"><label for="quickAccess3">Schnellzugriff 3</label><select id="quickAccess3"><option value="nutrition">Ernährung</option><option value="dashboard">Dashboard</option><option value="ai">KI-Coach</option><option value="training">Training</option><option value="progress">Fortschritt</option><option value="friends">Community</option><option value="profile">Über mich / Profil</option></select></div>
+            <button class="secondary-btn" type="button" onclick="saveQuickAccess()">Schnellzugriffe speichern</button><p id="quickAccessStatus" class="settings-message" role="status" aria-live="polite"></p>
+          </div>
+          <div class="card settings-section">
+            <h3>Mein Konto</h3><p class="card-description" style="margin:7px 0 15px">Verwalte deine persönlichen Angaben oder melde dich sicher ab.</p>
+            <button class="secondary-btn" type="button" onclick="showTab('profile')">Profildaten verwalten</button><button class="secondary-btn" type="button" style="margin-top:10px" onclick="logout()">Abmelden</button>
+          </div>
+          <div class="card settings-section">
+            <h3>Hilfe und Feedback</h3><p class="card-description" style="margin:7px 0 15px">Fehler melden oder Verbesserungsideen senden.</p>
+            <button class="secondary-btn" type="button" onclick="showTab('feedback')">Feedback öffnen</button>
+          </div>
+        </div>
+      </section>
+
       <!-- =========================
            ADMIN
       ========================== -->
@@ -2463,7 +2518,7 @@ body{background:#090a08}
         <div class="topbar">
 
           <div>
-            <h2>🛠️ Admin</h2>
+            <h2>️ Admin</h2>
             <p>Feedback und Rückmeldungen der Nutzer.</p>
           </div>
 
@@ -2502,5 +2557,72 @@ body{background:#090a08}
       });
     }
   </script>
+
+  <script>
+    const FIT_SETTINGS_KEY = "fitnessAiProUiSettingsV1";
+    const FIT_QUICK_LABELS = {dashboard:"Dashboard",ai:"KI-Coach",training:"Training",nutrition:"Ernährung",progress:"Fortschritt",friends:"Community",feedback:"Feedback",profile:"Über mich",settings:"Einstellungen"};
+    let chosenAccent = "#dfff38";
+    function readUiSettings(){try{return JSON.parse(localStorage.getItem(FIT_SETTINGS_KEY)||"{}")}catch{return {}}}
+    function applyUiSettings(){
+      const cfg=readUiSettings();
+      const accent=cfg.accent||"#dfff38";
+      const theme=cfg.theme||"dark";
+      document.documentElement.style.setProperty("--accent",accent);
+      document.documentElement.style.setProperty("--accent2",accent);
+      document.documentElement.style.setProperty("--green",accent);
+      document.body.dataset.theme=theme;
+      if(theme==="light"){
+        document.documentElement.style.setProperty("--bg","#f2f4ef");document.documentElement.style.setProperty("--bg2","#ffffff");document.documentElement.style.setProperty("--card","#ffffff");document.documentElement.style.setProperty("--card2","#e9ede3");document.documentElement.style.setProperty("--border","#d8ddd1");document.documentElement.style.setProperty("--text","#171a13");document.documentElement.style.setProperty("--muted","#64695d");document.body.style.background="#f2f4ef";
+      }else{
+        document.documentElement.style.setProperty("--bg",theme==="midnight"?"#070b16":"#090a08");document.documentElement.style.setProperty("--bg2",theme==="midnight"?"#0d1423":"#10120e");document.documentElement.style.setProperty("--card",theme==="midnight"?"#101a2a":"#151711");document.documentElement.style.setProperty("--card2",theme==="midnight"?"#19253a":"#1c2016");document.documentElement.style.setProperty("--border",theme==="midnight"?"#27364c":"#2b3024");document.documentElement.style.setProperty("--text","#f6f7f1");document.documentElement.style.setProperty("--muted","#a0a397");document.body.style.background="";
+      }
+      chosenAccent=accent;
+      document.querySelectorAll(".settings-color").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.accent===accent)));
+      const mode=document.getElementById("themeMode");if(mode)mode.value=theme;
+      ["dashboard","training","nutrition"].forEach((fallback,i)=>{const el=document.getElementById("quickAccess"+(i+1));if(el)el.value=(cfg.quick&&cfg.quick[i])||fallback});
+      renderQuickAccess(cfg.quick||["dashboard","training","nutrition"]);
+    }
+    function renderQuickAccess(values){
+      const quick=(values||["dashboard","training","nutrition"]).slice(0,3);
+      const nav=document.querySelector(".sidebar .nav");
+      if(nav){
+        const buttons=[...nav.querySelectorAll(":scope > button[data-quick='true']")];
+        buttons.forEach(b=>b.remove());
+        const more=nav.querySelector(".sidebar-more");
+        quick.forEach((key,i)=>{const b=document.createElement("button");b.dataset.tab=key;b.dataset.quick="true";b.onclick=()=>showTab(key);b.innerHTML='<span class="nav-icon">'+({dashboard:"⌂",ai:"✳",training:"▥",nutrition:"◒",progress:"↗",friends:"◎",feedback:"✉",profile:"○"}[key]||"•")+'</span><span>'+FIT_QUICK_LABELS[key]+'</span>';if(i===0)b.classList.add("active");nav.insertBefore(b,more);});
+      }
+    }
+    function toggleMoreMenu(){
+      const menu=document.getElementById("moreMenu"),btn=document.getElementById("moreMenuToggle");if(!menu||!btn)return;
+      menu.hidden=!menu.hidden;btn.setAttribute("aria-expanded",String(!menu.hidden));
+    }
+    function toggleMobileMore(){
+      const menu=document.getElementById("mobileMoreMenu"),btn=document.getElementById("mobileMoreToggle"),navBtn=document.getElementById("mobileMoreNavButton");if(!menu)return;
+      menu.hidden=!menu.hidden;if(btn)btn.setAttribute("aria-expanded",String(!menu.hidden));if(navBtn)navBtn.setAttribute("aria-expanded",String(!menu.hidden));
+    }
+    function navigateMore(tab){
+      showTab(tab);
+      const menu=document.getElementById("moreMenu"),btn=document.getElementById("moreMenuToggle");if(menu)menu.hidden=true;if(btn)btn.setAttribute("aria-expanded","false");
+      const mobile=document.getElementById("mobileMoreMenu");if(mobile)mobile.hidden=true;
+      const mb=document.getElementById("mobileMoreToggle"),nb=document.getElementById("mobileMoreNavButton");if(mb)mb.setAttribute("aria-expanded","false");if(nb)nb.setAttribute("aria-expanded","false");
+    }
+    function saveAppSettings(){
+      const old=readUiSettings();const theme=document.getElementById("themeMode")?.value||"dark";
+      const cfg={...old,theme,accent:chosenAccent,quick:old.quick||["dashboard","training","nutrition"]};
+      localStorage.setItem(FIT_SETTINGS_KEY,JSON.stringify(cfg));applyUiSettings();
+      const status=document.getElementById("settingsStatus");if(status)status.textContent="Darstellung gespeichert.";
+    }
+    function saveQuickAccess(){
+      const quick=[1,2,3].map(i=>document.getElementById("quickAccess"+i)?.value||["dashboard","training","nutrition"][i-1]);
+      if(new Set(quick).size!==3){const st=document.getElementById("quickAccessStatus");if(st)st.textContent="Bitte wähle drei unterschiedliche Bereiche.";return}
+      const old=readUiSettings();localStorage.setItem(FIT_SETTINGS_KEY,JSON.stringify({...old,quick}));
+      applyUiSettings();const st=document.getElementById("quickAccessStatus");if(st)st.textContent="Schnellzugriffe gespeichert.";
+    }
+    document.addEventListener("DOMContentLoaded",()=>{
+      applyUiSettings();
+      document.querySelectorAll(".settings-color").forEach(b=>b.addEventListener("click",()=>{chosenAccent=b.dataset.accent;document.querySelectorAll(".settings-color").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));document.documentElement.style.setProperty("--accent",chosenAccent);document.documentElement.style.setProperty("--accent2",chosenAccent);}));
+    });
+  </script>
+
 </body>
 </html>
