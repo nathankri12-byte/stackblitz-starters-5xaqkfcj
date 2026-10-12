@@ -3346,141 +3346,295 @@ function renderMyFeedback(
    ADMIN
 ========================================================= */
 
+let adminAccessGranted = false;
+let adminFeedbackCache = [];
+
 function isCurrentUserAdmin() {
   return Boolean(
     currentUser &&
-    typeof currentUser.email === "string" &&
-    currentUser.email.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase()
+    (
+      currentUser.email?.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase() ||
+      adminAccessGranted
+    )
   );
 }
 
+function setAdminStatus(message, success = false) {
+  const element = document.getElementById("adminManagementStatus");
+  if (!element) return;
+  element.textContent = message || "";
+  element.style.color = success ? "var(--green)" : "var(--red)";
+}
 
 async function checkAdmin() {
-
   const buttons = [
     document.getElementById("adminNavButton"),
     document.getElementById("mobileAdminNavButton")
   ].filter(Boolean);
 
-  if (!buttons.length || !currentUser) {
-    return;
-  }
+  adminAccessGranted = Boolean(
+    currentUser?.email?.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase()
+  );
 
-  const isAdmin = isCurrentUserAdmin();
+  if (currentUser && supabaseClient) {
+    try {
+      const { data, error } = await supabaseClient
+        .from("app_admins")
+        .select("email")
+        .eq("email", currentUser.email.trim().toLowerCase())
+        .maybeSingle();
+
+      if (error) {
+        console.warn("Admin-Berechtigung konnte nicht aus der Datenbank gelesen werden:", error.message);
+      } else {
+        adminAccessGranted = Boolean(data);
+      }
+    } catch (error) {
+      console.error("Admin-Prüfung fehlgeschlagen:", error);
+    }
+  }
 
   buttons.forEach(button => {
-    button.classList.toggle("hidden", !isAdmin);
+    button.classList.toggle("hidden", !isCurrentUserAdmin());
   });
+
+  if (!isCurrentUserAdmin() && document.getElementById("admin")?.classList.contains("active")) {
+    showTab("dashboard");
+  }
 }
 
+function getAdminDisplayName(email, profileByEmail) {
+  return profileByEmail.get(String(email || "").trim().toLowerCase()) || "";
+}
 
-async function loadAllFeedback() {
-
-  const container =
-    document.getElementById(
-      "allFeedback"
-    );
-
-  if (
-    !container ||
-    !currentUser
-  ) {
+async function addAdminFromForm(event) {
+  event?.preventDefault();
+  if (!isCurrentUserAdmin() || !supabaseClient) {
+    setAdminStatus("Du hast keine Berechtigung, Administratoren zu verwalten.");
     return;
   }
 
-  const isAdmin = isCurrentUserAdmin();
-
-  if (!isAdmin) {
-
-    container.innerHTML =
-      `
-        <p class="card-description">
-          Kein Zugriff.
-        </p>
-      `;
-
+  const input = document.getElementById("newAdminEmail");
+  const email = String(input?.value || "").trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    setAdminStatus("Bitte gib eine gültige E-Mail-Adresse ein.");
     return;
   }
+
+  const button = document.getElementById("addAdminButton");
+  if (button) {
+    button.disabled = true;
+    button.textContent = "Wird hinzugefügt …";
+  }
+  setAdminStatus("");
 
   try {
-
-    const {
-      data,
-      error
-    } =
-      await supabaseClient
-        .from("feedback")
-        .select("*")
-        .order(
-          "id",
-          {
-            ascending: false
-          }
-        );
+    const { error } = await supabaseClient
+      .from("app_admins")
+      .insert({ email, added_by: currentUser.id });
 
     if (error) {
-
-      console.error(error);
-
-      container.innerHTML =
-        `
-          <p class="card-description">
-            Feedback konnte nicht geladen werden:<br>
-            ${escapeHTML(error.message)}
-          </p>
-        `;
-
+      if (error.code === "23505") {
+        setAdminStatus("Diese E-Mail-Adresse ist bereits als Admin eingetragen.");
+      } else {
+        console.error("Admin konnte nicht hinzugefügt werden:", error);
+        setAdminStatus("Admin konnte nicht hinzugefügt werden: " + error.message);
+      }
       return;
     }
 
-    if (!data?.length) {
-
-      container.innerHTML =
-        `
-          <p class="card-description">
-            Noch kein Feedback vorhanden.
-          </p>
-        `;
-
-      return;
-    }
-
-    container.innerHTML =
-      data
-        .map(
-          item => `
-            <div class="feedback-item">
-
-              <div class="feedback-meta">
-                User ID:
-                ${escapeHTML(
-                  String(
-                    item.user_id ||
-                      "—"
-                  )
-                )}
-
-                • Bewertung:
-                ${
-                  item.rating ||
-                  "—"
-                }/5
-              </div>
-
-              <div>
-                ${escapeHTML(
-                  item.message ||
-                    ""
-                )}
-              </div>
-
-            </div>
-          `
-        )
-        .join("");
-
+    if (input) input.value = "";
+    setAdminStatus("Administrator wurde hinzugefügt.", true);
+    await loadAllFeedback();
   } catch (error) {
     console.error(error);
+    setAdminStatus("Beim Hinzufügen ist ein unerwarteter Fehler aufgetreten.");
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.textContent = "Admin hinzufügen";
+    }
+  }
+}
+
+async function removeAdmin(email) {
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  if (!isCurrentUserAdmin() || !supabaseClient) {
+    setAdminStatus("Du hast keine Berechtigung, Administratoren zu verwalten.");
+    return;
+  }
+  if (normalizedEmail === ADMIN_EMAIL.toLowerCase()) {
+    setAdminStatus("Das geschützte Hauptkonto kann nicht entfernt werden.");
+    return;
+  }
+  if (!window.confirm("Admin-Berechtigung für " + normalizedEmail + " wirklich entfernen?")) return;
+
+  try {
+    const { error } = await supabaseClient
+      .from("app_admins")
+      .delete()
+      .eq("email", normalizedEmail);
+
+    if (error) {
+      console.error("Admin konnte nicht entfernt werden:", error);
+      setAdminStatus("Admin konnte nicht entfernt werden: " + error.message);
+      return;
+    }
+
+    setAdminStatus("Admin-Berechtigung wurde entfernt.", true);
+    await checkAdmin();
+    if (isCurrentUserAdmin()) await loadAllFeedback();
+  } catch (error) {
+    console.error(error);
+    setAdminStatus("Beim Entfernen ist ein unerwarteter Fehler aufgetreten.");
+  }
+}
+
+function filterAdminFeedback(query = "") {
+  const target = document.getElementById("allFeedback");
+  if (!target) return;
+
+  const term = String(query).trim().toLocaleLowerCase("de");
+  const filtered = adminFeedbackCache.filter(item => {
+    const haystack = [
+      item.displayName,
+      item.email,
+      item.message,
+      item.rating,
+      item.createdLabel
+    ].join(" ").toLocaleLowerCase("de");
+    return !term || haystack.includes(term);
+  });
+
+  if (!filtered.length) {
+    target.innerHTML = '<p class="card-description">Keine passenden Feedback-Einträge gefunden.</p>';
+    return;
+  }
+
+  target.innerHTML = filtered.map(item => `
+    <article class="admin-feedback-entry">
+      <div class="admin-feedback-entry-head">
+        <div>
+          <div class="admin-feedback-user">${escapeHTML(item.displayName)}</div>
+          ${item.email ? `<div class="admin-feedback-email">${escapeHTML(item.email)}</div>` : ""}
+          <div class="admin-feedback-date">${escapeHTML(item.createdLabel)}</div>
+        </div>
+        <div class="admin-feedback-rating">${item.rating ? escapeHTML(String(item.rating)) + "/5" : "Ohne Bewertung"}</div>
+      </div>
+      <div class="admin-feedback-message">${escapeHTML(item.message || "Kein Text hinterlegt.")}</div>
+    </article>
+  `).join("");
+}
+
+async function loadAllFeedback() {
+  const container = document.getElementById("allFeedback");
+  if (!container || !currentUser || !supabaseClient) return;
+
+  if (!isCurrentUserAdmin()) {
+    container.innerHTML = '<p class="card-description">Kein Zugriff.</p>';
+    return;
+  }
+
+  container.innerHTML = '<p class="card-description">Admin-Daten werden geladen …</p>';
+  const adminList = document.getElementById("adminList");
+  if (adminList) adminList.innerHTML = '<p class="card-description">Administratoren werden geladen …</p>';
+
+  try {
+    const [feedbackResult, profilesResult, adminsResult, communityResult] = await Promise.all([
+      supabaseClient.from("feedback").select("*").order("created_at", { ascending: false }),
+      supabaseClient.from("profiles").select("user_id,Name,email,created_at").order("id", { ascending: false }),
+      supabaseClient.from("app_admins").select("email,created_at,added_by").order("created_at", { ascending: true }),
+      supabaseClient.from("community_profiles").select("user_id,display_name")
+    ]);
+
+    const queryError = feedbackResult.error || profilesResult.error || adminsResult.error || communityResult.error;
+    if (queryError) {
+      console.error("Admin-Daten konnten nicht vollständig geladen werden:", queryError);
+      container.innerHTML = '<p class="card-description">Ein Teil der Admin-Daten konnte nicht geladen werden. Bitte aktualisieren und die Zugriffsregeln prüfen.</p>';
+      if (adminList) adminList.innerHTML = '<p class="card-description">Die Admin-Liste konnte nicht geladen werden.</p>';
+      return;
+    }
+
+    const profiles = profilesResult.data || [];
+    const feedback = feedbackResult.data || [];
+    const admins = adminsResult.data || [];
+    const communityProfiles = communityResult.data || [];
+    const profileByUser = new Map();
+    const profileByEmail = new Map();
+    const communityNameByUser = new Map();
+
+    profiles.forEach(profile => {
+      const uid = String(profile.user_id || "");
+      const name = String(profile.Name || "").trim();
+      const email = String(profile.email || "").trim();
+      if (uid && !profileByUser.has(uid) && name) profileByUser.set(uid, name);
+      if (email && name && !profileByEmail.has(email.toLowerCase())) profileByEmail.set(email.toLowerCase(), name);
+      if (email && !profileByEmail.has(email.toLowerCase())) profileByEmail.set(email.toLowerCase(), email);
+    });
+
+    communityProfiles.forEach(profile => {
+      const uid = String(profile.user_id || "");
+      const name = String(profile.display_name || "").trim();
+      if (uid && name) communityNameByUser.set(uid, name);
+    });
+
+    const resolveUser = userId => {
+      const uid = String(userId || "");
+      const profile = profiles.find(item => String(item.user_id || "") === uid);
+      const name = profileByUser.get(uid) || communityNameByUser.get(uid) || String(profile?.email || "").trim();
+      return { name: name || "Nutzer", email: String(profile?.email || "").trim() };
+    };
+
+    const statUsers = document.getElementById("adminStatUsers");
+    const statFeedback = document.getElementById("adminStatFeedback");
+    const statAdmins = document.getElementById("adminStatAdmins");
+    if (statUsers) statUsers.textContent = String(new Set(profiles.map(p => p.user_id).filter(Boolean)).size);
+    if (statFeedback) statFeedback.textContent = String(feedback.length);
+    if (statAdmins) statAdmins.textContent = String(admins.length);
+
+    if (adminList) {
+      if (!admins.length) {
+        adminList.innerHTML = '<p class="card-description">Noch keine Administratoren eingetragen.</p>';
+      } else {
+        adminList.innerHTML = admins.map(admin => {
+          const email = String(admin.email || "").trim().toLowerCase();
+          const displayName = getAdminDisplayName(email, profileByEmail) || email;
+          const isOwner = email === ADMIN_EMAIL.toLowerCase();
+          const addedDate = admin.created_at ? new Date(admin.created_at).toLocaleDateString("de-DE") : "";
+          return `
+            <div class="admin-person-row">
+              <div class="admin-person-main">
+                <span class="admin-person-name">${escapeHTML(displayName)}</span>
+                <span class="admin-person-email">${escapeHTML(email)}</span>
+                ${addedDate ? `<span class="admin-person-meta">Hinzugefügt am ${escapeHTML(addedDate)}</span>` : ""}
+              </div>
+              ${isOwner
+                ? '<span class="admin-owner-badge">Hauptadmin · geschützt</span>'
+                : `<button type="button" class="admin-remove-btn" onclick="removeAdmin('${escapeHTML(email)}')">Entfernen</button>`}
+            </div>`;
+        }).join("");
+      }
+    }
+
+    adminFeedbackCache = feedback.map(item => {
+      const user = resolveUser(item.user_id);
+      const createdDate = item.created_at ? new Date(item.created_at) : null;
+      return {
+        displayName: user.name,
+        email: user.email,
+        message: String(item.message || ""),
+        rating: item.rating,
+        createdLabel: createdDate && !Number.isNaN(createdDate.getTime())
+          ? createdDate.toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "short" })
+          : "Datum unbekannt"
+      };
+    });
+
+    const search = document.getElementById("adminFeedbackSearch");
+    filterAdminFeedback(search?.value || "");
+  } catch (error) {
+    console.error("Admin-Bereich konnte nicht geladen werden:", error);
+    container.innerHTML = '<p class="card-description">Beim Laden ist ein unerwarteter Fehler aufgetreten.</p>';
   }
 }
 
