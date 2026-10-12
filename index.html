@@ -2954,7 +2954,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 
 
   <!-- Deine JavaScript-Datei -->
-  <script src="script.js?v=20261012-clean-ui-4"></script>
+  <script src="script.js?v=20261012-shortcuts-fix-5"></script>
 
   <script>
     if ("serviceWorker" in navigator && location.protocol === "https:") {
@@ -2992,14 +2992,43 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
       renderQuickAccess(cfg.quick||["dashboard","training","nutrition"]);
     }
     function renderQuickAccess(values){
-      const quick=(values||["dashboard","training","nutrition"]).slice(0,3);
-      const nav=document.querySelector(".sidebar .nav");
-      if(nav){
-        const buttons=[...nav.querySelectorAll(":scope > button[data-quick='true']")];
-        buttons.forEach(b=>b.remove());
-        const more=nav.querySelector(".sidebar-more");
-        quick.forEach((key,i)=>{const b=document.createElement("button");b.dataset.tab=key;b.dataset.quick="true";b.onclick=()=>showTab(key);b.innerHTML='<span class="nav-icon">'+({dashboard:"⌂",ai:"",training:"▥",nutrition:"◒",progress:"",friends:"◎",feedback:"",profile:"○"}[key]||"•")+'</span><span>'+FIT_QUICK_LABELS[key]+'</span>';if(i===0)b.classList.add("active");nav.insertBefore(b,more);});
+      const defaults=["dashboard","training","nutrition"];
+      const allowed=Object.keys(FIT_QUICK_LABELS).filter(key=>["dashboard","ai","training","nutrition","progress","friends","feedback","profile"].includes(key));
+      const quick=[];
+      (Array.isArray(values)?values:defaults).forEach(key=>{
+        if(allowed.includes(key)&&!quick.includes(key)&&quick.length<3)quick.push(key);
+      });
+      defaults.forEach(key=>{if(quick.length<3&&!quick.includes(key))quick.push(key)});
+      const icons={dashboard:"⌂",ai:"✳",training:"▥",nutrition:"◒",progress:"↗",friends:"◎",feedback:"✉",profile:"○"};
+      const mobileLabels={dashboard:"Home",ai:"KI-Coach",training:"Training",nutrition:"Ernährung",progress:"Fortschritt",friends:"Community",feedback:"Feedback",profile:"Profil"};
+      const desktopNav=document.querySelector(".sidebar .nav");
+      if(desktopNav){
+        desktopNav.querySelectorAll(":scope > button[data-quick='true']").forEach(button=>button.remove());
+        const more=desktopNav.querySelector(".sidebar-more");
+        quick.forEach(key=>{
+          const button=document.createElement("button");
+          button.dataset.tab=key;button.dataset.quick="true";button.type="button";
+          button.onclick=()=>showTab(key);
+          button.innerHTML='<span class="nav-icon">'+icons[key]+'</span><span>'+FIT_QUICK_LABELS[key]+'</span>';
+          if(more)desktopNav.insertBefore(button,more);else desktopNav.appendChild(button);
+        });
       }
+      const mobileNav=document.querySelector(".mobile-nav");
+      if(mobileNav){
+        const buttons=[...mobileNav.querySelectorAll("button")];
+        const moreButton=buttons.find(button=>button.id==="mobileMoreNavButton");
+        buttons.filter(button=>button!==moreButton).forEach(button=>button.remove());
+        quick.forEach(key=>{
+          const button=document.createElement("button");
+          button.type="button";button.dataset.tab=key;button.dataset.quick="true";
+          button.onclick=()=>showTab(key);
+          button.innerHTML='<span>'+icons[key]+'</span>'+mobileLabels[key];
+          if(moreButton)mobileNav.insertBefore(button,moreButton);else mobileNav.appendChild(button);
+        });
+      }
+      document.querySelectorAll("[data-tab]").forEach(button=>{
+        button.classList.toggle("active",button.dataset.tab===document.querySelector(".page.active")?.id);
+      });
     }
     function toggleMoreMenu(){
       const menu=document.getElementById("moreMenu"),btn=document.getElementById("moreMenuToggle");if(!menu||!btn)return;
