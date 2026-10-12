@@ -22,8 +22,8 @@
       --border: #26313d;
       --text: #f5f7fa;
       --muted: #8d9aaa;
-      --accent: #7c5cff;
-      --accent2: #9a82ff;
+      --accent: #d9ff3f;
+      --accent2: #c8f542;
       --green: #35d07f;
       --red: #ff5d6c;
       --orange: #ffad42;
@@ -40,7 +40,7 @@
     body {
       font-family: Inter, Arial, Helvetica, sans-serif;
       background:
-        radial-gradient(circle at 80% -10%, rgba(124,92,255,.18), transparent 35%),
+        radial-gradient(circle at 80% -10%, rgba(217,255,63,.18), transparent 35%),
         var(--bg);
       color: var(--text);
       min-height: 100vh;
@@ -88,9 +88,9 @@
       border-radius: 22px;
       display: grid;
       place-items: center;
-      background: linear-gradient(135deg, var(--accent), #4934b5);
+      background: linear-gradient(135deg, var(--accent), #879f00);
       font-size: 32px;
-      box-shadow: 0 15px 45px rgba(124,92,255,.25);
+      box-shadow: 0 15px 45px rgba(217,255,63,.25);
     }
 
     .logo h1 {
@@ -229,7 +229,7 @@
       border-radius: 11px;
       display: grid;
       place-items: center;
-      background: linear-gradient(135deg, var(--accent), #4934b5);
+      background: linear-gradient(135deg, var(--accent), #879f00);
     }
 
     .nav {
@@ -369,9 +369,9 @@
 
     .hero {
       background:
-        radial-gradient(circle at 100% 0%, rgba(124,92,255,.28), transparent 45%),
+        radial-gradient(circle at 100% 0%, rgba(217,255,63,.28), transparent 45%),
         linear-gradient(135deg, #161326, #10161e);
-      border: 1px solid #31285c;
+      border: 1px solid #3c4a17;
       border-radius: 23px;
       padding: 28px;
       margin-bottom: 18px;
@@ -437,7 +437,7 @@
       border-radius: 14px;
       display: grid;
       place-items: center;
-      background: linear-gradient(135deg, var(--accent), #4835aa);
+      background: linear-gradient(135deg, var(--accent), #879f00);
       font-size: 22px;
     }
 
@@ -470,7 +470,7 @@
     }
 
     .ai-message.user {
-      background: linear-gradient(135deg, #5d45c9, #765be9);
+      background: linear-gradient(135deg, #d9ff3f, #c8f542);
       margin-left: auto;
     }
 
@@ -675,7 +675,7 @@
     }
 
     .rating button.selected {
-      background: #30265f;
+      background: #334018;
       border-color: var(--accent);
       color: white;
     }
@@ -697,7 +697,7 @@
       width: 75px;
       height: 75px;
       border-radius: 22px;
-      background: linear-gradient(135deg, var(--accent), #4934b5);
+      background: linear-gradient(135deg, var(--accent), #879f00);
       display: grid;
       place-items: center;
       font-size: 30px;
@@ -1120,7 +1120,7 @@
     @media (max-width: 760px) {
       body {
         background:
-          radial-gradient(ellipse at 85% 0%, rgba(124,92,255,.13), transparent 34%),
+          radial-gradient(ellipse at 85% 0%, rgba(217,255,63,.13), transparent 34%),
           #080b10;
       }
 
@@ -1147,7 +1147,7 @@
         position: relative;
         overflow: hidden;
         background:
-          radial-gradient(circle at 100% 0%, rgba(124,92,255,.3), transparent 48%),
+          radial-gradient(circle at 100% 0%, rgba(217,255,63,.3), transparent 48%),
           linear-gradient(145deg, #19162b, #111821 78%);
         border-color: rgba(154,130,255,.32);
         box-shadow: 0 12px 32px rgba(0,0,0,.16);
@@ -1205,7 +1205,7 @@
       }
 
       .primary-btn {
-        box-shadow: 0 6px 18px rgba(124,92,255,.18);
+        box-shadow: 0 6px 18px rgba(217,255,63,.18);
       }
 
       .primary-btn:active,
@@ -1265,6 +1265,66 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
+
+  
+/* FITNESS AI PRO — neon-lime redesign */
+:root {
+  --bg:#090b09; --bg2:#10130e; --card:#141812; --card2:#1b2115;
+  --border:#2b3322; --text:#f7f8f3; --muted:#a0a69a;
+  --accent:#d9ff3f; --accent2:#c8f542; --green:#d9ff3f; --radius:20px;
+}
+body {
+  background: radial-gradient(ellipse at 80% -15%, rgba(217,255,63,.09), transparent 42%), var(--bg);
+}
+.logo-icon,.sidebar-logo span,.ai-avatar,.profile-avatar {
+  background:linear-gradient(135deg,#d9ff3f,#a9d900); color:#10130b;
+  box-shadow:0 8px 28px rgba(217,255,63,.13);
+}
+.sidebar { background:rgba(10,12,9,.98); border-right-color:#252b20; }
+.nav button:hover,.nav button.active {
+  background:rgba(217,255,63,.11); color:var(--accent);
+  box-shadow:inset 3px 0 0 var(--accent);
+}
+.card {
+  background:linear-gradient(145deg,rgba(25,30,21,.98),rgba(16,19,14,.98));
+  border-color:#2a3123; box-shadow:0 8px 26px rgba(0,0,0,.12);
+}
+.hero {
+  background:radial-gradient(circle at 95% 0%,rgba(217,255,63,.17),transparent 42%),linear-gradient(120deg,#1c2411,#11150e);
+  border:1px solid #455323; position:relative; overflow:hidden;
+}
+.hero:after { content:""; position:absolute; width:190px;height:190px;border:1px solid rgba(217,255,63,.14);border-radius:50%;right:-65px;bottom:-115px;box-shadow:0 0 0 24px rgba(217,255,63,.025),0 0 0 48px rgba(217,255,63,.02);pointer-events:none; }
+.primary-btn,.ai-send {
+  background:linear-gradient(135deg,#d9ff3f,#c5ed27); color:#11150a;
+  box-shadow:0 6px 18px rgba(217,255,63,.12); font-weight:800;
+}
+.primary-btn:hover,.ai-send:hover { filter:brightness(1.06); transform:translateY(-1px); }
+.secondary-btn { border-color:#3a4528; background:#202719; }
+.field input:focus,.field select:focus,.field textarea:focus,.ai-input-area textarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(217,255,63,.08); }
+.tag { background:#28301c;color:#d7e6ad; }
+.meal-card { border-left-color:var(--accent); }
+.meal-time { color:var(--accent); }
+.shopping-list li::before { color:var(--accent); }
+.rating button.selected { background:rgba(217,255,63,.13);border-color:var(--accent);color:var(--accent); }
+.ai-message.user { background:linear-gradient(135deg,#d9ff3f,#c5ed27); color:#14170d; }
+.weight-chart-dot { fill:var(--accent); }
+.average-box { background:#10140d;border:1px solid var(--border); }
+.user-pill { background:#171c13; }
+.topbar h2 { letter-spacing:-.9px; }
+.stat-value { letter-spacing:-1px; }
+@media (max-width: 760px) {
+  .main { padding:18px 14px 95px; }
+  .topbar { margin-bottom:20px; align-items:flex-start; }
+  .topbar h2 { font-size:24px; }
+  .hero { padding:22px 18px; }
+  .hero h1 { font-size:26px; }
+  .grid { gap:12px; }
+  .grid-2,.grid-3 { grid-template-columns:minmax(0,1fr); }
+  .ai-layout { grid-template-columns:minmax(0,1fr); }
+  .card { padding:17px; border-radius:17px; }
+  .weight-form { grid-template-columns:minmax(0,1fr); }
+  .training-metrics,.training-progress-grid { grid-template-columns:repeat(3,minmax(0,1fr));gap:8px; }
+}
 
   </style>
 </head>
