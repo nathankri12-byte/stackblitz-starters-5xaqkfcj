@@ -3712,7 +3712,13 @@ async function loadCommunity(){
    supabaseClient.from("community_likes").select("post_id").eq("user_id",currentUser.id)
   ]);
   for(const r of [pr,po,fo,li])if(r.error)throw r.error;
-  communityState.profiles=pr.data||[];communityState.posts=po.data||[];
+  communityState.profiles=pr.data||[];
+  communityState.posts=await Promise.all((po.data||[]).map(async post=>{
+   if(!post.image_path)return post;
+   const {data,error}=await supabaseClient.storage.from("community-images").createSignedUrl(post.image_path,3600);
+   if(error){console.warn("Beitragsbild konnte nicht geladen werden:",error.message);return {...post,image_url:null};}
+   return {...post,image_url:data?.signedUrl||null};
+  }));
   communityState.following=new Set((fo.data||[]).map(x=>x.following_id));
   communityState.likes=new Set((li.data||[]).map(x=>x.post_id));
   const ids=communityState.posts.map(p=>p.id);
@@ -3740,7 +3746,7 @@ function renderCommunityFeed(){
  feed.innerHTML=posts.map(post=>{
   const p=map.get(post.user_id),name=p?.display_name||"Community-Mitglied",mine=post.user_id===currentUser?.id,liked=communityState.likes.has(post.id);
   const comments=communityState.comments.filter(c=>c.post_id===post.id);
-  const image=post.image_path?supabaseClient.storage.from("community-images").getPublicUrl(post.image_path).data.publicUrl:"";
+  const image=post.image_url||"";
   const commentHtml=comments.map(c=>'<div class="community-comment"><div class="community-avatar" style="width:28px;height:28px;flex-basis:28px;font-size:9px">'+communityEscape(communityInitials(map.get(c.user_id)?.display_name||"FP"))+'</div><div><strong>'+communityEscape(map.get(c.user_id)?.display_name||"Mitglied")+'</strong><span>'+communityEscape(c.body)+'</span></div></div>').join("");
   return '<article class="card community-post" data-post-id="'+communityEscape(post.id)+'"><div class="community-post-head"><div class="community-avatar">'+communityEscape(communityInitials(name))+'</div><div class="community-post-author"><strong>'+communityEscape(name)+'</strong><small>'+communityEscape(communityDate(post.created_at))+'</small></div>'+(mine?'<button class="community-post-menu" type="button" aria-label="Beitrag löschen" title="Beitrag löschen" onclick="deleteCommunityPost(\''+communityEscape(post.id)+'\')">×</button>':'')+'</div>'+(post.body?'<div class="community-post-body">'+communityEscape(post.body)+'</div>':'')+(image?'<img class="community-post-image" src="'+communityEscape(image)+'" alt="Bild zum Community-Beitrag" loading="lazy">':'')+'<div class="community-post-stats">'+comments.length+' Kommentare</div><div class="community-post-actions"><button type="button" class="'+(liked?"liked":"")+'" onclick="toggleCommunityLike(\''+communityEscape(post.id)+'\')">'+(liked?"♥ Gefällt dir":"♡ Gefällt mir")+'</button><button type="button" onclick="document.getElementById(\'communityComment-'+communityEscape(post.id)+'\')?.focus()">▢ Kommentieren</button>'+(mine?"":'<button type="button" onclick="followCommunityUser(\''+communityEscape(post.user_id)+'\')">'+(communityState.following.has(post.user_id)?"✓ Folge ich":"+ Folgen")+'</button>')+'</div><div class="community-comments">'+(commentHtml||'<p class="community-muted">Noch keine Kommentare.</p>')+'<form class="community-comment-form" onsubmit="event.preventDefault();submitCommunityComment(\''+communityEscape(post.id)+'\',this)"><label class="sr-only" for="communityComment-'+communityEscape(post.id)+'">Kommentar schreiben</label><input id="communityComment-'+communityEscape(post.id)+'" name="comment" maxlength="500" placeholder="Schreibe einen Kommentar …" required><button type="submit">Senden</button></form></div></article>';
  }).join("");
