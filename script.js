@@ -3540,14 +3540,13 @@ async function loadAllFeedback() {
   if (adminList) adminList.innerHTML = '<p class="card-description">Administratoren werden geladen …</p>';
 
   try {
-    const [feedbackResult, profilesResult, adminsResult, communityResult] = await Promise.all([
+    const [feedbackResult, profilesResult, adminsResult] = await Promise.all([
       supabaseClient.from("feedback").select("*").order("created_at", { ascending: false }),
-      supabaseClient.from("profiles").select("user_id,Name,email,created_at").order("id", { ascending: false }),
-      supabaseClient.from("app_admins").select("email,created_at,added_by").order("created_at", { ascending: true }),
-      supabaseClient.from("community_profiles").select("user_id,display_name")
+      supabaseClient.rpc("admin_list_profile_names"),
+      supabaseClient.from("app_admins").select("email,created_at,added_by").order("created_at", { ascending: true })
     ]);
 
-    const queryError = feedbackResult.error || profilesResult.error || adminsResult.error || communityResult.error;
+    const queryError = feedbackResult.error || profilesResult.error || adminsResult.error;
     if (queryError) {
       console.error("Admin-Daten konnten nicht vollständig geladen werden:", queryError);
       container.innerHTML = '<p class="card-description">Ein Teil der Admin-Daten konnte nicht geladen werden. Bitte aktualisieren und die Zugriffsregeln prüfen.</p>';
@@ -3558,33 +3557,28 @@ async function loadAllFeedback() {
     const profiles = profilesResult.data || [];
     const feedback = feedbackResult.data || [];
     const admins = adminsResult.data || [];
-    const communityProfiles = communityResult.data || [];
     const profileByUser = new Map();
     const profileByEmail = new Map();
-    const communityNameByUser = new Map();
+    const profileEmailByUser = new Map();
 
     profiles.forEach(profile => {
       const uid = String(profile.user_id || "");
-      const name = String(profile.Name || "").trim();
+      const name = String(profile.display_name || "").trim();
       const email = String(profile.email || "").trim();
-      if (uid && !profileByUser.has(uid) && name) profileByUser.set(uid, name);
+      if (uid && name) profileByUser.set(uid, name);
+      if (uid && email) profileEmailByUser.set(uid, email);
       if (email && name && (!profileByEmail.has(email.toLowerCase()) || profileByEmail.get(email.toLowerCase()) === email)) {
         profileByEmail.set(email.toLowerCase(), name);
       }
       if (email && !profileByEmail.has(email.toLowerCase())) profileByEmail.set(email.toLowerCase(), email);
     });
 
-    communityProfiles.forEach(profile => {
-      const uid = String(profile.user_id || "");
-      const name = String(profile.display_name || "").trim();
-      if (uid && name) communityNameByUser.set(uid, name);
-    });
-
     const resolveUser = userId => {
       const uid = String(userId || "");
-      const profile = profiles.find(item => String(item.user_id || "") === uid);
-      const name = profileByUser.get(uid) || communityNameByUser.get(uid) || String(profile?.email || "").trim();
-      return { name: name || "Nutzer", email: String(profile?.email || "").trim() };
+      return {
+        name: profileByUser.get(uid) || "Nutzer",
+        email: profileEmailByUser.get(uid) || ""
+      };
     };
 
     const statUsers = document.getElementById("adminStatUsers");
