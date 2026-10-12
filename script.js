@@ -697,6 +697,141 @@ async function saveProfile() {
 
 
 /* =========================================================
+   MANUAL DAILY CHECK-IN
+   These are user-entered values, never automatic device data.
+========================================================= */
+
+function getLocalDateString() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return year + "-" + month + "-" + day;
+}
+
+async function loadDailyCheckin() {
+  const status = document.getElementById("dailyCheckinStatus");
+  if (!currentUser || !supabaseClient) {
+    if (status) status.textContent = "Bitte melde dich an, um deine Tageswerte zu laden.";
+    return;
+  }
+
+  if (status) status.textContent = "Deine Einträge werden geladen …";
+
+  try {
+    const { data, error } = await supabaseClient
+      .from("daily_checkins")
+      .select("sleep_hours, water_glasses, steps, checkin_date")
+      .eq("user_id", currentUser.id)
+      .eq("checkin_date", getLocalDateString())
+      .maybeSingle();
+
+    if (error) throw error;
+
+    const sleep = document.getElementById("dailySleepHours");
+    const water = document.getElementById("dailyWaterGlasses");
+    const steps = document.getElementById("dailySteps");
+
+    if (sleep) sleep.value = data?.sleep_hours ?? "";
+    if (water) water.value = data?.water_glasses ?? "";
+    if (steps) steps.value = data?.steps ?? "";
+
+    if (status) {
+      status.textContent = data
+        ? "Deine selbst eingetragenen Werte für heute sind geladen."
+        : "Für heute sind noch keine Werte gespeichert.";
+      status.style.color = "var(--muted)";
+    }
+  } catch (error) {
+    console.error("Tages-Check-in konnte nicht geladen werden:", error);
+    if (status) {
+      status.textContent = "Tageswerte konnten nicht geladen werden. Bitte prüfe die Verbindung und versuche es erneut.";
+      status.style.color = "var(--red)";
+    }
+  }
+}
+
+async function saveDailyCheckin() {
+  const status = document.getElementById("dailyCheckinStatus");
+  if (!currentUser || !supabaseClient) {
+    if (status) status.textContent = "Bitte melde dich zuerst an.";
+    return;
+  }
+
+  const readValue = (id, label, min, max, integerOnly = false) => {
+    const input = document.getElementById(id);
+    const raw = input?.value?.trim() ?? "";
+    if (raw === "") return null;
+    const value = Number(raw);
+    if (!Number.isFinite(value) || value < min || value > max || (integerOnly && !Number.isInteger(value))) {
+      throw new Error(label + ": Bitte gib einen gültigen Wert zwischen " + min + " und " + max + (integerOnly ? " als ganze Zahl" : "") + " ein.");
+    }
+    return value;
+  };
+
+  let sleepHours, waterGlasses, steps;
+  try {
+    sleepHours = readValue("dailySleepHours", "Schlaf", 0, 24);
+    waterGlasses = readValue("dailyWaterGlasses", "Wasser", 0, 30, true);
+    steps = readValue("dailySteps", "Schritte", 0, 200000, true);
+  } catch (error) {
+    if (status) {
+      status.textContent = error.message;
+      status.style.color = "var(--red)";
+    }
+    return;
+  }
+
+  if (sleepHours === null && waterGlasses === null && steps === null) {
+    if (status) {
+      status.textContent = "Trage mindestens einen Wert ein, bevor du speicherst.";
+      status.style.color = "var(--red)";
+    }
+    return;
+  }
+
+  const button = document.querySelector('button[onclick="saveDailyCheckin()"]');
+  if (button) {
+    button.disabled = true;
+    button.textContent = "Speichert …";
+  }
+  if (status) {
+    status.textContent = "Deine Werte werden gespeichert …";
+    status.style.color = "var(--muted)";
+  }
+
+  try {
+    const { error } = await supabaseClient
+      .from("daily_checkins")
+      .upsert({
+        user_id: currentUser.id,
+        checkin_date: getLocalDateString(),
+        sleep_hours: sleepHours,
+        water_glasses: waterGlasses,
+        steps
+      }, { onConflict: "user_id,checkin_date" });
+
+    if (error) throw error;
+
+    if (status) {
+      status.textContent = "Tageswerte erfolgreich gespeichert. Du kannst sie jederzeit ändern.";
+      status.style.color = "var(--green)";
+    }
+  } catch (error) {
+    console.error("Tages-Check-in konnte nicht gespeichert werden:", error);
+    if (status) {
+      status.textContent = "Speichern fehlgeschlagen. Bitte versuche es erneut.";
+      status.style.color = "var(--red)";
+    }
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.textContent = "Tageswerte speichern";
+    }
+  }
+}
+
+/* =========================================================
    APP
 ========================================================= */
 
@@ -728,6 +863,7 @@ async function loadApp() {
 
   await createProfileIfMissing();
   await loadProfile();
+  await loadDailyCheckin();
   await loadWeights();
   await loadTrainingProgress();
   await loadFeedback();
@@ -784,6 +920,10 @@ function showTab(tabName) {
     top: 0,
     behavior: "smooth"
   });
+
+  if (tabName === "dashboard") {
+    loadDailyCheckin();
+  }
 
   if (
     tabName ===
