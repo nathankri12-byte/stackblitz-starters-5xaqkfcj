@@ -86,8 +86,9 @@ async function connectGymStudio() {
     const result = await supabaseClient.from("profiles").update({
       selected_studio_id: studio.id,
       training_location: "Fitnessstudio"
-    }).eq("user_id", currentUser.id);
+    }).eq("user_id", currentUser.id).select("user_id").maybeSingle();
     if (result.error) throw result.error;
+    if (!result.data) throw new Error("Dein Profil wurde nicht gefunden. Bitte lade die App neu und versuche es erneut.");
     currentProfile = Object.assign({}, currentProfile || {}, {
       selected_studio_id: studio.id,
       training_location: "Fitnessstudio",
