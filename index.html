@@ -1982,6 +1982,10 @@ body {
     .meal-diary-entry p{font-size:13px;color:var(--muted);white-space:pre-wrap;overflow-wrap:anywhere}
     .meal-diary-entry button{border:1px solid var(--border);background:transparent;color:var(--muted);border-radius:8px;padding:6px 9px;flex-shrink:0}
     @media(max-width:600px){.meal-diary-form{grid-template-columns:minmax(0,1fr)}.meal-diary-form .field,.meal-diary-form button,.meal-diary-form #mealDiaryStatus{grid-column:1}.community-friend-request{align-items:flex-start;flex-wrap:wrap}.community-request-actions{width:100%;padding-left:46px}}
+
+    .apple-auth-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid #343b45;border-radius:12px;padding:12px 14px;margin-top:10px;background:#08090b;color:#fff;font-weight:650}
+    .apple-auth-btn span{font-size:20px;line-height:1}
+    .apple-auth-btn:hover{background:#1a1c20}
 </style>
 
   <style>
@@ -2122,6 +2126,7 @@ body {
           <span class="google-g" aria-hidden="true">G</span>
           Mit Google anmelden
         </button>
+        <button class="apple-auth-btn" type="button" onclick="signInWithApple()"><span aria-hidden="true"></span> Mit Apple anmelden</button>
         <div id="authMessage" class="auth-message"></div>
 
       </div>
@@ -2772,7 +2777,7 @@ body {
         <div class="card meal-diary-card" style="margin-bottom:18px">
           <div class="section-header"><div><h3>Dein privates Ernährungstagebuch</h3><p class="card-description">Halte Mahlzeiten und Notizen fest – ohne Kalorienzwang oder Bewertung. Deine Einträge sind nur für dich sichtbar.</p></div></div>
           <form id="mealDiaryForm" class="meal-diary-form" onsubmit="saveMealDiaryEntry(event)">
-            <div class="field"><label for="mealDiaryDate">Datum</label><input id="mealDiaryDate" type="date" required></div>
+            <div class="field"><label for="mealDiaryDate">Datum</label><input id="mealDiaryDate" type="date" required onchange="loadMealDiary()"></div>
             <div class="field"><label for="mealDiaryType">Mahlzeit</label><select id="mealDiaryType" required><option value="breakfast">Frühstück</option><option value="lunch">Mittagessen</option><option value="dinner">Abendessen</option><option value="snack">Snack</option></select></div>
             <div class="field"><label for="mealDiaryName">Was hast du gegessen?</label><input id="mealDiaryName" type="text" maxlength="120" required placeholder="z. B. Brot mit Käse und Gurke"></div>
             <div class="field"><label for="mealDiaryNotes">Notiz (optional)</label><textarea id="mealDiaryNotes" maxlength="500" rows="2" placeholder="z. B. selbst gekocht oder mit Freunden gegessen"></textarea></div>
