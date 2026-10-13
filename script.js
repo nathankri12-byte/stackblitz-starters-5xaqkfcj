@@ -2722,8 +2722,9 @@ function renderTrainingPlan(text) {
     '</section>'
   ).join("") + '</div>';
 
-  void loadSavedTrainingEntries();
+  void loadSavedTrainingEntries().then(() => updateWorkoutLiveProgress());
   updateDashboardWorkout();
+  updateWorkoutLiveProgress();
 }
 
 
@@ -2901,9 +2902,30 @@ async function loadSavedTrainingEntries() {
       if (reps) reps.value = entry?.reps ?? "";
       if (duration) duration.value = entry?.duration_seconds ?? "";
     });
+    updateWorkoutLiveProgress();
   } catch (error) {
     console.error("Gespeicherte Trainingsdaten konnten nicht geladen werden:", error);
   }
+}
+
+function updateWorkoutLiveProgress() {
+  const checkboxes = Array.from(document.querySelectorAll(".training-exercise-checkbox"));
+  const text = document.getElementById("workoutLiveProgressText");
+  const count = document.getElementById("workoutLiveProgressCount");
+  const bar = document.getElementById("workoutLiveProgressBar");
+  if (!checkboxes.length) {
+    if (text) text.textContent = "Erstelle einen Plan, um deinen Trainingsfortschritt hier live zu sehen.";
+    if (count) count.textContent = "0%";
+    if (bar) bar.style.width = "0%";
+    return;
+  }
+  const completed = checkboxes.filter(item => item.checked).length;
+  const percent = Math.round(completed / checkboxes.length * 100);
+  if (text) text.textContent = completed === checkboxes.length
+    ? "Stark – alle Übungen in deinem aktuellen Wochenplan sind abgehakt. Erholung gehört genauso dazu."
+    : completed + " von " + checkboxes.length + " Übungen in deinem aktuellen Wochenplan erledigt.";
+  if (count) count.textContent = percent + "%";
+  if (bar) bar.style.width = percent + "%";
 }
 
 async function saveTrainingPerformance(button) {
@@ -2941,6 +2963,7 @@ async function saveTrainingPerformance(button) {
     if (error) throw error;
     button.textContent = "✓ Gespeichert";
     await loadTrainingProgress();
+    updateWorkoutLiveProgress();
     window.setTimeout(() => { if (button.isConnected) button.textContent = "Werte speichern"; }, 1800);
   } catch (error) {
     console.error("Fehler beim Speichern der Trainingsleistung:", error);
@@ -2989,6 +3012,7 @@ async function toggleTrainingExercise(checkbox) {
     alert("Die Übung konnte nicht gespeichert werden. Bitte prüfe deine Verbindung und versuche es erneut.");
   } finally {
     checkbox.disabled = false;
+    updateWorkoutLiveProgress();
   }
 }
 
