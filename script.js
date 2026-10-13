@@ -1976,6 +1976,9 @@ ${profile.weight || "unbekannt"} kg
 Ziel:
 ${profile.goal || "unbekannt"}
 
+Ziel-Zeitraum:
+${profile.goal_target_date || "kein Datum festgelegt"}
+
 Trainingsort:
 ${profile.training_location || "unbekannt"}
 
@@ -2035,6 +2038,10 @@ ${systemInstruction}
               goal:
                 profile.goal ||
                 "unbekannt",
+
+              goal_target_date:
+                profile.goal_target_date ||
+                "kein Datum festgelegt",
 
               training_location:
                 profile.training_location ||
