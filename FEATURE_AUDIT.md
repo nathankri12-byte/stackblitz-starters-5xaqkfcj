@@ -13,7 +13,7 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 5 | Geräte per QR-Code scannen | Später | Benötigt zuverlässige Geräte-Datenbank/Studio-Kooperation; kein MVP. |
 | 6 | First Gym Mode | Grundversion umgesetzt im Folge-Branch | Aufklappbarer Einsteiger-Guide mit Geräteeinweisung, leichter Startlast, Pausen und Sicherheits-Hinweisen. |
 | 7 | Kontextsensitiver KI-Coach | Teilweise umgesetzt | KI-Chat berücksichtigt Profil, bis zu 10 aktuelle Trainingseinträge und die letzten drei Kurzfeedbacks. Adaptive Folgeplanung berücksichtigt bis zu 30 Einträge und die letzten sieben Rückmeldungen. Ende-zu-Ende-Test offen. |
-| 8 | Einfaches Onboarding | Verbessern | Profilfelder und Trainingsort schrittweise statt als lange Form erfassen. |
+| 8 | Einfaches Onboarding | Teilweise umgesetzt | Dashboard zeigt fehlende Pflichtangaben vor der Planerstellung und bietet einen direkten Profil-Link. Ein mehrstufiger Einrichtungsassistent bleibt offen. |
 | 9 | Geschlecht nur bei echter Relevanz erfassen | Prüfen | Nicht unnötig erfassen; keine geschlechtsbasierten pauschalen Annahmen. |
 | 10 | Sichere Ernährungshinweise für Jugendliche | Grundschutz ergänzt, Prüfung offen | KI-Anweisungen verbieten für Minderjährige restriktive Kalorien-/Makroziele zur Gewichtsabnahme, Crash-Diäten und Druck durch Gewichtszahlen. Ernährungsplan-UI und authentifizierte End-to-End-Tests noch prüfen. |
 | 11 | Ausführliches Makrotracking für Erwachsene | Später | Erst nach Stabilisierung des Trainings-Kernablaufs. |
@@ -23,7 +23,7 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 15 | Persönliche Rekorde (PRs) | Grundversion umgesetzt im Folge-Branch | Höchste gespeicherte Gewichte je Übung werden im Fortschrittsbereich zusammengefasst; noch kein automatischer PR-Verlauf. |
 | 16 | Nicht-toxische Gamification | Teilweise umgesetzt | Persönliche Meilensteine und wertfreie Texte vorhanden; öffentliche Challenge-Ranglisten entfernt. Weitere Texte und Vergleichselemente prüfen. |
 | 17 | Community | Vorhanden, E2E offen | Community-Tab, Profile, Posts, Likes, Kommentare, Freundschaftsanfragen und Challenges vorhanden. Profil-/Beitrags-Sichtbarkeit ist jetzt standardmäßig privat und muss aktiv freigegeben werden. Authentifizierte End-to-End-Tests offen. |
-| 18 | Gemeinsam trainieren | Später | Benötigt Einladungen/Datenschutzregeln und Missbrauchsschutz. |
+| 18 | Gemeinsam trainieren | Grundversion umgesetzt | Nutzer können den heutigen Trainingsschwerpunkt und Übungen ohne persönliche Profilwerte über die native Teilen-Funktion an Freunde senden. Gemeinsame Live-Sessions/Terminplanung bleiben offen. |
 | 19 | Teilbare Fortschrittskarten | Grundversion umgesetzt | Fortschrittskarte als PNG kann freiwillig erstellt/geteilt werden; sensible Profilwerte werden nicht standardmäßig aufgenommen. E2E offen. |
 | 20 | Privacy-by-default für Minderjährige | Teilweise umgesetzt, weiter kritisch prüfen | Community-Profile sind standardmäßig privat; Freigabe ist explizit per Checkbox erforderlich. RLS beschränkt Profile, Beiträge, Kommentare, Likes, Follows und Challenge-Teilnahmen auf sichtbare Mitglieder bzw. eigene Daten. Storage-Bildrichtlinien, Moderation und authentifizierte E2E-Prüfung bleiben offen. |
 | 21 | Altersmodi 14–15, 16–17, 18+ | Grundversion umgesetzt | KI-Coach schaltet anhand des Profilalters automatisch auf Leitlinien für 14–15, 16–17 oder 18+; bei fehlendem/ungültigem Alter gilt eine konservative Fallback-Regel. UI-Test offen. |
