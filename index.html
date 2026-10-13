@@ -1954,7 +1954,15 @@ body {
   .mobile-nav button { font-size:9px; }
 }
 
-  </style>
+  
+    /* Community: Suche & Einladungen */
+    .community-search-label{display:block;color:var(--muted);font-size:12px;margin:14px 0 6px}
+    .community-search-input{width:100%;min-width:0;border:1px solid var(--border);background:#0b1016;color:var(--text);border-radius:11px;padding:11px 12px;outline:none;margin-bottom:8px}
+    .community-search-input:focus{border-color:var(--accent)}
+    .community-invite-box{border-top:1px solid var(--border);margin-top:16px;padding-top:16px;display:grid;gap:9px}
+    .community-invite-box p{font-size:12px;line-height:1.5;color:var(--muted)}
+    .community-invite-box .secondary-btn{width:100%}
+</style>
 
   <style>
     #music.page{max-width:1100px;margin:0 auto}
@@ -2682,7 +2690,15 @@ body {
             </div>
             <div class="card community-people-card">
               <div class="community-people-heading"><div><h3>Kanäle</h3><p>Entdecke andere, die trainieren.</p></div><span id="communityMemberCount" class="community-count">—</span></div>
+              <label class="community-search-label" for="communityPeopleSearch">Personen suchen</label>
+              <input id="communityPeopleSearch" class="community-search-input" type="search" maxlength="40" placeholder="Name eingeben …" oninput="renderCommunityPeople()">
               <div id="communityPeople"><p class="community-muted">Mitglieder werden geladen …</p></div>
+              <div class="community-invite-box">
+                <strong>Freunde einladen</strong>
+                <p>Teile deinen persönlichen Link. Angemeldete Freunde können sich darüber direkt mit deinem Kanal verbinden.</p>
+                <button class="secondary-btn" type="button" onclick="shareCommunityInvite()">🔗 Einladungslink teilen</button>
+                <p id="communityInviteStatus" class="settings-message" role="status" aria-live="polite"></p>
+              </div>
             </div>
             <div class="community-safety-note"><strong>Fair bleiben.</strong><p>Teile keine privaten Daten. Bilder werden privat gespeichert und nur angemeldeten Community-Mitgliedern über zeitlich begrenzte Bildlinks angezeigt. Teile trotzdem keine sensiblen oder privaten Fotos.</p></div>
           </aside>
