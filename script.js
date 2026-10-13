@@ -2733,7 +2733,7 @@ function swapTrainingExercise(button) {
     "Plank":["Core","Bauch"],"Unterarmstütz":["Core","Bauch"],"Dead Bug":["Core","Bauch"],"Bird Dog":["Core","Rücken"],"Mountain Climbers":["Core","Ausdauer"],"Marching Plank":["Core","Ausdauer"],
     "Schulterdrücken":["Schulter","Trizeps"],"Schulterpresse":["Schulter","Trizeps"],"Seitheben":["Schulter"]
   };
-  if (tags) tags.innerHTML = (tagMap[nextName] || []).map(function(tag) { return '<span class="tag">' + escape(tag) + '</span>'; }).join("");
+  if (tags) tags.innerHTML = (tagMap[nextName] || []).map(function(tag) { return '<span class="tag">' + escapeHTML(tag) + '</span>'; }).join("");
   const notice = document.createElement("p");
   notice.className = "card-description exercise-swap-notice";
   notice.textContent = "Alternative gewählt: " + nextName + ". Bitte Technik und Belastung neu prüfen.";
