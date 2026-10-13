@@ -58,7 +58,7 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 50 | Gym-Confidence-Modus | Grundversion vorhanden | First Gym Mode mit Einstiegs-/Sicherheitshinweisen sowie KI-Erklärung pro Übung; ausführlichere Geräteanleitungen bleiben offen. |
 | 51 | Skill-Level | Grundversion im Folge-Branch | Erfahrungslevel Anfänger / Schon etwas Erfahrung / Fortgeschritten ist speicherbar und fließt in Trainingsplan und KI-Coach-Kontext ein. |
 | 52 | Skills über Gewichte hinaus | Teilweise umgesetzt | Ziele für Technik, Beweglichkeit und Trainingsroutine ergänzt; Fortschrittsübersicht zeigt zusätzlich Wiederholungen und Dauer statt nur Gewichte. Eigenständige Skill-Bewertung bleibt offen. |
-| 53 | Flexible Ziele | Teilweise | Zielauswahl existiert; temporäre und veränderbare Ziele verbessern. |
+| 53 | Flexible Ziele | Grundversion ergänzt | Ziele können um ein optionales Zieldatum ergänzt werden; Datum wird im Profil gespeichert und in den KI-Planprompt übernommen. E2E-Test offen. |
 | 54 | Sport-spezifische Programme | Grundversion ergänzt | Ziele für Basketball, Tennis, Parkour, Laufen und Fußball ergänzen den KI-Planprompt. Vollständige geprüfte Sportprogramme und gezielte Tests bleiben offen. |
 | 55 | Kein Body-Shaming | Kritisch prüfen | Texte, KI-Prompts und Progress-Anzeigen auf wertfreie Sprache prüfen. |
 | 56 | Strukturiertes Feedback | Vorhanden | Bewertung und Nachricht im Feedbackformular vorhanden. |
