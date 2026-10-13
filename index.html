@@ -1986,6 +1986,13 @@ body {
     .apple-auth-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid #343b45;border-radius:12px;padding:12px 14px;margin-top:10px;background:#08090b;color:#fff;font-weight:650}
     .apple-auth-btn span{font-size:20px;line-height:1}
     .apple-auth-btn:hover{background:#1a1c20}
+
+    .community-report-btn{margin-left:auto;border:1px solid var(--border);background:transparent;color:var(--muted);border-radius:8px;padding:6px 9px;font-size:11px}
+    .community-report-btn:hover{border-color:var(--red);color:var(--red)}
+    .community-report-row{padding:13px 0;border-bottom:1px solid var(--border)}
+    .community-report-row:last-child{border-bottom:0}
+    .community-report-row p{margin:6px 0;color:var(--muted);font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}
+    .community-report-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
 </style>
 
   <style>
@@ -3327,6 +3334,14 @@ body {
 <p id="createStudioStatus" class="settings-message" role="status" aria-live="polite"></p><div id="adminStudioList" class="admin-list"><p class="card-description">Studios werden geladen …</p></div></div>
 
 <div class="card admin-card">
+          <div class="admin-card-heading admin-feedback-heading">
+            <div><h3>Community-Meldungen</h3><p class="card-description">Prüfe gemeldete Beiträge und markiere die Bearbeitung. Melder bleiben vertraulich.</p></div>
+            <button class="secondary-btn" type="button" onclick="loadCommunityReports()">Meldungen aktualisieren</button>
+          </div>
+          <p id="communityReportsStatus" class="settings-message" role="status" aria-live="polite"></p>
+          <div id="communityReportsList" class="admin-feedback-list" aria-live="polite">Meldungen werden geladen …</div>
+        </div>
+        <div class="card admin-card">
           <div class="admin-card-heading admin-feedback-heading">
             <div><h3>Nutzerfeedback</h3><p class="card-description">Feedback wird mit dem Profilnamen statt der internen Nutzer-ID angezeigt.</p></div>
             <input id="adminFeedbackSearch" class="admin-search" type="search" placeholder="Feedback durchsuchen …" aria-label="Feedback durchsuchen" oninput="filterAdminFeedback(this.value)">
