@@ -13,7 +13,7 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 5 | Geräte per QR-Code scannen | Später | Benötigt zuverlässige Geräte-Datenbank/Studio-Kooperation; kein MVP. |
 | 6 | First Gym Mode | Grundversion umgesetzt im Folge-Branch | Aufklappbarer Einsteiger-Guide mit Geräteeinweisung, leichter Startlast, Pausen und Sicherheits-Hinweisen. |
 | 7 | Kontextsensitiver KI-Coach | Teilweise umgesetzt | KI-Chat berücksichtigt Profil, bis zu 10 aktuelle Trainingseinträge, die letzten drei Kurzfeedbacks und den neuesten privaten Tages-Check-in. Adaptive Folgeplanung berücksichtigt bis zu 30 Einträge und die letzten sieben Rückmeldungen. Ende-zu-Ende-Test offen. |
-| 8 | Einfaches Onboarding | Teilweise umgesetzt | Dashboard zeigt fehlende Pflichtangaben vor der Planerstellung und bietet einen direkten Profil-Link. Ein mehrstufiger Einrichtungsassistent bleibt offen. |
+| 8 | Einfaches Onboarding | Grundversion umgesetzt, E2E offen | Dashboard enthält jetzt einen geführten 3-Schritte-Start mit dynamischem Profilstatus, Planstatus und direkten Schaltflächen. Noch mit angemeldetem Testkonto prüfen. |
 | 9 | Geschlecht nur bei echter Relevanz erfassen | Erfüllt für das aktuelle MVP | Es gibt kein Geschlechtsfeld im Profil; die Trainingsplanung soll keine geschlechtsbasierten pauschalen Annahmen machen. |
 | 10 | Sichere Ernährungshinweise für Jugendliche | Grundschutz ergänzt, Prüfung offen | KI-Anweisungen verbieten für Minderjährige restriktive Kalorien-/Makroziele zur Gewichtsabnahme, Crash-Diäten und Druck durch Gewichtszahlen. Ernährungsplan-UI und authentifizierte End-to-End-Tests noch prüfen. |
 | 11 | Ausführliches Makrotracking für Erwachsene | Später | Erst nach Stabilisierung des Trainings-Kernablaufs. |
@@ -128,3 +128,11 @@ Diese Punkte sind einzeln geprüft und werden nicht als „fertig“ ausgegeben,
 - `index.html` enthält jetzt vor dem Login eine responsive Produktpräsentation: „Weniger raten. Gezielter trainieren.“, Fitnessstudio-Foto, drei konkrete Funktionskarten und eine CTA „Kostenlos starten“.
 - CTA öffnet die Registrierungsansicht, ohne ein Formular abzusenden.
 - Render-Deployment live; öffentlicher Browser-Smoke-Test bestätigt Bild, Text, drei Karten und CTA auf Desktop. Noch nicht bestätigt: echte mobile Geräteansichten und angemeldete End-to-End-Flows.
+
+
+## Umsetzungsrunde am 13.10.2026 — Onboarding und responsives Layout
+
+- Dashboard: geführte 3-Schritte-Karte ergänzt. Sie erkennt fehlende Profilangaben und vorhandenen Trainingsplan, zeigt den Status an und führt zu Profil bzw. Trainingsplan. Die Karte behauptet nicht, dass ein Training abgeschlossen sei.
+- Öffentliche Landingpage: Tablet-Breakpoint von 860 auf 1024 CSS-Pixel erweitert, damit das Hero-/Login-Layout auf schmalen iPads in eine Spalte wechselt.
+- Live-Test nach Deployment bei ungefähr 980 CSS-Pixeln: keine horizontale Scrollleiste, keine abgeschnittenen Ränder, drei Feature-Karten und Login-Formular sichtbar.
+- Syntaxcheck vor der letzten Onboarding-Änderung: `script.js`, `studio-admin.js`, `music.js`, `service-worker.js` sowie beide Inline-Scripts bestanden; keine doppelten HTML-IDs. Nach der Onboarding-Änderung wird erneut geprüft.
