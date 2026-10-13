@@ -2944,9 +2944,10 @@ body {
               <small>3–30 Zeichen: Buchstaben, Zahlen, _ oder -</small>
               <label for="communityDisplayName">Anzeigename</label><input id="communityDisplayName" type="text" maxlength="40" placeholder="Wie sollen dich andere sehen?">
               <label for="communityBio">Kurz über dich</label><textarea id="communityBio" maxlength="180" rows="3" placeholder="Deine Ziele, Sportarten oder Motivation …"></textarea>
+              <label for="communityVisible" style="display:flex;align-items:flex-start;gap:10px;margin:14px 0;font-size:13px;line-height:1.5;color:var(--text)"><input id="communityVisible" type="checkbox" style="width:auto;flex:0 0 auto;margin-top:3px"> Ich möchte mein Community-Profil und meine Beiträge für angemeldete Mitglieder sichtbar machen.</label>
               <button class="secondary-btn" type="button" onclick="saveCommunityProfile()">Profil speichern</button>
               <p id="communityProfileStatus" class="settings-message" role="status" aria-live="polite"></p>
-              <small>Nur dein Anzeigename und deine Bio sind für angemeldete Community-Mitglieder sichtbar. Private Profildaten wie Gewicht und E-Mail werden nicht veröffentlicht.</small>
+              <small>Standardmäßig ist dein Profil privat. Bei Freigabe sind Benutzername, Anzeigename, Bio und Beiträge sichtbar. E-Mail, Alter, Gewicht und andere private Trainingsdaten bleiben verborgen.</small>
             </div>
             <div class="card community-friends-card">
               <div class="community-people-heading"><div><h3>Freundschaftsanfragen</h3><p>Du entscheidest, mit wem du befreundet bist.</p></div><span id="communityRequestCount" class="community-count">0</span></div>
