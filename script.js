@@ -524,7 +524,10 @@ async function loadProfile() {
           data.Diet || "",
 
         training_location:
-          data.training_location || ""
+          data.training_location || "",
+
+        training_level:
+          data.training_level || "Anfänger"
       };
     } else {
       currentProfile = {};
@@ -616,6 +619,8 @@ function fillProfileUI() {
     currentProfile.training_location
   );
 
+  setValue("trainingLevel", currentProfile.training_level || "Anfänger");
+
   setValue(
     "goal",
     currentProfile.goal
@@ -670,6 +675,8 @@ async function saveProfile() {
       )
       ?.value || "";
 
+  const trainingLevel = document.getElementById("trainingLevel")?.value || "Anfänger";
+
   const goal =
     document
       .getElementById(
@@ -715,6 +722,8 @@ async function saveProfile() {
 
     training_location:
       trainingLocation,
+
+    training_level: trainingLevel,
 
     Goal:
       goal,
@@ -1571,6 +1580,7 @@ function buildAIContext() {
     `Gewicht: ${currentProfile.weight || "unbekannt"} kg`,
     `Ziel: ${currentProfile.goal || "nicht angegeben"}`,
     `Trainingsort: ${currentProfile.training_location || "nicht angegeben"}`,
+    `Erfahrungslevel: ${currentProfile.training_level || "Anfänger"}`,
     `Ernährungsweise: ${currentProfile.diet || "nicht angegeben"}`
   ].join("\n");
 }
@@ -1837,6 +1847,9 @@ ${profile.goal || "unbekannt"}
 Trainingsort:
 ${profile.training_location || "unbekannt"}
 
+Erfahrungslevel:
+${profile.training_level || "Anfänger"}
+
 Ernährung:
 ${profile.diet || "keine Angabe"}
 
@@ -1886,6 +1899,10 @@ ${systemInstruction}
               training_location:
                 profile.training_location ||
                 "unbekannt",
+
+              training_level:
+                profile.training_level ||
+                "Anfänger",
 
               diet:
                 profile.diet ||
@@ -2057,7 +2074,8 @@ async function generateTrainingPlan(customPrompt = "") {
     height: document.getElementById("profileHeight")?.value !== undefined && document.getElementById("profileHeight")?.value !== ""
       ? Number(document.getElementById("profileHeight").value) : savedProfile.height,
     goal: document.getElementById("goal")?.value || savedProfile.goal || "",
-    training_location: document.getElementById("trainingLocation")?.value || savedProfile.training_location || ""
+    training_location: document.getElementById("trainingLocation")?.value || savedProfile.training_location || "",
+    training_level: document.getElementById("trainingLevel")?.value || savedProfile.training_level || "Anfänger"
   };
 
   // Nicht stillschweigend einen allgemeinen Plan erstellen, wenn die nötigen Angaben fehlen.
@@ -2086,6 +2104,7 @@ async function generateTrainingPlan(customPrompt = "") {
       Height: Number(profile.height),
       Goal: profile.goal,
       training_location: profile.training_location,
+      training_level: profile.training_level || "Anfänger",
       Diet: profile.diet || "",
       email: currentUser.email || ""
     };
@@ -2133,6 +2152,7 @@ Größe: ${profile.height} cm
 Gewicht: ${profile.weight || "nicht angegeben"} kg
 Trainingsziel: ${profile.goal}
 Trainingsort: ${profile.training_location}
+Erfahrungslevel: ${profile.training_level || "Anfänger"}
 Ernährungsweise: ${profile.diet || "nicht angegeben"}
 
 PERSÖNLICHE WÜNSCHE, die konkret im Plan umgesetzt werden müssen:
