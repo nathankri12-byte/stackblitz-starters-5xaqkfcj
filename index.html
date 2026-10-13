@@ -1993,6 +1993,21 @@ body {
     .community-report-row:last-child{border-bottom:0}
     .community-report-row p{margin:6px 0;color:var(--muted);font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}
     .community-report-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+
+    .community-challenges-card{margin-bottom:16px}
+    .community-challenge-form{display:grid;gap:7px;margin:12px 0 16px;padding-bottom:15px;border-bottom:1px solid var(--border)}
+    .community-challenge-form label{font-size:12px;color:var(--muted)}
+    .community-challenge-form input,.community-challenge-form select{width:100%;min-width:0;border:1px solid var(--border);background:#0b1016;color:var(--text);border-radius:10px;padding:10px}
+    .community-challenge{padding:13px 0;border-bottom:1px solid var(--border)}
+    .community-challenge:last-child{border-bottom:0}
+    .community-challenge-title{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .community-challenge-title strong{overflow-wrap:anywhere}
+    .community-challenge small{display:block;color:var(--muted);font-size:11px;margin:5px 0}
+    .community-challenge-progress{height:6px;background:var(--border);border-radius:99px;overflow:hidden;margin:9px 0}
+    .community-challenge-progress span{display:block;height:100%;background:var(--accent);border-radius:99px}
+    .community-challenge-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+    .community-challenge-actions button{font-size:12px;padding:7px 9px}
+    .community-challenge-leaders{font-size:11px;color:var(--muted);line-height:1.5;margin-top:7px}
 </style>
 
   <style>
@@ -2725,6 +2740,22 @@ body {
             <div class="card community-friends-card">
               <div class="community-people-heading"><div><h3>Freundschaftsanfragen</h3><p>Du entscheidest, mit wem du befreundet bist.</p></div><span id="communityRequestCount" class="community-count">0</span></div>
               <div id="communityFriendRequests"><p class="community-muted">Anfragen werden geladen …</p></div>
+            </div>
+            <div class="card community-challenges-card">
+              <div class="community-people-heading"><div><h3>Community-Challenges</h3><p>Kleine, freiwillige Ziele ohne Leistungsdruck.</p></div><span id="communityChallengeCount" class="community-count">—</span></div>
+              <form id="communityChallengeForm" class="community-challenge-form" onsubmit="createCommunityChallenge(event)">
+                <label for="communityChallengeTitle">Neue Challenge</label>
+                <input id="communityChallengeTitle" type="text" maxlength="100" minlength="3" required placeholder="z. B. 3 Trainingseinheiten diese Woche">
+                <label for="communityChallengeGoal">Ziel</label>
+                <input id="communityChallengeGoal" type="number" min="1" max="1000" step="1" value="3" required>
+                <label for="communityChallengeUnit">Was wird gezählt?</label>
+                <select id="communityChallengeUnit"><option value="workouts">Trainingseinheiten</option><option value="minutes">Aktive Minuten</option><option value="active_days">Aktive Tage</option></select>
+                <label for="communityChallengeDuration">Dauer</label>
+                <select id="communityChallengeDuration"><option value="7">7 Tage</option><option value="14">14 Tage</option><option value="30">30 Tage</option></select>
+                <button class="secondary-btn" type="submit">Challenge erstellen</button>
+                <p id="communityChallengeStatus" class="settings-message" role="status" aria-live="polite"></p>
+              </form>
+              <div id="communityChallengeList"><p class="community-muted">Challenges werden geladen …</p></div>
             </div>
             <div class="card community-people-card">
               <div class="community-people-heading"><div><h3>Kanäle</h3><p>Entdecke andere, die trainieren.</p></div><span id="communityMemberCount" class="community-count">—</span></div>
