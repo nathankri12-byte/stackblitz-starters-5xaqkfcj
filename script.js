@@ -2808,6 +2808,55 @@ function renderTrainingPlan(text) {
 }
 
 
+async function shareWorkoutPlan() {
+  const status = document.getElementById("workoutShareStatus");
+  const plan = (localStorage.getItem("fitness_ai_training_plan") || "").trim();
+  if (!plan) {
+    if (status) status.textContent = "Erstelle zuerst deinen Trainingsplan.";
+    return;
+  }
+  const dayNames = ["SONNTAG", "MONTAG", "DIENSTAG", "MITTWOCH", "DONNERSTAG", "FREITAG", "SAMSTAG"];
+  const todayName = dayNames[new Date().getDay()];
+  const lines = plan.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+  const headingRegex = /^\s*(?:#{1,6}\s*)?(?:\*{1,2})?(MONTAG|DIENSTAG|MITTWOCH|DONNERSTAG|FREITAG|SAMSTAG|SONNTAG)(?:\*{1,2})?\s*(?:\||[-–—:]|\s+)?\s*(.*?)\s*$/i;
+  const start = lines.findIndex(line => {
+    const match = line.match(headingRegex);
+    return match && match[1].toUpperCase() === todayName;
+  });
+  if (start < 0) {
+    if (status) status.textContent = "Für heute wurde kein eigener Trainingstag im Plan gefunden. Öffne deinen Plan und prüfe die Wochentage.";
+    return;
+  }
+  const heading = lines[start].match(headingRegex);
+  const focus = (heading?.[2] || todayName).replace(/^\s*[|:–—-]\s*/, "").trim();
+  const exercises = [];
+  for (let i = start + 1; i < lines.length; i++) {
+    if (headingRegex.test(lines[i])) break;
+    if (/^ÜBUNG\s*:/i.test(lines[i])) exercises.push(lines[i].replace(/^ÜBUNG\s*:\s*/i, ""));
+    else if (/^(?:RUHETAG|REST DAY|ERHOLUNG)\b/i.test(lines[i])) { exercises.push("Ruhetag / Erholung"); break; }
+  }
+  const shareText = ["FITNESS AI PRO – Training für heute", focus, ...exercises.map(name => "• " + name), "", "Gemeinsam trainieren – sauber, sicher und im eigenen Tempo."].join("\n");
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: "Mein Training heute", text: shareText });
+      if (status) status.textContent = "Dein Trainingsschwerpunkt wurde zum Teilen geöffnet.";
+    } else if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(shareText);
+      if (status) status.textContent = "Trainingsplan kopiert. Du kannst ihn jetzt an Freunde senden.";
+    } else {
+      window.prompt("Kopiere diesen Trainingsplan und sende ihn an deine Freunde:", shareText);
+      if (status) status.textContent = "Teile nur den Trainingsplan – keine privaten Profildaten.";
+    }
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      if (status) status.textContent = "Teilen abgebrochen.";
+      return;
+    }
+    console.error("Trainingsplan konnte nicht geteilt werden:", error);
+    if (status) status.textContent = "Teilen ist gerade nicht möglich. Bitte versuche es erneut.";
+  }
+}
+
 /* In-workout rest timer */
 let restTimerInterval = null;
 let restTimerEnd = 0;
