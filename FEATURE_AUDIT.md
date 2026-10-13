@@ -48,8 +48,8 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 40 | KI korrigiert Fitness-Mythen | Teilweise umgesetzt | KI-Prompt fordert freundliche, evidenzorientierte Korrektur verbreiteter Fitness-Mythen und klare Unsicherheit; gezielte Testfälle fehlen. |
 | 41 | Quellenangaben | Teilweise umgesetzt | KI soll nur zuverlässig bekannte Quellen/Organisationen nennen und keine Studien/Links erfinden. Verifizierte Quellenabrufe bzw. automatische Quellenprüfung sind nicht integriert. |
 | 42 | Keine medizinischen Versprechen | Grundschutz ergänzt, Prüfung offen | KI-Anweisungen untersagen medizinische Diagnosen/Heilversprechen und verweisen bei gesundheitlichen Problemen an Eltern oder medizinische Fachpersonen. Weitere UI-/Prompt-Prüfung offen. |
-| 43 | Markenauftritt | Teilweise umgesetzt | Sportfotografie und responsive visuelle Hierarchie ergänzt; Navigation, Typografie und sämtliche Ansichten weiter prüfen. |
-| 44 | Design nicht wie generische KI-Startup-Seite | Teilweise umgesetzt | Positionierung nennt jetzt Training, Technik und Fortschritt als Kern; Training und Workout im Dashboard weiter priorisieren. |
+| 43 | Markenauftritt | Teilweise umgesetzt | Neue öffentliche Hero-/Landing-Ansicht mit Fitnessstudio-Foto, prägnanter Nutzenbotschaft und drei Feature-Karten. Live-Browsertest auf Desktop bestanden; vollständige App-Ansichten und Mobile-Feinschliff weiter prüfen. |
+| 44 | Design nicht wie generische KI-Startup-Seite | Grundansatz umgesetzt, weitere Prüfung offen | Öffentliche Seite positioniert das Produkt konkret über personalisiertes Training, verständliche Übungshilfe und messbaren Fortschritt; Trainings-/Workout-Dashboard weiter priorisieren. |
 | 45 | Tonalität | Teilweise umgesetzt | KI-Leitlinien und Fortschrittstexte sind freundlich, nicht wertend und altersgerecht ausgerichtet. Vollständige Textprüfung der gesamten Oberfläche bleibt offen. |
 | 46 | Navigation und Hauptbereiche | Teilweise umgesetzt | Mobile Navigation nutzt drei konfigurierbare Schnellzugriffe plus Drei-Punkte-Menü, wie gewünscht. Desktop-Navigation und Informationsarchitektur müssen noch im Browser geprüft werden; keine Änderung gegen die mobile Vorgabe. |
 | 47 | Fortschritt direkt im Training | Grundversion umgesetzt | Live-Balken zeigt erledigte Übungen im aktuellen Wochenplan und aktualisiert sich beim Abhaken/Speichern. Browser-E2E offen. |
@@ -121,3 +121,10 @@ Diese Punkte sind einzeln geprüft und werden nicht als „fertig“ ausgegeben,
 - Anmeldung: Apple-OAuth-Schaltfläche ergänzt; der Provider benötigt noch eine Apple-/Supabase-Konfiguration, bevor echte Anmeldung möglich ist.
 - Datenbank: neue RLS-geschützte Tabellen für Freundschaftsanfragen, Challenges, Teilnahmen, Meldungen und Ernährungstagebuch; Fremdschlüssel-Indizes ergänzt.
 - Tests: JavaScript-Syntax, Inline-Scripts und doppelte HTML-IDs geprüft. Live-Smoke-Test der Login-Seite erfolgreich; authentifizierte End-to-End-Tests der neuen Funktionen stehen noch aus.
+
+
+## Neu ergänzt am 13.10.2026 — öffentliche Landingpage
+
+- `index.html` enthält jetzt vor dem Login eine responsive Produktpräsentation: „Weniger raten. Gezielter trainieren.“, Fitnessstudio-Foto, drei konkrete Funktionskarten und eine CTA „Kostenlos starten“.
+- CTA öffnet die Registrierungsansicht, ohne ein Formular abzusenden.
+- Render-Deployment live; öffentlicher Browser-Smoke-Test bestätigt Bild, Text, drei Karten und CTA auf Desktop. Noch nicht bestätigt: echte mobile Geräteansichten und angemeldete End-to-End-Flows.
