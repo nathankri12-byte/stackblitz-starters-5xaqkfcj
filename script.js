@@ -526,6 +526,14 @@ async function loadProfile() {
         training_location:
           data.training_location || "",
 
+        selected_studio_id:
+          data.selected_studio_id || null,
+
+        studio_name: "",
+        studio_city: "",
+        studio_description: "",
+        studio_equipment: "",
+
         training_level:
           data.training_level || "Anfänger"
       };
@@ -626,6 +634,9 @@ function fillProfileUI() {
     currentProfile.goal
   );
 
+  handleTrainingLocationChange();
+  if (typeof loadAvailableStudios === "function") loadAvailableStudios();
+
   updateAIUserInfo();
 }
 
@@ -722,6 +733,8 @@ async function saveProfile() {
 
     training_location:
       trainingLocation,
+
+    selected_studio_id: currentProfile?.selected_studio_id || null,
 
     training_level: trainingLevel,
 
@@ -1580,6 +1593,10 @@ function buildAIContext() {
     `Gewicht: ${currentProfile.weight || "unbekannt"} kg`,
     `Ziel: ${currentProfile.goal || "nicht angegeben"}`,
     `Trainingsort: ${currentProfile.training_location || "nicht angegeben"}`,
+    `Fitnessstudio: ${currentProfile.studio_name || "nicht verbunden"}`,
+    `Studio-Stadt: ${currentProfile.studio_city || "nicht angegeben"}`,
+    `Verfügbare Studio-Geräte: ${currentProfile.studio_equipment || "nicht hinterlegt"}`,
+    `Studio-Beschreibung: ${currentProfile.studio_description || "nicht hinterlegt"}`,
     `Erfahrungslevel: ${currentProfile.training_level || "Anfänger"}`,
     `Ernährungsweise: ${currentProfile.diet || "nicht angegeben"}`
   ].join("\n");
