@@ -2515,6 +2515,28 @@ body {
 }
 @media(prefers-reduced-motion:reduce){.onboarding-step-visual{animation:none}.onboarding-step{transition:none}}
 
+
+    /* iPad/tablet layout: use only the fixed left sidebar */
+    @media (min-width: 761px) and (max-width: 1100px) {
+      .sidebar {
+        display: block !important;
+        position: fixed !important;
+        left: 0 !important;
+        right: auto !important;
+        width: 245px !important;
+      }
+      .main {
+        margin-left: 245px !important;
+        width: calc(100% - 245px) !important;
+        min-width: 0 !important;
+      }
+      .mobile-header,
+      .mobile-nav,
+      .mobile-more-menu {
+        display: none !important;
+      }
+    }
+  
 </style>
 
 </head>
