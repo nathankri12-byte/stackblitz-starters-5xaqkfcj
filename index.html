@@ -2682,6 +2682,8 @@ body {
           <aside class="community-side-column">
             <div class="card community-profile-card">
               <span class="eyebrow">DEIN PROFIL</span><h3>Dein Community-Profil</h3>
+              <label for="communityUsername">Benutzername</label><input id="communityUsername" type="text" maxlength="30" minlength="3" pattern="[a-zA-Z0-9_-]+" autocomplete="off" placeholder="z. B. nathan_fitness">
+              <small>3–30 Zeichen: Buchstaben, Zahlen, _ oder -</small>
               <label for="communityDisplayName">Anzeigename</label><input id="communityDisplayName" type="text" maxlength="40" placeholder="Wie sollen dich andere sehen?">
               <label for="communityBio">Kurz über dich</label><textarea id="communityBio" maxlength="180" rows="3" placeholder="Deine Ziele, Sportarten oder Motivation …"></textarea>
               <button class="secondary-btn" type="button" onclick="saveCommunityProfile()">Profil speichern</button>
@@ -2690,8 +2692,8 @@ body {
             </div>
             <div class="card community-people-card">
               <div class="community-people-heading"><div><h3>Kanäle</h3><p>Entdecke andere, die trainieren.</p></div><span id="communityMemberCount" class="community-count">—</span></div>
-              <label class="community-search-label" for="communityPeopleSearch">Personen suchen</label>
-              <input id="communityPeopleSearch" class="community-search-input" type="search" maxlength="40" placeholder="Name eingeben …" oninput="renderCommunityPeople()">
+              <label class="community-search-label" for="communityPeopleSearch">Benutzername oder Name suchen</label>
+              <input id="communityPeopleSearch" class="community-search-input" type="search" maxlength="40" placeholder="@benutzername oder Name …" oninput="renderCommunityPeople()">
               <div id="communityPeople"><p class="community-muted">Mitglieder werden geladen …</p></div>
               <div class="community-invite-box">
                 <strong>Freunde einladen</strong>
