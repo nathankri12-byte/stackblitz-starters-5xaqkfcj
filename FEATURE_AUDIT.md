@@ -89,3 +89,12 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 4. Adaptive Folgepläne und First Gym Mode.
 5. Altersmodi, Quellen, wertfreie Sprache und Feedbackschleife.
 6. Danach Community-Extras, Integrationen und Monetarisierung.
+
+## Neu ergänzt am 13.10.2026
+
+- Community: Freundschaftsanfragen (senden, annehmen, ablehnen, zurückziehen), Challenges mit Fortschrittsanzeige und freiwilliger Rangliste, Meldungen zu Beiträgen und ein Admin-Prüfbereich.
+- Fortschritt: Erfolgskarten als PNG zum Teilen/Herunterladen; private Körper- und Gesundheitswerte werden nicht auf die Karte gesetzt.
+- Ernährung: privates Ernährungstagebuch mit Mahlzeit, Datum und optionaler Notiz; keine Kalorienziele als Standard.
+- Anmeldung: Apple-OAuth-Schaltfläche ergänzt; der Provider benötigt noch eine Apple-/Supabase-Konfiguration, bevor echte Anmeldung möglich ist.
+- Datenbank: neue RLS-geschützte Tabellen für Freundschaftsanfragen, Challenges, Teilnahmen, Meldungen und Ernährungstagebuch; Fremdschlüssel-Indizes ergänzt.
+- Tests: JavaScript-Syntax, Inline-Scripts und doppelte HTML-IDs geprüft. Live-Smoke-Test der Login-Seite erfolgreich; authentifizierte End-to-End-Tests der neuen Funktionen stehen noch aus.
