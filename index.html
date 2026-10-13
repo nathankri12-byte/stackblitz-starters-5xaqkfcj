@@ -2461,6 +2461,14 @@ body {
               <label for="dailySteps">Schritte (manuell)</label>
               <input id="dailySteps" type="number" min="0" max="200000" step="1" inputmode="numeric" placeholder="z. B. 4500">
             </div>
+            <div class="field" style="margin:0">
+              <label for="dailyEnergyLevel">Energie heute (1–5)</label>
+              <select id="dailyEnergyLevel"><option value="">Nicht angeben</option><option value="1">1 · sehr niedrig</option><option value="2">2 · eher niedrig</option><option value="3">3 · mittel</option><option value="4">4 · gut</option><option value="5">5 · sehr gut</option></select>
+            </div>
+            <div class="field" style="margin:0">
+              <label for="dailySorenessLevel">Muskelkater (1–5)</label>
+              <select id="dailySorenessLevel"><option value="">Nicht angeben</option><option value="1">1 · kaum</option><option value="2">2 · leicht</option><option value="3">3 · mittel</option><option value="4">4 · stark</option><option value="5">5 · sehr stark</option></select>
+            </div>
           </div>
           <button class="primary-btn" style="max-width:220px;margin-top:14px" type="button" onclick="saveDailyCheckin()">Tageswerte speichern</button>
           <p id="dailyCheckinStatus" class="form-status" role="status" aria-live="polite" style="margin-top:10px;min-height:1.4em"></p>
@@ -3695,7 +3703,7 @@ body {
 
 
   <!-- Deine JavaScript-Datei -->
-  <script src="script.js?v=20261013-age-modes-1"></script>
+  <script src="script.js?v=20261013-readiness-1"></script>
   <script src="studio-admin.js?v=20261013-gym-1"></script>
   <script src="music.js?v=20261013-regex-fix-1"></script>
 
