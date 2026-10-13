@@ -634,7 +634,7 @@ function fillProfileUI() {
     currentProfile.goal
   );
 
-  handleTrainingLocationChange();
+  if (typeof handleTrainingLocationChange === "function") handleTrainingLocationChange(false);
   if (typeof loadAvailableStudios === "function") loadAvailableStudios();
 
   updateAIUserInfo();
