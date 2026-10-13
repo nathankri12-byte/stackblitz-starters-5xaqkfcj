@@ -2629,7 +2629,7 @@ function renderTrainingPlan(text) {
           '<div class="field"><label>Gewicht (kg)</label><input type="number" min="0" step="0.5" placeholder="z. B. 20" class="training-weight-input" inputmode="decimal"></div>' +
           '<div class="field"><label>Wiederholungen</label><input type="number" min="0" step="1" placeholder="z. B. 10" class="training-reps-input" inputmode="numeric"></div>' +
           '<div class="field"><label>Dauer (Sek.)</label><input type="number" min="0" step="1" placeholder="z. B. 60" class="training-duration-input" inputmode="numeric"></div>' +
-          '</div><div class="training-exercise-actions" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0"><button type="button" class="secondary-btn" onclick="startRestTimer(60)">⏱ 60 s Pause</button><button type="button" class="secondary-btn" onclick="swapTrainingExercise(this)">Übung tauschen</button></div><button type="button" class="primary-btn save-performance-btn" onclick="saveTrainingPerformance(this)">Werte speichern</button></article>'
+          '</div><div class="training-exercise-actions" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0"><button type="button" class="secondary-btn" onclick="startRestTimer(60)">⏱ 60 s Pause</button><button type="button" class="secondary-btn" onclick="swapTrainingExercise(this)">Übung tauschen</button><button type="button" class="secondary-btn" onclick="explainTrainingExercise(this)">Warum diese Übung?</button></div><button type="button" class="primary-btn save-performance-btn" onclick="saveTrainingPerformance(this)">Werte speichern</button></article>'
         ).join("") + '</div>'
       : '<p class="card-description training-rest-day">Für diesen Tag sind keine Übungen eingeplant.</p>') +
     '</section>'
@@ -2707,6 +2707,16 @@ function stopRestTimer() {
   if (panel) panel.style.display = "none";
 }
 
+async function explainTrainingExercise(button) {
+  const card = button && button.closest(".training-exercise-card");
+  const checkbox = card && card.querySelector(".training-exercise-checkbox");
+  const name = checkbox && checkbox.dataset.exercise;
+  if (!name) return;
+  const location = currentProfile && currentProfile.training_location || "dein gewählter Trainingsort";
+  const goal = currentProfile && currentProfile.goal || "dein Trainingsziel";
+  showTab("ai");
+  await askGemini("Erkläre mir kurz und altersgerecht, warum " + name + " für mein Ziel " + goal + " sinnvoll sein kann, welche Muskeln sie trainiert, worauf ich bei der Technik achten sollte und welche häufigen Fehler ich vermeiden sollte. Trainingsort: " + location + ". Keine medizinischen Versprechen und keine gefährlichen Maximalbelastungen.", {showInChat:true});
+}
 /* Simple exercise alternatives that keep the target muscle group broadly similar. */
 function swapTrainingExercise(button) {
   const card = button && button.closest(".training-exercise-card");
@@ -2919,23 +2929,24 @@ function renderTrainingProgress(entries) {
   const container = document.getElementById("trainingProgressCharts");
   if (!container) return;
   const grouped = new Map();
+  entries.forEach(entry => { if (!grouped.has(entry.exercise_name)) grouped.set(entry.exercise_name, []); grouped.get(entry.exercise_name).push(entry); });
+  const completedDays = new Set(entries.filter(entry => entry.completed).map(entry => entry.training_date)).size;
+  const completedExercises = entries.filter(entry => entry.completed).length;
+  const bestByExercise = new Map();
   entries.forEach(entry => {
-    if (!grouped.has(entry.exercise_name)) grouped.set(entry.exercise_name, []);
-    grouped.get(entry.exercise_name).push(entry);
+    if (entry.weight === null || entry.weight === undefined || !Number.isFinite(Number(entry.weight))) return;
+    const previous = bestByExercise.get(entry.exercise_name);
+    if (!previous || Number(entry.weight) > Number(previous.weight)) bestByExercise.set(entry.exercise_name, entry);
   });
+  const records = Array.from(bestByExercise.entries()).sort((a,b) => Number(b[1].weight) - Number(a[1].weight)).slice(0,4);
+  const recordMarkup = records.length ? records.map(([name,entry]) => "<li><strong>" + escapeHTML(name) + "</strong>: " + escapeHTML(String(entry.weight)) + " kg</li>").join("") : "<li>Speichere Trainingsgewichte, damit hier deine persönlichen Bestwerte erscheinen.</li>";
+  const summary = '<article class="card" style="margin-bottom:16px"><span class="eyebrow">DEINE MEILENSTEINE</span><div class="grid grid-2" style="margin-top:10px"><div><strong style="font-size:28px">' + completedDays + '</strong><p class="card-description">Trainingstage mit abgeschlossenen Übungen</p></div><div><strong style="font-size:28px">' + completedExercises + '</strong><p class="card-description">Abgeschlossene Übungen</p></div></div><h4 style="margin-top:14px">Bisher höchste gespeicherte Gewichte</h4><ul style="padding-left:20px;line-height:1.8">' + recordMarkup + '</ul><p class="card-description">Vergleiche dich mit deinem eigenen Verlauf – nicht mit anderen. Die Werte zeigen nur deine gespeicherten Einträge.</p></article>';
   const cards = [];
   for (const [name, values] of grouped) {
-    const charts = [
-      renderMetricChart(values, "weight", "Gewicht", "kg"),
-      renderMetricChart(values, "reps", "Wiederholungen", "Wdh."),
-      renderMetricChart(values, "duration_seconds", "Dauer", "Sek.")
-    ].filter(Boolean);
-    if (charts.length) cards.push('<article class="card training-progress-exercise"><div class="section-header"><h4>' +
-      escapeHTML(name) + '</h4><span class="tag">' + values.length + ' Einträge</span></div><div class="training-progress-grid">' +
-      charts.join("") + '</div></article>');
+    const charts = [renderMetricChart(values, "weight", "Gewicht", "kg"), renderMetricChart(values, "reps", "Wiederholungen", "Wdh."), renderMetricChart(values, "duration_seconds", "Dauer", "Sek.")].filter(Boolean);
+    if (charts.length) cards.push('<article class="card training-progress-exercise"><div class="section-header"><h4>' + escapeHTML(name) + '</h4><span class="tag">' + values.length + ' Einträge</span></div><div class="training-progress-grid">' + charts.join("") + '</div></article>');
   }
-  container.innerHTML = cards.length ? cards.join("") :
-    '<p class="card-description">Noch keine Trainingswerte vorhanden. Trage Gewicht, Wiederholungen oder Dauer ein und speichere sie, dann erscheint hier dein Verlauf.</p>';
+  container.innerHTML = summary + (cards.length ? cards.join("") : '<p class="card-description">Noch keine Trainingswerte vorhanden. Trage Gewicht, Wiederholungen oder Dauer ein und speichere sie, dann erscheint hier dein Verlauf.</p>');
 }
 
 function renderMetricChart(entries, field, label, unit) {
