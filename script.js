@@ -1772,6 +1772,9 @@ function getAgeModeGuidance(ageValue) {
   if (!Number.isFinite(age) || age < 1 || age > 120) {
     return "ALTERSMODUS: Alter unbekannt. Wähle besonders vorsichtige, allgemeine Empfehlungen und frage bei altersabhängigen Entscheidungen zuerst nach dem Alter.";
   }
+  if (age < 14) {
+    return "ALTERSMODUS UNTER 14: Nur allgemeine, altersgerechte Bewegungsempfehlungen. Keine Gewichtsabnahme-Ziele, Kalorien-/Makroziele oder intensiven Kraftpläne. Technik, Spaß, Erholung und die Begleitung durch Eltern bzw. qualifizierte Erwachsene haben Vorrang.";
+  }
   if (age <= 15) {
     return "ALTERSMODUS 14–15: Fokus auf Techniklernen, Freude an Bewegung, ausgewogene Ernährung, Schlaf und Erholung. Keine Gewichtsabnahme-Ziele, keine Kalorien- oder Makroziele zur Restriktion, keine Maximalversuche. Bei Übungen mit Gewichten leichte kontrollierbare Belastungen und fachkundige Aufsicht empfehlen.";
   }
