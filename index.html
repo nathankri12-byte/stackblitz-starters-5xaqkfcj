@@ -2043,6 +2043,125 @@ body {
     .music-external{display:inline-block;margin-top:12px;color:var(--accent);font-size:13px;text-decoration:none}
     .music-help{margin-top:16px}.music-help ol{padding-left:22px;color:var(--muted);line-height:1.8}.music-help p{font-size:12px;color:var(--muted);line-height:1.6;margin-top:14px}
     @media(max-width:760px){.music-layout{grid-template-columns:1fr}.music-hero{padding:22px}.music-note{font-size:70px;padding:0}.music-hero p{font-size:14px}#musicEmbed{height:352px}}
+  
+    /* FITNESS AI PRO — visual polish pass */
+    :root {
+      --bg: #070a0e;
+      --bg2: #0c1118;
+      --card: #101720;
+      --card2: #151f2a;
+      --border: rgba(161,180,198,.15);
+      --radius: 20px;
+    }
+    body {
+      background:
+        radial-gradient(ellipse at 92% 0%, rgba(217,255,63,.095), transparent 32%),
+        radial-gradient(ellipse at 0% 45%, rgba(45,112,89,.08), transparent 30%),
+        var(--bg);
+      letter-spacing: -.01em;
+    }
+    .main { max-width: 1560px; }
+    .topbar { align-items:center; gap:18px; }
+    .topbar h2 { letter-spacing:-.045em; font-weight:800; }
+    .topbar p, .section-subtitle { line-height:1.65; }
+    .card, .stat-card, .dashboard-card, .panel, .feature-card,
+    .community-composer, .community-post, .timer-panel, .music-player-card,
+    .meal-diary-card, .progress-card, .settings-card {
+      border-color:var(--border);
+      box-shadow:0 10px 34px rgba(0,0,0,.15);
+    }
+    .card, .stat-card, .dashboard-card, .panel, .feature-card {
+      transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;
+    }
+    .card:hover, .stat-card:hover, .dashboard-card:hover, .feature-card:hover {
+      border-color:rgba(217,255,63,.27);
+      box-shadow:0 14px 38px rgba(0,0,0,.23);
+    }
+    .primary-btn, .secondary-btn, .nav button, .mobile-nav button,
+    .more-menu button, .mobile-more-menu button {
+      transition:background .18s ease,color .18s ease,border-color .18s ease,transform .18s ease;
+    }
+    button:active { transform:scale(.985); }
+    input, select, textarea {
+      accent-color:var(--accent);
+    }
+    .field input, .field select, .field textarea,
+    .music-input, input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+    select, textarea {
+      transition:border-color .18s ease,box-shadow .18s ease;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus,
+    .music-input:focus, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      border-color:var(--accent) !important;
+      box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 12%,transparent);
+      outline:none;
+    }
+    .sidebar {
+      background:rgba(8,11,15,.96);
+      border-right-color:rgba(161,180,198,.12);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+    }
+    .sidebar-logo { letter-spacing:-.035em; }
+    .nav button { margin:2px 0; }
+    .nav button.active { box-shadow:inset 3px 0 0 var(--accent); }
+    .logo-icon { animation:logoGlow 5s ease-in-out infinite; }
+    @keyframes logoGlow {
+      0%,100% { box-shadow:0 8px 24px rgba(217,255,63,.12); }
+      50% { box-shadow:0 8px 34px rgba(217,255,63,.28); }
+    }
+    .dashboard-showcase, .hero {
+      overflow:hidden;
+      isolation:isolate;
+    }
+    .dashboard-showcase::after, .hero::after {
+      content:"";
+      position:absolute;
+      width:230px;height:230px;
+      right:-90px;top:-110px;
+      border:1px solid rgba(217,255,63,.16);
+      border-radius:50%;
+      box-shadow:0 0 0 24px rgba(217,255,63,.025),0 0 0 50px rgba(217,255,63,.018);
+      pointer-events:none;
+      z-index:-1;
+    }
+    .mobile-nav {
+      background:rgba(8,11,14,.94) !important;
+      border-top-color:rgba(217,255,63,.2) !important;
+      box-shadow:0 -12px 34px rgba(0,0,0,.34) !important;
+    }
+    .mobile-nav button { font-weight:600; }
+    .mobile-nav button.active { box-shadow:inset 0 0 0 1px rgba(217,255,63,.13); }
+    .mobile-more-menu {
+      background:rgba(15,20,26,.98) !important;
+      border-color:rgba(161,180,198,.2) !important;
+      backdrop-filter:blur(22px);
+      -webkit-backdrop-filter:blur(22px);
+    }
+    @media (max-width:760px) {
+      body {
+        background:
+          radial-gradient(ellipse at 100% 0%,rgba(217,255,63,.075),transparent 35%),
+          var(--bg);
+      }
+      .main { padding-top:12px !important; }
+      .topbar { margin-bottom:18px; }
+      .topbar h2 { font-size:clamp(25px,7vw,32px) !important; }
+      .mobile-header {
+        background:rgba(7,10,14,.88) !important;
+        border-bottom-color:rgba(161,180,198,.13) !important;
+      }
+      .card, .stat-card, .dashboard-card, .panel, .feature-card {
+        border-radius:18px;
+      }
+      .dashboard-showcase::after, .hero::after { width:160px;height:160px;right:-75px;top:-70px; }
+      .primary-btn, .secondary-btn { min-height:44px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .logo-icon { animation:none !important; }
+      *,*::before,*::after { scroll-behavior:auto !important; transition:none !important; }
+    }
+
   </style>
 
 </head>
@@ -3428,7 +3547,7 @@ body {
 
 
   <!-- Deine JavaScript-Datei -->
-  <script src="script.js?v=20261013-community-5"></script>
+  <script src="script.js?v=20261013-design-1"></script>
   <script src="studio-admin.js?v=20261013-gym-1"></script>
   <script src="music.js?v=20261012-1"></script>
 
