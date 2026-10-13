@@ -2578,25 +2578,27 @@ body {
         FITNESS AI PRO
       </div>
 
-      <div class="sidebar-section-label">DEIN BEREICH</div>
+      <div class="sidebar-section-label">HAUPTMENÜ</div>
       <nav class="nav" aria-label="Hauptnavigation">
-        <button class="active" onclick="showTab('dashboard')" data-tab="dashboard" data-quick="true"><span class="nav-icon">⌂</span><span id="quickLabel1">Dashboard</span></button>
+        <button class="active" onclick="showTab('dashboard')" data-tab="dashboard" data-quick="true"><span class="nav-icon">⌂</span><span id="quickLabel1">Übersicht</span></button>
         <button onclick="showTab('training')" data-tab="training" data-quick="true"><span class="nav-icon">▥</span><span id="quickLabel2">Training</span></button>
         <button onclick="showTab('nutrition')" data-tab="nutrition" data-quick="true"><span class="nav-icon">◒</span><span id="quickLabel3">Ernährung</span></button>
         <div class="sidebar-more">
-          <div class="sidebar-section-label sidebar-more-label">WEITERE FUNKTIONEN</div>
+          <div class="sidebar-section-label sidebar-more-label">WEITERE BEREICHE</div>
           <button class="sidebar-more-toggle" id="moreMenuToggle" type="button" aria-expanded="false" aria-controls="moreMenu" onclick="toggleMoreMenu()"><span class="nav-icon">•••</span><span>Mehr</span><span style="margin-left:auto">⌄</span></button>
           <div class="more-menu" id="moreMenu" hidden>
+            <div class="sidebar-section-label sidebar-more-label">GEMEINSAM WEITERENTWICKELN</div>
+            <button onclick="navigateMore('feedback')" data-tab="feedback"><span class="nav-icon">✦</span>Ideen &amp; Feedback</button>
             <button onclick="navigateMore('friends')" data-tab="friends"><span class="nav-icon">◎</span>Community</button>
-            <button onclick="navigateMore('timer')" data-tab="timer"><span class="nav-icon">◷</span>Timer</button>
-            <button onclick="navigateMore('ai')" data-tab="ai"><span class="nav-icon"></span>KI-Coach</button>
-            <button onclick="navigateMore('progress')" data-tab="progress"><span class="nav-icon"></span>Fortschritt</button>
-            <button onclick="navigateMore('feedback')" data-tab="feedback"><span class="nav-icon"></span>Feedback</button>
-            <button onclick="navigateMore('profile')" data-tab="profile"><span class="nav-icon">○</span>Über mich / Profil</button>
-            <button onclick="navigateMore('about')" data-tab="about"><span class="nav-icon">ⓘ</span>Über uns</button>
-            <button onclick="navigateMore('settings')" data-tab="settings"><span class="nav-icon"></span>Einstellungen</button>
-            <button onclick="navigateMore('music')" data-tab="music"><span class="nav-icon">♫</span>Musik</button>
-            <button id="publicStudioOffersNav" onclick="navigateMore('studioOffersPage')" data-tab="studioOffersPage"><span class="nav-icon">⌂</span>Studios &amp; Angebote</button>
+            <button onclick="navigateMore('ai')" data-tab="ai"><span class="nav-icon">✧</span>KI-Coach</button>
+            <button onclick="navigateMore('progress')" data-tab="progress"><span class="nav-icon">↗</span>Mein Fortschritt</button>
+            <div class="sidebar-section-label sidebar-more-label">TRAINING &amp; KONTO</div>
+            <button id="publicStudioOffersNav" onclick="navigateMore('studioOffersPage')" data-tab="studioOffersPage"><span class="nav-icon">⌂</span>Fitnessstudios</button>
+            <button onclick="navigateMore('music')" data-tab="music"><span class="nav-icon">♫</span>Trainingsmusik</button>
+            <button onclick="navigateMore('timer')" data-tab="timer"><span class="nav-icon">◷</span>Pausen-Timer</button>
+            <button onclick="navigateMore('profile')" data-tab="profile"><span class="nav-icon">○</span>Mein Profil</button>
+            <button onclick="navigateMore('settings')" data-tab="settings"><span class="nav-icon">⚙</span>Einstellungen</button>
+            <button onclick="navigateMore('about')" data-tab="about"><span class="nav-icon">ⓘ</span>Über FITNESS AI PRO</button>
             <button id="adminNavButton" class="hidden" onclick="navigateMore('admin')" data-tab="admin"><span class="nav-icon">▤</span>Admin</button>
             <button id="studioNavButton" class="hidden" onclick="navigateMore('studioAdmin')" data-tab="studioAdmin"><span class="nav-icon">⌂</span>Studio</button>
           </div>
@@ -2615,13 +2617,13 @@ body {
     <!-- MOBILE NAV -->
 
     <div class="mobile-nav">
-      <button class="active" onclick="showTab('dashboard')" data-tab="dashboard"><span>⌂</span>Home</button>
+      <button class="active" onclick="showTab('dashboard')" data-tab="dashboard"><span>⌂</span>Übersicht</button>
       <button onclick="showTab('training')" data-tab="training"><span>▥</span>Training</button>
       <button onclick="showTab('nutrition')" data-tab="nutrition"><span>◒</span>Ernährung</button>
       <button onclick="toggleMobileMore()" id="mobileMoreNavButton" aria-expanded="false"><span>•••</span>Mehr</button>
     </div>
     <div class="mobile-more-menu" id="mobileMoreMenu" hidden>
-      <button onclick="navigateMore('friends')">Community / Kanäle</button><button onclick="navigateMore('timer')">Timer</button><button onclick="navigateMore('ai')">KI-Coach</button><button onclick="navigateMore('progress')">Fortschritt</button><button onclick="navigateMore('feedback')">Feedback</button><button onclick="navigateMore('profile')">Über mich</button><button onclick="navigateMore('about')">Über uns</button><button onclick="navigateMore('settings')">Einstellungen</button><button onclick="navigateMore('music')">Musik</button><button onclick="navigateMore('studioOffersPage')">Studios &amp; Angebote</button><button id="mobileAdminNavButton" class="hidden" onclick="navigateMore('admin')">Admin</button><button id="mobileStudioNavButton" class="hidden" onclick="navigateMore('studioAdmin')">Studio</button>
+      <button onclick="navigateMore('feedback')">✦ Ideen &amp; Feedback</button><button onclick="navigateMore('friends')">Community</button><button onclick="navigateMore('ai')">KI-Coach</button><button onclick="navigateMore('progress')">Mein Fortschritt</button><button onclick="navigateMore('studioOffersPage')">Fitnessstudios</button><button onclick="navigateMore('music')">Trainingsmusik</button><button onclick="navigateMore('timer')">Pausen-Timer</button><button onclick="navigateMore('profile')">Mein Profil</button><button onclick="navigateMore('settings')">Einstellungen</button><button onclick="navigateMore('about')">Über FITNESS AI PRO</button><button id="mobileAdminNavButton" class="hidden" onclick="navigateMore('admin')">Verwaltung</button><button id="mobileStudioNavButton" class="hidden" onclick="navigateMore('studioAdmin')">Studioverwaltung</button>
     </div>
 
         <!-- MAIN -->
@@ -3597,8 +3599,8 @@ body {
         <div class="topbar">
 
           <div>
-            <h2> Feedback</h2>
-            <p>Hilf uns, FITNESS AI PRO besser zu machen.</p>
+            <h2>Gestalte FITNESS AI PRO mit</h2>
+            <p>Deine Ideen bestimmen mit, wie sich die App weiterentwickelt.</p>
           </div>
 
         </div>
@@ -3608,11 +3610,10 @@ body {
 
           <div class="card">
 
-            <h3>Dein Feedback</h3>
+            <h3>Was brauchst du?</h3>
 
             <p class="card-description">
-              Schreib uns, was dir gefällt oder was verbessert
-              werden sollte.
+              Du bist nicht nur Nutzer, sondern kannst die App mitentwickeln. Sag uns, welche Funktion dir fehlt, was einfacher werden soll oder welche Idee wir als Nächstes umsetzen sollten.
             </p>
 
 
@@ -3635,12 +3636,12 @@ body {
 
             <div class="field">
 
-              <label>Nachricht</label>
+              <label>Deine Idee, dein Wunsch oder ein Problem</label>
 
               <textarea
                 id="feedbackMessage"
                 maxlength="2000"
-                placeholder="Was können wir verbessern?"
+                placeholder="Mir fehlt … / Ich wünsche mir … / Das funktioniert noch nicht gut …"
               ></textarea>
 
             </div>
@@ -3651,7 +3652,7 @@ body {
               class="primary-btn"
               onclick="sendFeedback()"
             >
-              Feedback senden
+              Idee an das Team senden
             </button>
 
             <div
@@ -3666,10 +3667,10 @@ body {
 
           <div class="card">
 
-            <h3> Mein Feedback</h3>
+            <h3>Meine bisherigen Vorschläge</h3>
 
             <p class="card-description">
-              Hier kannst du deine bisherigen Rückmeldungen sehen.
+              Hier siehst du deine bisherigen Rückmeldungen und Vorschläge.
             </p>
 
             <div
