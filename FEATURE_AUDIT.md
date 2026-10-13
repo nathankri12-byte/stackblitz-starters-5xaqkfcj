@@ -9,7 +9,7 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 1 | Klare USP: persönlicher KI-Gym-Coach für Einsteiger | Verbessern | Positionierung in Dashboard und Onboarding konsistent machen. |
 | 2 | Zielgruppe Einsteiger/Jugendliche klar definieren | Verbessern | Altersgerechte Sprache, Belastungsgrenzen und Privatsphäre klarer sichtbar machen. |
 | 3 | Adaptive Trainingspläne | Grundversion umgesetzt im Folge-Branch | Die Planerstellung lädt bis zu 30 eigene Trainingseinträge und übergibt die neuesten 20 als Kontext an die KI; sichere, kleine Anpassungen statt großer automatischer Steigerungen. E2E offen. |
-| 4 | Trainingspläne passend zu Studio-Geräten | Teilweise vorhanden | Trainingsort wird berücksichtigt; Gerätebestand des konkreten Studios fehlt. |
+| 4 | Trainingspläne passend zu Studio-Geräten | Grundversion umgesetzt, E2E offen | Admins pflegen Geräte/Ausstattung pro Studio. Nutzer wählen ein freigeschaltetes Studio per Name; dessen Geräte-Liste fließt in den Planprompt ein. |
 | 5 | Geräte per QR-Code scannen | Später | Benötigt zuverlässige Geräte-Datenbank/Studio-Kooperation; kein MVP. |
 | 6 | First Gym Mode | Grundversion umgesetzt im Folge-Branch | Aufklappbarer Einsteiger-Guide mit Geräteeinweisung, leichter Startlast, Pausen und Sicherheits-Hinweisen. |
 | 7 | Kontextsensitiver KI-Coach | Teilweise vorhanden | Profilkontext und KI-Chat existieren; Trainingstage, Verlauf und letzte Einheit stärker einbeziehen. |
@@ -36,7 +36,7 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 28 | Erholung/Readiness | Teilweise | Tages-Check-in für Schlaf, Wasser und Schritte existiert; keine medizinische Readiness-Bewertung. |
 | 29 | Apple Health / Health Connect | Später | Plattformintegration und Berechtigungen erforderlich. |
 | 30 | Wearables | Später | Erst nach Kern-MVP und Datenschutzprüfung. |
-| 31 | Studio-Dashboard | Teilweise umgesetzt im Feature-Branch | Studio-Center für Studio-Admins mit Profil-/Öffnungszeiten-/Ausstattungsdaten; Plattform-Admin kann Studios anlegen und Manager zuordnen. Live-E2E offen. |
+| 31 | Studio-Dashboard | Grundversion umgesetzt, E2E offen | Plattform-Admin legt Studio an und ordnet Manager zu; Studio-Manager pflegt Profil, Geräte/Ausstattung und Angebote; Admin steuert Veröffentlichung. |
 | 32 | Studio-Inhalte | Später | Benötigt autorisierte Inhalte und Studio-Partnerschaft. |
 | 33 | White Label | Später | Erst bei validiertem B2B-Bedarf. |
 | 34 | Monetarisierungsstufen | Später / prüfen | Keine Bezahlwand vor funktionierendem Kernablauf. |
@@ -55,7 +55,7 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 47 | Fortschritt direkt im Training | Teilweise | Trainingskarten speichern Werte; Live-Fortschritt im Workout ergänzen. |
 | 48 | „Warum diese Übung?“ | Grundversion im Folge-Branch | Jede Trainingskarte hat eine Aktion, die im separaten KI-Coach Ziel, Muskelgruppen, Technik und häufige Fehler erklären lässt. |
 | 49 | Übung tauschen | Grundversion im Feature-Branch | Tauschoptionen für bekannte Übungen, passende Tags und zurückgesetzte Logging-Felder; unbekannte Übungen zeigen einen sicheren Hinweis statt blind zu ersetzen. E2E offen. |
-| 50 | Gym-Confidence-Modus | Fehlt | Kurze Gerätehinweise und diskrete Schritt-für-Schritt-Anleitung. |
+| 50 | Gym-Confidence-Modus | Grundversion vorhanden | First Gym Mode mit Einstiegs-/Sicherheitshinweisen sowie KI-Erklärung pro Übung; ausführlichere Geräteanleitungen bleiben offen. |
 | 51 | Skill-Level | Grundversion im Folge-Branch | Erfahrungslevel Anfänger / Schon etwas Erfahrung / Fortgeschritten ist speicherbar und fließt in Trainingsplan und KI-Coach-Kontext ein. |
 | 52 | Skills über Gewichte hinaus | Verbessern | Technik, Mobilität, Ausdauer und Trainingsroutine abbilden. |
 | 53 | Flexible Ziele | Teilweise | Zielauswahl existiert; temporäre und veränderbare Ziele verbessern. |
@@ -65,9 +65,10 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 57 | Microfeedback | Verbessern | Kurze Rückmeldung nach abgeschlossener Einheit anbieten, nicht aufdringlich. |
 | 58 | Produktanalytics | Prüfen | Keine belastbare Ereignis-/Funnel-Auswertung in diesem Audit bestätigt. |
 | 59 | North-Star-Metrik | Definieren | Vorschlag: wöchentlich abgeschlossene, protokollierte Trainingseinheiten pro aktivem Nutzer. |
-| 60 | MVP-Kernablauf | Teilweise vorhanden | Onboarding → Ort → KI-Plan → Workout/Erklärungen → Logging → adaptive nächste Einheit → Fortschritt. Adaptivität ist die größte funktionale Lücke. |
+| 60 | MVP-Kernablauf | Grundversion implementiert, E2E offen | Profil → Studio verbinden per Name → gerätebewusster KI-Plan → Workout/Logging → Trainingshistorie im Folgeplan → persönliche Meilensteine. Der vollständige Ablauf muss live durchgetestet werden. |
 
-## Neue Studio-Admin-Funktion (im vorherigen Deploy veröffentlicht)\n\n- Plattform-Admin kann ein Studio mit Stadt anlegen und eine Manager-E-Mail zuordnen.\n- Studio-Manager kann Studio-Name, Stadt, Adresse, Telefon, Website, Öffnungszeiten, Beschreibung/Ausstattung bearbeiten.\n- Studio-Manager kann Angebote mit Preis/Vorteil, Beschreibung, Start-/Enddatum erstellen, pausieren/aktivieren und löschen.\n- Veröffentlichung bleibt dem Plattform-Admin vorbehalten; ein Datenbank-Trigger blockiert Änderungen am Veröffentlichungsstatus durch Studio-Manager.\n- Neue Tabellen: `fitness_studios`, `studio_admins`, `studio_offers`; RLS aktiviert, Policies: 5/4/5. `anon` kann nur veröffentlichte Studios und gültige aktive Angebote lesen.\n- Live-Smoke-Test des App-Shells und des sign-out Zustands bestanden. Browser-End-to-End-Test der Studio-Verwaltung mit angemeldetem Admin steht noch aus.\n\n## Verifizierte technische Checks
+## Studio-Admin und Verbindung per Studio-Namen (Feature-Branch, Deploy nach Merge)\n\n- Plattform-Admin kann ein Studio mit Stadt anlegen und eine Manager-E-Mail zuordnen.\n- Studio-Manager kann Studio-Name, Stadt, Adresse, Telefon, Website, Öffnungszeiten, Beschreibung und separate Geräte-/Ausstattungsliste bearbeiten.
+- Nutzer wählen im Profil „Fitnessstudio“, geben den Namen eines freigeschalteten Studios ein und speichern die Verbindung; die ausgewählte Studio-ID wird im Profil gespeichert und die Geräte-/Ausstattungsdaten fließen in den KI-Trainingsplan ein.\n- Studio-Manager kann Angebote mit Preis/Vorteil, Beschreibung, Start-/Enddatum erstellen, pausieren/aktivieren und löschen.\n- Veröffentlichung bleibt dem Plattform-Admin vorbehalten; ein Datenbank-Trigger blockiert Änderungen am Veröffentlichungsstatus durch Studio-Manager.\n- Neue Tabellen: `fitness_studios`, `studio_admins`, `studio_offers`; RLS aktiviert, Policies: 5/4/5. `anon` kann nur veröffentlichte Studios und gültige aktive Angebote lesen.\n- Live-Smoke-Test des App-Shells und des sign-out Zustands bestanden. Browser-End-to-End-Test der Studio-Verwaltung und der Verbindung per Studio-Namen steht noch aus.\n\n## Verifizierte technische Checks
 
 - `script.js` und `studio-admin.js` bestehen den JavaScript-Syntaxcheck.
 - `index.html` hat keine doppelten `id`-Attribute; Inline-JavaScript besteht den Syntaxcheck.
@@ -78,7 +79,7 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 - Supabase Security Advisor meldet: veraltete Tabelle `public."Feedback"` ohne RLS-Policies; zwei `SECURITY DEFINER`-Funktionen sind für `anon` ausführbar; Schutz vor kompromittierten Passwörtern ist deaktiviert. Diese Punkte sollten vor breiter Veröffentlichung behoben werden.
 - Supabase Performance Advisor meldet fehlende Indizes auf zwei Fremdschlüsseln und mehrere permissive Feedback-SELECT-Policies; vor Schemaänderungen prüfen.
 - Ein vollständiger End-to-End-Test aller Community-, KI-, Musik- und Trainingsabläufe steht noch aus.
-- Folge-Branch ergänzt adaptive Planerstellung anhand eigener Trainingshistorie, First-Gym-Einsteiger-Guide, öffentliche Seite für freigeschaltete Studios/Angebote, Übungserklärungen direkt aus dem Workout, wertfreie Trainings-Meilensteine und ein speicherbares Erfahrungslevel. JavaScript-Syntax- und HTML-ID-Prüfungen bestanden; Live-Test nach Deployment offen.
+- Feature-Branch ergänzt adaptive Planerstellung anhand eigener Trainingshistorie, First-Gym-Einsteiger-Guide, öffentliche Seite für freigeschaltete Studios/Angebote, Übungserklärungen direkt aus dem Workout, wertfreie Trainings-Meilensteine, speicherbares Erfahrungslevel und Verbindung zum konfigurierten Studio anhand des Namens. JavaScript-Syntax- und HTML-ID-Prüfungen sowie Live-Tests müssen nach Merge/Deploy erneut bestätigt werden.
 
 ## Reihenfolge für die Umsetzung
 
