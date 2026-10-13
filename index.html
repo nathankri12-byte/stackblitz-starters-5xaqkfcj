@@ -1962,6 +1962,26 @@ body {
     .community-invite-box{border-top:1px solid var(--border);margin-top:16px;padding-top:16px;display:grid;gap:9px}
     .community-invite-box p{font-size:12px;line-height:1.5;color:var(--muted)}
     .community-invite-box .secondary-btn{width:100%}
+
+    .community-friends-card{margin-bottom:16px}
+    .community-friend-request{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)}
+    .community-friend-request:last-child{border-bottom:0}
+    .community-friend-request-info{flex:1;min-width:0}
+    .community-friend-request-info strong,.community-friend-request-info small{display:block;overflow-wrap:anywhere}
+    .community-friend-request-info small{color:var(--muted);font-size:11px;margin-top:3px}
+    .community-request-actions{display:flex;gap:6px;flex-wrap:wrap}
+    .community-request-actions button{font-size:12px;padding:7px 9px}
+    .meal-diary-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
+    .meal-diary-form .field{margin:0;min-width:0}
+    .meal-diary-form .field input,.meal-diary-form .field select,.meal-diary-form .field textarea{width:100%;min-width:0;border:1px solid var(--border);background:#0b1016;color:var(--text);border-radius:11px;padding:11px 12px}
+    .meal-diary-form .field:nth-child(3),.meal-diary-form .field:nth-child(4),.meal-diary-form button,.meal-diary-form #mealDiaryStatus{grid-column:1/-1}
+    .meal-diary-list-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:22px;padding-top:16px;border-top:1px solid var(--border)}
+    .meal-diary-entry{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)}
+    .meal-diary-entry:last-child{border-bottom:0}
+    .meal-diary-entry small{display:block;color:var(--muted);font-size:12px;margin:4px 0}
+    .meal-diary-entry p{font-size:13px;color:var(--muted);white-space:pre-wrap;overflow-wrap:anywhere}
+    .meal-diary-entry button{border:1px solid var(--border);background:transparent;color:var(--muted);border-radius:8px;padding:6px 9px;flex-shrink:0}
+    @media(max-width:600px){.meal-diary-form{grid-template-columns:minmax(0,1fr)}.meal-diary-form .field,.meal-diary-form button,.meal-diary-form #mealDiaryStatus{grid-column:1}.community-friend-request{align-items:flex-start;flex-wrap:wrap}.community-request-actions{width:100%;padding-left:46px}}
 </style>
 
   <style>
@@ -2690,6 +2710,10 @@ body {
               <p id="communityProfileStatus" class="settings-message" role="status" aria-live="polite"></p>
               <small>Nur dein Anzeigename und deine Bio sind für angemeldete Community-Mitglieder sichtbar. Private Profildaten wie Gewicht und E-Mail werden nicht veröffentlicht.</small>
             </div>
+            <div class="card community-friends-card">
+              <div class="community-people-heading"><div><h3>Freundschaftsanfragen</h3><p>Du entscheidest, mit wem du befreundet bist.</p></div><span id="communityRequestCount" class="community-count">0</span></div>
+              <div id="communityFriendRequests"><p class="community-muted">Anfragen werden geladen …</p></div>
+            </div>
             <div class="card community-people-card">
               <div class="community-people-heading"><div><h3>Kanäle</h3><p>Entdecke andere, die trainieren.</p></div><span id="communityMemberCount" class="community-count">—</span></div>
               <label class="community-search-label" for="communityPeopleSearch">Benutzername oder Name suchen</label>
@@ -2745,9 +2769,18 @@ body {
 
 
 
-        <div class="card" style="margin-bottom:18px">
-          <h3>Mahlzeiten-Tracking</h3>
-          <p class="card-description">Automatische Kalorien-, Makro-, Wasser- und Schlafmessung ist derzeit nicht verfügbar. Es werden hier keine Mahlzeiten oder Werte erfunden. Du kannst unten weiterhin mit der Ernährungs-KI einen Mahlzeitenplan erstellen und daraus eine Einkaufsliste ableiten.</p>
+        <div class="card meal-diary-card" style="margin-bottom:18px">
+          <div class="section-header"><div><h3>Dein privates Ernährungstagebuch</h3><p class="card-description">Halte Mahlzeiten und Notizen fest – ohne Kalorienzwang oder Bewertung. Deine Einträge sind nur für dich sichtbar.</p></div></div>
+          <form id="mealDiaryForm" class="meal-diary-form" onsubmit="saveMealDiaryEntry(event)">
+            <div class="field"><label for="mealDiaryDate">Datum</label><input id="mealDiaryDate" type="date" required></div>
+            <div class="field"><label for="mealDiaryType">Mahlzeit</label><select id="mealDiaryType" required><option value="breakfast">Frühstück</option><option value="lunch">Mittagessen</option><option value="dinner">Abendessen</option><option value="snack">Snack</option></select></div>
+            <div class="field"><label for="mealDiaryName">Was hast du gegessen?</label><input id="mealDiaryName" type="text" maxlength="120" required placeholder="z. B. Brot mit Käse und Gurke"></div>
+            <div class="field"><label for="mealDiaryNotes">Notiz (optional)</label><textarea id="mealDiaryNotes" maxlength="500" rows="2" placeholder="z. B. selbst gekocht oder mit Freunden gegessen"></textarea></div>
+            <button id="mealDiarySaveButton" class="primary-btn" type="submit">Mahlzeit speichern</button>
+            <p id="mealDiaryStatus" class="settings-message" role="status" aria-live="polite"></p>
+          </form>
+          <div class="meal-diary-list-heading"><h3>Einträge für den Tag</h3><button class="secondary-btn" type="button" onclick="loadMealDiary()">Aktualisieren</button></div>
+          <div id="mealDiaryEntries" class="meal-diary-entries"><p class="card-description">Deine Mahlzeiten werden geladen …</p></div>
         </div>
 
         <div class="grid grid-2">
