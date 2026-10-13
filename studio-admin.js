@@ -232,7 +232,7 @@ async function loadPublicStudioOffers() {
       return;
     }
     const offerResult = await supabaseClient.from("studio_offers")
-      .select("id,studio_id,title,description,price_label,valid_from,valid_until")
+      .select("id,studio_id,title,description,price_label,valid_from,valid_until,created_at")
       .in("studio_id", studios.map(function(studio) { return studio.id; }))
       .eq("is_active", true).order("created_at", {ascending:false});
     if (offerResult.error) throw offerResult.error;
