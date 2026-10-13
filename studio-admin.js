@@ -216,6 +216,52 @@ async function openStudioFromAdmin(studioId) {
   showTab("studioAdmin");
 }
 
+
+async function loadPublicStudioOffers() {
+  const target = document.getElementById("publicStudioOffersList");
+  if (!target || !supabaseClient) return;
+  target.innerHTML = '<div class="card"><p class="card-description">Studios und Angebote werden geladen …</p></div>';
+  try {
+    const studioResult = await supabaseClient.from("fitness_studios")
+      .select("id,name,city,address,description,phone,website,opening_hours")
+      .eq("is_published", true).order("name");
+    if (studioResult.error) throw studioResult.error;
+    const studios = studioResult.data || [];
+    if (!studios.length) {
+      target.innerHTML = '<div class="card"><h3>Hier entsteht etwas</h3><p class="card-description">Es sind noch keine Partnerstudios freigeschaltet. Schau später wieder vorbei.</p></div>';
+      return;
+    }
+    const offerResult = await supabaseClient.from("studio_offers")
+      .select("id,studio_id,title,description,price_label,valid_from,valid_until")
+      .in("studio_id", studios.map(function(studio) { return studio.id; }))
+      .eq("is_active", true).order("created_at", {ascending:false});
+    if (offerResult.error) throw offerResult.error;
+    const offers = offerResult.data || [];
+    target.innerHTML = studios.map(function(studio) {
+      const studioOffers = offers.filter(function(offer) { return offer.studio_id === studio.id; });
+      const offerMarkup = studioOffers.length ? studioOffers.map(function(offer) {
+        const dates = [offer.valid_from ? "ab " + offer.valid_from : "", offer.valid_until ? "bis " + offer.valid_until : ""].filter(Boolean).join(" · ");
+        return '<article style="padding:12px;border:1px solid var(--border);border-radius:12px;margin-top:10px"><strong>' + studioEscape(offer.title) + '</strong>' +
+          (offer.price_label ? '<p style="margin:5px 0;color:var(--accent);font-weight:700">' + studioEscape(offer.price_label) + '</p>' : '') +
+          (offer.description ? '<p class="card-description">' + studioEscape(offer.description) + '</p>' : '') +
+          (dates ? '<small class="card-description">' + studioEscape(dates) + '</small>' : '') + '</article>';
+      }).join("") : '<p class="card-description" style="margin-top:12px">Aktuell keine aktiven Angebote.</p>';
+      const address = [studio.address, studio.city].filter(Boolean).join(", ");
+      const rawWebsite = String(studio.website || "");
+      const website = rawWebsite.startsWith("https://") || rawWebsite.startsWith("http://")
+        ? '<a class="secondary-btn" href="' + studioEscape(rawWebsite) + '" target="_blank" rel="noopener noreferrer">Website öffnen ↗</a>' : "";
+      const phone = studio.phone ? '<p class="card-description">Telefon: ' + studioEscape(studio.phone) + '</p>' : "";
+      const hours = studio.opening_hours ? '<p class="card-description"><strong>Öffnungszeiten:</strong><br>' + studioEscape(studio.opening_hours).split("\n").join("<br>") + '</p>' : "";
+      return '<article class="card"><span class="eyebrow">FITNESSSTUDIO</span><h3>' + studioEscape(studio.name) + '</h3><p class="card-description">' + studioEscape(address) + '</p>' +
+        (studio.description ? '<p>' + studioEscape(studio.description) + '</p>' : '') + hours + phone + website +
+        '<div style="margin-top:12px"><h4>Angebote</h4>' + offerMarkup + '</div></article>';
+    }).join("");
+  } catch (error) {
+    console.error("Studios und Angebote konnten nicht geladen werden:", error);
+    target.innerHTML = '<div class="card"><h3>Gerade nicht verfügbar</h3><p class="card-description">Die Studio-Informationen konnten nicht geladen werden. Bitte versuche es später erneut.</p></div>';
+  }
+}
+
 /* Hook into the existing auth/navigation without rewriting the core app. */
 (function installStudioAdminHooks() {
   const originalCheckAdmin = window.checkAdmin;
@@ -246,6 +292,7 @@ async function openStudioFromAdmin(studioId) {
       }
       const result = originalShowTab.apply(this, [tabName]);
       if (tabName === "studioAdmin") loadStudioPortal();
+      if (tabName === "studioOffersPage") loadPublicStudioOffers();
       if (tabName === "admin" && isCurrentUserAdmin()) loadAdminStudios();
       return result;
     };
