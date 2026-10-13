@@ -2854,6 +2854,13 @@ body {
               </div>
               <div style="height:7px;background:var(--border);border-radius:999px;overflow:hidden;margin-top:12px"><div id="workoutLiveProgressBar" style="height:100%;width:0%;background:var(--accent);transition:width .2s ease"></div></div>
             </div>
+            <div class="card" style="margin-top:12px;padding:16px">
+              <span class="eyebrow">GEMEINSAM TRAINIEREN</span>
+              <h4 style="margin-top:6px">Trainiere mit Freunden</h4>
+              <p class="card-description">Teile den heutigen Schwerpunkt und die Übungen. Persönliche Profilwerte oder gespeicherte Gewichte werden nicht mitgeteilt.</p>
+              <button type="button" class="secondary-btn" onclick="shareWorkoutPlan()">Heutiges Training teilen</button>
+              <p id="workoutShareStatus" class="settings-message" role="status" aria-live="polite"></p>
+            </div>
             <div id="workoutFeedbackPanel" class="card" hidden style="margin-top:12px;padding:16px" aria-live="polite">
               <span class="eyebrow">KURZES TRAININGSFEEDBACK</span>
               <h4 style="margin-top:6px">Wie hat sich dein Training heute angefühlt?</h4>
@@ -3681,7 +3688,7 @@ body {
 
 
   <!-- Deine JavaScript-Datei -->
-  <script src="script.js?v=20261013-context-1"></script>
+  <script src="script.js?v=20261013-share-workout-1"></script>
   <script src="studio-admin.js?v=20261013-gym-1"></script>
   <script src="music.js?v=20261012-1"></script>
 
