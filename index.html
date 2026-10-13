@@ -2134,6 +2134,7 @@ body {
             <button onclick="navigateMore('about')" data-tab="about"><span class="nav-icon">ⓘ</span>Über uns</button>
             <button onclick="navigateMore('settings')" data-tab="settings"><span class="nav-icon"></span>Einstellungen</button>
             <button onclick="navigateMore('music')" data-tab="music"><span class="nav-icon">♫</span>Musik</button>
+            <button id="publicStudioOffersNav" onclick="navigateMore('studioOffersPage')" data-tab="studioOffersPage"><span class="nav-icon">⌂</span>Studios &amp; Angebote</button>
             <button id="adminNavButton" class="hidden" onclick="navigateMore('admin')" data-tab="admin"><span class="nav-icon">▤</span>Admin</button>
             <button id="studioNavButton" class="hidden" onclick="navigateMore('studioAdmin')" data-tab="studioAdmin"><span class="nav-icon">⌂</span>Studio</button>
           </div>
@@ -2158,7 +2159,7 @@ body {
       <button onclick="toggleMobileMore()" id="mobileMoreNavButton" aria-expanded="false"><span>•••</span>Mehr</button>
     </div>
     <div class="mobile-more-menu" id="mobileMoreMenu" hidden>
-      <button onclick="navigateMore('friends')">Community / Kanäle</button><button onclick="navigateMore('timer')">Timer</button><button onclick="navigateMore('ai')">KI-Coach</button><button onclick="navigateMore('progress')">Fortschritt</button><button onclick="navigateMore('feedback')">Feedback</button><button onclick="navigateMore('profile')">Über mich</button><button onclick="navigateMore('about')">Über uns</button><button onclick="navigateMore('settings')">Einstellungen</button><button onclick="navigateMore('music')">Musik</button><button id="mobileAdminNavButton" class="hidden" onclick="navigateMore('admin')">Admin</button><button id="mobileStudioNavButton" class="hidden" onclick="navigateMore('studioAdmin')">Studio</button>
+      <button onclick="navigateMore('friends')">Community / Kanäle</button><button onclick="navigateMore('timer')">Timer</button><button onclick="navigateMore('ai')">KI-Coach</button><button onclick="navigateMore('progress')">Fortschritt</button><button onclick="navigateMore('feedback')">Feedback</button><button onclick="navigateMore('profile')">Über mich</button><button onclick="navigateMore('about')">Über uns</button><button onclick="navigateMore('settings')">Einstellungen</button><button onclick="navigateMore('music')">Musik</button><button onclick="navigateMore('studioOffersPage')">Studios &amp; Angebote</button><button id="mobileAdminNavButton" class="hidden" onclick="navigateMore('admin')">Admin</button><button id="mobileStudioNavButton" class="hidden" onclick="navigateMore('studioAdmin')">Studio</button>
     </div>
 
         <!-- MAIN -->
@@ -3195,7 +3196,11 @@ body {
            ADMIN
       ========================== -->
 
-      <section id="studioAdmin" class="page">
+      <section id="studioOffersPage" class="page">
+  <div class="topbar"><div><p class="eyebrow">DEINE REGION</p><h2>Studios &amp; Angebote</h2><p>Entdecke freigeschaltete Fitnessstudios und ihre aktuellen Aktionen.</p></div><button type="button" class="secondary-btn" onclick="loadPublicStudioOffers()">Aktualisieren</button></div>
+  <div id="publicStudioOffersList" class="grid grid-2"><div class="card"><p class="card-description">Studios und Angebote werden geladen …</p></div></div>
+</section>
+<section id="studioAdmin" class="page">
   <div class="topbar"><div><p class="eyebrow">STUDIO MANAGEMENT</p><h2>Studio-Center</h2><p>Pflege Studio-Informationen und Angebote selbst. Die Veröffentlichung wird vom FITNESS AI PRO Team freigeschaltet.</p></div><button type="button" class="secondary-btn" onclick="loadStudioPortal()">Aktualisieren</button></div>
   <div class="card admin-card"><h3>Mein Fitnessstudio</h3><label class="admin-field" for="managedStudioSelect"><span>Studio</span><select id="managedStudioSelect" onchange="selectManagedStudio(this.value)"><option value="">Studios werden geladen …</option></select></label>
     <form id="studioProfileForm" onsubmit="saveStudioProfile(event)" style="margin-top:18px"><div class="grid grid-2">
