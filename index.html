@@ -2135,6 +2135,7 @@ body {
             <button onclick="navigateMore('settings')" data-tab="settings"><span class="nav-icon"></span>Einstellungen</button>
             <button onclick="navigateMore('music')" data-tab="music"><span class="nav-icon">♫</span>Musik</button>
             <button id="adminNavButton" class="hidden" onclick="navigateMore('admin')" data-tab="admin"><span class="nav-icon">▤</span>Admin</button>
+            <button id="studioNavButton" class="hidden" onclick="navigateMore('studioAdmin')" data-tab="studioAdmin"><span class="nav-icon">⌂</span>Studio</button>
           </div>
         </div>
       </nav>
@@ -2157,7 +2158,7 @@ body {
       <button onclick="toggleMobileMore()" id="mobileMoreNavButton" aria-expanded="false"><span>•••</span>Mehr</button>
     </div>
     <div class="mobile-more-menu" id="mobileMoreMenu" hidden>
-      <button onclick="navigateMore('friends')">Community / Kanäle</button><button onclick="navigateMore('timer')">Timer</button><button onclick="navigateMore('ai')">KI-Coach</button><button onclick="navigateMore('progress')">Fortschritt</button><button onclick="navigateMore('feedback')">Feedback</button><button onclick="navigateMore('profile')">Über mich</button><button onclick="navigateMore('about')">Über uns</button><button onclick="navigateMore('settings')">Einstellungen</button><button onclick="navigateMore('music')">Musik</button><button id="mobileAdminNavButton" class="hidden" onclick="navigateMore('admin')">Admin</button>
+      <button onclick="navigateMore('friends')">Community / Kanäle</button><button onclick="navigateMore('timer')">Timer</button><button onclick="navigateMore('ai')">KI-Coach</button><button onclick="navigateMore('progress')">Fortschritt</button><button onclick="navigateMore('feedback')">Feedback</button><button onclick="navigateMore('profile')">Über mich</button><button onclick="navigateMore('about')">Über uns</button><button onclick="navigateMore('settings')">Einstellungen</button><button onclick="navigateMore('music')">Musik</button><button id="mobileAdminNavButton" class="hidden" onclick="navigateMore('admin')">Admin</button><button id="mobileStudioNavButton" class="hidden" onclick="navigateMore('studioAdmin')">Studio</button>
     </div>
 
         <!-- MAIN -->
@@ -3179,7 +3180,24 @@ body {
            ADMIN
       ========================== -->
 
-      <section id="admin" class="page">
+      <section id="studioAdmin" class="page">
+  <div class="topbar"><div><p class="eyebrow">STUDIO MANAGEMENT</p><h2>Studio-Center</h2><p>Pflege Studio-Informationen und Angebote selbst. Die Veröffentlichung wird vom FITNESS AI PRO Team freigeschaltet.</p></div><button type="button" class="secondary-btn" onclick="loadStudioPortal()">Aktualisieren</button></div>
+  <div class="card admin-card"><h3>Mein Fitnessstudio</h3><label class="admin-field" for="managedStudioSelect"><span>Studio</span><select id="managedStudioSelect" onchange="selectManagedStudio(this.value)"><option value="">Studios werden geladen …</option></select></label>
+    <form id="studioProfileForm" onsubmit="saveStudioProfile(event)" style="margin-top:18px"><div class="grid grid-2">
+      <label class="admin-field"><span>Studio-Name</span><input id="studioName" maxlength="120" required></label><label class="admin-field"><span>Stadt</span><input id="studioCity" maxlength="100" required></label>
+      <label class="admin-field"><span>Adresse</span><input id="studioAddress" maxlength="200"></label><label class="admin-field"><span>Telefon</span><input id="studioPhone" maxlength="50" type="tel"></label>
+      <label class="admin-field"><span>Website</span><input id="studioWebsite" maxlength="250" type="url" placeholder="https://…"></label><label class="admin-field"><span>Öffnungszeiten</span><textarea id="studioOpeningHours" rows="3" maxlength="1200" placeholder="Mo–Fr 06:00–22:00 …"></textarea></label>
+    </div><label class="admin-field" style="margin-top:12px"><span>Beschreibung und Ausstattung</span><textarea id="studioDescription" rows="4" maxlength="2000" placeholder="Geräte, Kurse, Besonderheiten …"></textarea></label><button class="primary-btn" type="submit" id="saveStudioProfileButton" style="margin-top:14px">Studio-Informationen speichern</button></form>
+    <p id="studioProfileStatus" class="settings-message" role="status" aria-live="polite"></p></div>
+  <div class="card admin-card"><h3>Angebote verwalten</h3><p class="card-description">Erstelle Angebote wie Probetraining, Studentenrabatt oder Aktionen für neue Mitglieder.</p>
+    <form id="studioOfferForm" onsubmit="saveStudioOffer(event)" style="margin-top:14px"><div class="grid grid-2">
+      <label class="admin-field"><span>Angebotstitel</span><input id="studioOfferTitle" maxlength="120" required placeholder="z. B. 7 Tage gratis testen"></label><label class="admin-field"><span>Preis / Vorteil</span><input id="studioOfferPrice" maxlength="100" placeholder="z. B. kostenlos"></label>
+      <label class="admin-field"><span>Gültig ab</span><input id="studioOfferFrom" type="date"></label><label class="admin-field"><span>Gültig bis</span><input id="studioOfferUntil" type="date"></label>
+    </div><label class="admin-field" style="margin-top:12px"><span>Beschreibung und Bedingungen</span><textarea id="studioOfferDescription" rows="3" maxlength="1200"></textarea></label><button class="primary-btn" type="submit" id="saveStudioOfferButton" style="margin-top:14px">Angebot speichern</button></form>
+    <p id="studioOfferStatus" class="settings-message" role="status" aria-live="polite"></p><div id="studioOffersList" class="admin-list"><p class="card-description">Wähle ein Studio aus.</p></div></div>
+</section>
+
+<section id="admin" class="page">
         <div class="topbar">
           <div>
             <h2>Admin-Center</h2>
@@ -3210,7 +3228,11 @@ body {
           <p class="admin-note">Das Hauptkonto nathankri12@gmail.com bleibt als Eigentümerkonto geschützt.</p>
         </div>
 
-        <div class="card admin-card">
+        <div class="card admin-card"><div class="admin-card-heading"><div><h3>Fitnessstudios einrichten</h3><p class="card-description">Lege ein Studio an und ordne eine E-Mail-Adresse als Studio-Admin zu. Diese Person kann Profil, Öffnungszeiten und Angebote selbst pflegen.</p></div></div>
+<form id="createStudioForm" class="admin-add-form" onsubmit="createStudioFromAdmin(event)"><label class="admin-field"><span>Studio-Name</span><input id="newStudioName" maxlength="120" required></label><label class="admin-field"><span>Stadt</span><input id="newStudioCity" maxlength="100" required></label><label class="admin-field"><span>E-Mail des Studio-Admins</span><input id="newStudioManagerEmail" type="email" autocomplete="email" required placeholder="studio@beispiel.de"></label><button type="submit" class="primary-btn" id="createStudioButton">Studio + Admin anlegen</button></form>
+<p id="createStudioStatus" class="settings-message" role="status" aria-live="polite"></p><div id="adminStudioList" class="admin-list"><p class="card-description">Studios werden geladen …</p></div></div>
+
+<div class="card admin-card">
           <div class="admin-card-heading admin-feedback-heading">
             <div><h3>Nutzerfeedback</h3><p class="card-description">Feedback wird mit dem Profilnamen statt der internen Nutzer-ID angezeigt.</p></div>
             <input id="adminFeedbackSearch" class="admin-search" type="search" placeholder="Feedback durchsuchen …" aria-label="Feedback durchsuchen" oninput="filterAdminFeedback(this.value)">
@@ -3256,7 +3278,8 @@ body {
 
 
   <!-- Deine JavaScript-Datei -->
-  <script src="script.js?v=20261012-music-1"></script>
+  <script src="script.js?v=20261013-workout-1"></script>
+  <script src="studio-admin.js?v=20261013-1"></script>
   <script src="music.js?v=20261012-1"></script>
 
   <script>
