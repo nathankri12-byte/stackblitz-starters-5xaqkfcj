@@ -849,7 +849,7 @@ async function loadDailyCheckin() {
   try {
     const { data, error } = await supabaseClient
       .from("daily_checkins")
-      .select("sleep_hours, water_glasses, steps, checkin_date")
+      .select("sleep_hours, water_glasses, steps, energy_level, soreness_level, checkin_date")
       .eq("user_id", currentUser.id)
       .eq("checkin_date", getLocalDateString())
       .maybeSingle();
@@ -859,10 +859,14 @@ async function loadDailyCheckin() {
     const sleep = document.getElementById("dailySleepHours");
     const water = document.getElementById("dailyWaterGlasses");
     const steps = document.getElementById("dailySteps");
+    const energy = document.getElementById("dailyEnergyLevel");
+    const soreness = document.getElementById("dailySorenessLevel");
 
     if (sleep) sleep.value = data?.sleep_hours ?? "";
     if (water) water.value = data?.water_glasses ?? "";
     if (steps) steps.value = data?.steps ?? "";
+    if (energy) energy.value = data?.energy_level ?? "";
+    if (soreness) soreness.value = data?.soreness_level ?? "";
 
     if (status) {
       status.textContent = data
@@ -897,11 +901,13 @@ async function saveDailyCheckin() {
     return value;
   };
 
-  let sleepHours, waterGlasses, steps;
+  let sleepHours, waterGlasses, steps, energyLevel, sorenessLevel;
   try {
     sleepHours = readValue("dailySleepHours", "Schlaf", 0, 24);
     waterGlasses = readValue("dailyWaterGlasses", "Wasser", 0, 30, true);
     steps = readValue("dailySteps", "Schritte", 0, 200000, true);
+    energyLevel = readValue("dailyEnergyLevel", "Energie", 1, 5, true);
+    sorenessLevel = readValue("dailySorenessLevel", "Muskelkater", 1, 5, true);
   } catch (error) {
     if (status) {
       status.textContent = error.message;
@@ -910,7 +916,7 @@ async function saveDailyCheckin() {
     return;
   }
 
-  if (sleepHours === null && waterGlasses === null && steps === null) {
+  if (sleepHours === null && waterGlasses === null && steps === null && energyLevel === null && sorenessLevel === null) {
     if (status) {
       status.textContent = "Trage mindestens einen Wert ein, bevor du speicherst.";
       status.style.color = "var(--red)";
@@ -936,7 +942,9 @@ async function saveDailyCheckin() {
         checkin_date: getLocalDateString(),
         sleep_hours: sleepHours,
         water_glasses: waterGlasses,
-        steps
+        steps,
+        energy_level: energyLevel,
+        soreness_level: sorenessLevel
       }, { onConflict: "user_id,checkin_date" });
 
     if (error) throw error;
