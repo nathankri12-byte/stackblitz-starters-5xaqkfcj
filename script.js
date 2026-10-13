@@ -4336,7 +4336,7 @@ async function processCommunityInvite(){
  if(!supabaseClient||!currentUser)return;
  const url=new URL(window.location.href),inviterId=url.searchParams.get("communityInvite");
  if(!inviterId||inviterId===currentUser.id)return;
- const key="fitness-ai-community-invite-"+inviterId;
+ const key="fitness-ai-community-invite-v2-"+inviterId;
  if(localStorage.getItem(key)==="done")return;
  try{
   const relation=communityFriendRelation(inviterId);
