@@ -2499,13 +2499,22 @@ body {
 
               <select
                 id="trainingLocation"
-                onchange="saveProfile()"
+                onchange="handleTrainingLocationChange()"
               >
                 <option value="">Auswählen</option>
-                <option value="Zuhause"> Zuhause</option>
-                <option value="Fitnessstudio"> Fitnessstudio</option>
+                <option value="Zuhause">Zuhause</option>
+                <option value="Fitnessstudio">Fitnessstudio</option>
               </select>
 
+            </div>
+
+            <div class="field" id="gymStudioConnectField" hidden>
+              <label for="gymStudioName">Dein Fitnessstudio</label>
+              <input id="gymStudioName" type="text" list="availableStudioNames" maxlength="120" autocomplete="organization" placeholder="Name deines Fitnessstudios">
+              <datalist id="availableStudioNames"></datalist>
+              <button class="secondary-btn" type="button" id="connectGymStudioButton" onclick="connectGymStudio()" style="width:100%;margin-top:10px">Fitnessstudio speichern</button>
+              <p class="card-description" style="margin-top:8px">Gib den Namen ein, wähle dein Studio aus und speichere. Es muss vom FITNESS AI PRO Admin freigeschaltet sein.</p>
+              <p id="gymStudioConnectStatus" class="settings-message" role="status" aria-live="polite"></p>
             </div>
 
             <div class="field">
@@ -3216,7 +3225,7 @@ body {
       <label class="admin-field"><span>Studio-Name</span><input id="studioName" maxlength="120" required></label><label class="admin-field"><span>Stadt</span><input id="studioCity" maxlength="100" required></label>
       <label class="admin-field"><span>Adresse</span><input id="studioAddress" maxlength="200"></label><label class="admin-field"><span>Telefon</span><input id="studioPhone" maxlength="50" type="tel"></label>
       <label class="admin-field"><span>Website</span><input id="studioWebsite" maxlength="250" type="url" placeholder="https://…"></label><label class="admin-field"><span>Öffnungszeiten</span><textarea id="studioOpeningHours" rows="3" maxlength="1200" placeholder="Mo–Fr 06:00–22:00 …"></textarea></label>
-    </div><label class="admin-field" style="margin-top:12px"><span>Beschreibung und Ausstattung</span><textarea id="studioDescription" rows="4" maxlength="2000" placeholder="Geräte, Kurse, Besonderheiten …"></textarea></label><button class="primary-btn" type="submit" id="saveStudioProfileButton" style="margin-top:14px">Studio-Informationen speichern</button></form>
+    </div><label class="admin-field" style="margin-top:12px"><span>Beschreibung</span><textarea id="studioDescription" rows="3" maxlength="2000" placeholder="Besonderheiten, Kurse und Angebote …"></textarea></label><label class="admin-field" style="margin-top:12px"><span>Geräte und Ausstattung (wichtig für KI-Trainingspläne)</span><textarea id="studioEquipment" rows="4" maxlength="3000" placeholder="z. B. Kabelzug, Brustpresse, Beinpresse, Kurzhanteln bis 30 kg, Laufbänder …"></textarea></label><button class="primary-btn" type="submit" id="saveStudioProfileButton" style="margin-top:14px">Studio-Informationen speichern</button></form>
     <p id="studioProfileStatus" class="settings-message" role="status" aria-live="polite"></p></div>
   <div class="card admin-card"><h3>Angebote verwalten</h3><p class="card-description">Erstelle Angebote wie Probetraining, Studentenrabatt oder Aktionen für neue Mitglieder.</p>
     <form id="studioOfferForm" onsubmit="saveStudioOffer(event)" style="margin-top:14px"><div class="grid grid-2">
@@ -3307,8 +3316,8 @@ body {
 
 
   <!-- Deine JavaScript-Datei -->
-  <script src="script.js?v=20261013-level-1"></script>
-  <script src="studio-admin.js?v=20261013-1"></script>
+  <script src="script.js?v=20261013-gym-1"></script>
+  <script src="studio-admin.js?v=20261013-gym-1"></script>
   <script src="music.js?v=20261012-1"></script>
 
   <script>
