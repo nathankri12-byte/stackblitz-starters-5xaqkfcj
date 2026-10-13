@@ -2121,6 +2121,7 @@ async function generateTrainingPlan(customPrompt = "") {
       Height: Number(profile.height),
       Goal: profile.goal,
       training_location: profile.training_location,
+      selected_studio_id: profile.selected_studio_id || null,
       training_level: profile.training_level || "Anfänger",
       Diet: profile.diet || "",
       email: currentUser.email || ""
@@ -2169,6 +2170,10 @@ Größe: ${profile.height} cm
 Gewicht: ${profile.weight || "nicht angegeben"} kg
 Trainingsziel: ${profile.goal}
 Trainingsort: ${profile.training_location}
+Verbundenes Fitnessstudio: ${profile.studio_name || "kein Studio verbunden"}
+Stadt des Fitnessstudios: ${profile.studio_city || "nicht angegeben"}
+Geräte/Ausstattung des Studios: ${profile.studio_equipment || "keine Geräteliste hinterlegt; nur allgemein übliche, kontrollierbare Studio-Geräte annehmen"}
+Studio-Beschreibung: ${profile.studio_description || "nicht hinterlegt"}
 Erfahrungslevel: ${profile.training_level || "Anfänger"}
 Ernährungsweise: ${profile.diet || "nicht angegeben"}
 
