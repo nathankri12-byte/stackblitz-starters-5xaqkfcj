@@ -6,12 +6,12 @@ let studioOffersCache = [];
 let availableStudiosCache = [];
 let availableStudiosLoadPromise = null;
 
-function handleTrainingLocationChange() {
+function handleTrainingLocationChange(shouldSave = true) {
   const location = document.getElementById("trainingLocation")?.value || "";
   const field = document.getElementById("gymStudioConnectField");
   if (field) field.hidden = location !== "Fitnessstudio";
   if (location === "Fitnessstudio") loadAvailableStudios();
-  if (typeof saveProfile === "function") saveProfile();
+  if (shouldSave && typeof saveProfile === "function") saveProfile();
 }
 
 async function loadAvailableStudios() {
