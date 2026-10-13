@@ -2839,6 +2839,14 @@ body {
               > Plan erstellen / anpassen</button>
             </div>
 
+            <div id="workoutLiveProgress" class="card" style="margin-top:18px;padding:14px 16px" aria-live="polite">
+              <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
+                <div><span class="eyebrow">DEIN WOCHENFORTSCHRITT</span><p id="workoutLiveProgressText" class="card-description" style="margin-top:5px">Erstelle einen Plan, um deinen Trainingsfortschritt hier live zu sehen.</p></div>
+                <strong id="workoutLiveProgressCount" style="font-size:22px">0%</strong>
+              </div>
+              <div style="height:7px;background:var(--border);border-radius:999px;overflow:hidden;margin-top:12px"><div id="workoutLiveProgressBar" style="height:100%;width:0%;background:var(--accent);transition:width .2s ease"></div></div>
+            </div>
+
             <div
               id="trainingPlan"
               style="margin-top:18px"
