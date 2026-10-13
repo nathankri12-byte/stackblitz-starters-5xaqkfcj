@@ -2162,7 +2162,86 @@ body {
       *,*::before,*::after { scroll-behavior:auto !important; transition:none !important; }
     }
 
-  </style>
+  
+    /* PHOTO-FIRST FITNESS VISUALS */
+    .sport-photo-wall {
+      display:grid;
+      grid-template-columns:1.25fr 1fr 1fr 1fr;
+      gap:12px;
+      margin:0 0 22px;
+    }
+    .sport-photo {
+      min-height:205px;
+      position:relative;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-end;
+      align-items:flex-start;
+      gap:7px;
+      padding:17px;
+      overflow:hidden;
+      isolation:isolate;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.08);
+      background-size:cover;
+      background-position:center;
+      box-shadow:0 12px 30px rgba(0,0,0,.2);
+      transition:transform .22s ease, border-color .22s ease;
+    }
+    .sport-photo::before {
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:-1;
+      background:linear-gradient(0deg,rgba(4,7,10,.92) 0%,rgba(4,7,10,.28) 55%,rgba(4,7,10,.02) 100%);
+    }
+    .sport-photo:hover { transform:translateY(-3px); border-color:rgba(217,255,63,.38); }
+    .sport-photo span { color:var(--accent);font-size:9px;font-weight:850;letter-spacing:1.8px; }
+    .sport-photo strong { color:#fff;font-size:clamp(14px,1.5vw,19px);line-height:1.2;letter-spacing:-.4px; }
+    .sport-photo-lift { background-image:url('https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=1000&q=85'); }
+    .sport-photo-run { background-image:url('https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=85'); }
+    .sport-photo-stretch { background-image:url('https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=900&q=85'); }
+    .sport-photo-gym { background-image:url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=85'); }
+    .photo-banner {
+      min-height:225px;
+      display:flex;
+      align-items:flex-end;
+      position:relative;
+      overflow:hidden;
+      isolation:isolate;
+      padding:25px;
+      margin:0 0 22px;
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.09);
+      background-size:cover;
+      background-position:center 42%;
+      box-shadow:0 14px 36px rgba(0,0,0,.22);
+    }
+    .photo-banner::before {
+      content:"";
+      position:absolute;inset:0;z-index:-1;
+      background:linear-gradient(90deg,rgba(5,8,11,.93) 0%,rgba(5,8,11,.72) 48%,rgba(5,8,11,.12) 100%);
+    }
+    .photo-banner > div { max-width:520px; }
+    .photo-banner h3 { font-size:clamp(24px,3.5vw,36px);line-height:1.08;letter-spacing:-1.1px;margin:8px 0; }
+    .photo-banner p { max-width:440px;color:#e0e5e8;font-size:14px;line-height:1.65; }
+    .training-photo-banner { background-image:url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1800&q=85'); }
+    .nutrition-photo-banner { background-image:url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1800&q=85'); }
+    .progress-photo-banner { background-image:url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1800&q=85'); }
+    @media(max-width:900px) {
+      .sport-photo-wall { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .sport-photo { min-height:180px; }
+    }
+    @media(max-width:520px) {
+      .sport-photo-wall { gap:9px; margin-bottom:18px; }
+      .sport-photo { min-height:155px; padding:13px; border-radius:15px; }
+      .sport-photo strong { font-size:14px; }
+      .photo-banner { min-height:205px; padding:19px; border-radius:18px; background-position:center; }
+      .photo-banner::before { background:linear-gradient(0deg,rgba(5,8,11,.94),rgba(5,8,11,.36)); }
+      .photo-banner p { font-size:13px; }
+    }
+
+</style>
 
 </head>
 
@@ -2405,6 +2484,13 @@ body {
 
         </div>
 
+
+        <div class="sport-photo-wall" aria-label="Fitness-Fotogalerie">
+          <article class="sport-photo sport-photo-lift"><span>STRENGTH</span><strong>Stärker werden.</strong></article>
+          <article class="sport-photo sport-photo-run"><span>ENDURANCE</span><strong>In Bewegung bleiben.</strong></article>
+          <article class="sport-photo sport-photo-stretch"><span>RECOVERY</span><strong>Erholung gehört dazu.</strong></article>
+          <article class="sport-photo sport-photo-gym"><span>YOUR SPACE</span><strong>Dein Training. Dein Tempo.</strong></article>
+        </div>
 
         <div class="dashboard-image-links" aria-label="Schnellzugriffe">
           <button class="dashboard-image-link image-training" type="button" onclick="showTab('training')"><span>01 / TRAINING</span><strong>Trainiere mit Plan</strong><small>Übungen &amp; Fortschritt</small></button>
@@ -2658,6 +2744,10 @@ body {
           </button>
         </div>
 
+
+        <div class="photo-banner training-photo-banner">
+          <div><span class="eyebrow">YOUR NEXT SESSION</span><h3>Jede Wiederholung zählt.</h3><p>Finde deinen Rhythmus. Konzentriere dich auf saubere Technik und Fortschritt in deinem Tempo.</p></div>
+        </div>
 
         <div class="grid grid-2">
 
@@ -2933,6 +3023,10 @@ body {
 
 
 
+        <div class="photo-banner nutrition-photo-banner">
+          <div><span class="eyebrow">FUEL YOUR DAY</span><h3>Gute Gewohnheiten. Gute Energie.</h3><p>Eine abwechslungsreiche Ernährung unterstützt deinen Alltag und deine Bewegung.</p></div>
+        </div>
+
         <div class="card meal-diary-card" style="margin-bottom:18px">
           <div class="section-header"><div><h3>Dein privates Ernährungstagebuch</h3><p class="card-description">Halte Mahlzeiten und Notizen fest – ohne Kalorienzwang oder Bewertung. Deine Einträge sind nur für dich sichtbar.</p></div></div>
           <form id="mealDiaryForm" class="meal-diary-form" onsubmit="saveMealDiaryEntry(event)">
@@ -3066,6 +3160,10 @@ body {
 
         </div>
 
+
+        <div class="photo-banner progress-photo-banner">
+          <div><span class="eyebrow">PROGRESS OVER PERFECTION</span><h3>Fortschritt ist mehr als eine Zahl.</h3><p>Feiere deine Routine, deine Energie und die kleinen Schritte, die du machst.</p></div>
+        </div>
 
         <div class="grid grid-2">
 
@@ -3547,7 +3645,7 @@ body {
 
 
   <!-- Deine JavaScript-Datei -->
-  <script src="script.js?v=20261013-design-1"></script>
+  <script src="script.js?v=20261013-sports-photos-1"></script>
   <script src="studio-admin.js?v=20261013-gym-1"></script>
   <script src="music.js?v=20261012-1"></script>
 
