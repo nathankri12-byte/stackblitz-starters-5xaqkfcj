@@ -2508,6 +2508,15 @@ body {
 
             </div>
 
+            <div class="field">
+              <label for="trainingLevel">Dein Erfahrungslevel</label>
+              <select id="trainingLevel" onchange="saveProfile()">
+                <option value="Anfänger">Anfänger</option>
+                <option value="Schon etwas Erfahrung">Schon etwas Erfahrung</option>
+                <option value="Fortgeschritten">Fortgeschritten</option>
+              </select>
+              <p class="card-description">Du kannst das jederzeit ändern. Die KI berücksichtigt dein Level, dein Alter und deine Regeneration.</p>
+            </div>
 
             <div class="field">
 
@@ -3298,7 +3307,7 @@ body {
 
 
   <!-- Deine JavaScript-Datei -->
-  <script src="script.js?v=20261013-coach-1"></script>
+  <script src="script.js?v=20261013-level-1"></script>
   <script src="studio-admin.js?v=20261013-1"></script>
   <script src="music.js?v=20261012-1"></script>
 

@@ -56,7 +56,7 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 48 | „Warum diese Übung?“ | Grundversion im Folge-Branch | Jede Trainingskarte hat eine Aktion, die im separaten KI-Coach Ziel, Muskelgruppen, Technik und häufige Fehler erklären lässt. |
 | 49 | Übung tauschen | Grundversion im Feature-Branch | Tauschoptionen für bekannte Übungen, passende Tags und zurückgesetzte Logging-Felder; unbekannte Übungen zeigen einen sicheren Hinweis statt blind zu ersetzen. E2E offen. |
 | 50 | Gym-Confidence-Modus | Fehlt | Kurze Gerätehinweise und diskrete Schritt-für-Schritt-Anleitung. |
-| 51 | Skill-Level | Teilweise | KI soll Anfänger berücksichtigen; explizite Levelauswahl fehlt/prüfen. |
+| 51 | Skill-Level | Grundversion im Folge-Branch | Erfahrungslevel Anfänger / Schon etwas Erfahrung / Fortgeschritten ist speicherbar und fließt in Trainingsplan und KI-Coach-Kontext ein. |
 | 52 | Skills über Gewichte hinaus | Verbessern | Technik, Mobilität, Ausdauer und Trainingsroutine abbilden. |
 | 53 | Flexible Ziele | Teilweise | Zielauswahl existiert; temporäre und veränderbare Ziele verbessern. |
 | 54 | Sport-spezifische Programme | Später / ausbauen | Ziel „sportliche Leistung“ existiert; Programme für konkrete Sportarten fehlen. |
@@ -78,7 +78,7 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 - Supabase Security Advisor meldet: veraltete Tabelle `public."Feedback"` ohne RLS-Policies; zwei `SECURITY DEFINER`-Funktionen sind für `anon` ausführbar; Schutz vor kompromittierten Passwörtern ist deaktiviert. Diese Punkte sollten vor breiter Veröffentlichung behoben werden.
 - Supabase Performance Advisor meldet fehlende Indizes auf zwei Fremdschlüsseln und mehrere permissive Feedback-SELECT-Policies; vor Schemaänderungen prüfen.
 - Ein vollständiger End-to-End-Test aller Community-, KI-, Musik- und Trainingsabläufe steht noch aus.
-- Folge-Branch ergänzt adaptive Planerstellung anhand eigener Trainingshistorie, First-Gym-Einsteiger-Guide, öffentliche Seite für freigeschaltete Studios/Angebote, Übungserklärungen direkt aus dem Workout und wertfreie Trainings-Meilensteine. JavaScript-Syntax- und HTML-ID-Prüfungen bestanden; Live-Test nach Deployment offen.
+- Folge-Branch ergänzt adaptive Planerstellung anhand eigener Trainingshistorie, First-Gym-Einsteiger-Guide, öffentliche Seite für freigeschaltete Studios/Angebote, Übungserklärungen direkt aus dem Workout, wertfreie Trainings-Meilensteine und ein speicherbares Erfahrungslevel. JavaScript-Syntax- und HTML-ID-Prüfungen bestanden; Live-Test nach Deployment offen.
 
 ## Reihenfolge für die Umsetzung
 
