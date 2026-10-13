@@ -2537,6 +2537,88 @@ body {
       }
     }
   
+
+    /* Stronger FITNESS AI PRO brand mark and visible symbols on empty action buttons */
+    .logo-icon {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      background:
+        radial-gradient(circle at 25% 18%, rgba(255,255,255,.52), transparent 28%),
+        linear-gradient(145deg, #e6ff62 0%, #c5f52d 42%, #789b00 100%) !important;
+      border: 1px solid rgba(240,255,170,.62);
+      box-shadow: 0 12px 34px rgba(185,230,25,.24), inset 0 1px 0 rgba(255,255,255,.38) !important;
+    }
+    .logo-icon::before {
+      content: "F";
+      position: relative;
+      z-index: 1;
+      display: block;
+      color: #101508;
+      font-size: 43px;
+      line-height: 1;
+      font-weight: 950;
+      font-style: italic;
+      letter-spacing: -5px;
+      transform: skewX(-8deg) translateX(-2px);
+      text-shadow: 2px 2px 0 rgba(255,255,255,.16);
+    }
+    .logo-icon::after {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      width: 10px;
+      height: 54px;
+      right: 15px;
+      top: 8px;
+      border-radius: 8px;
+      background: rgba(16,21,8,.88);
+      transform: skewX(-24deg);
+      box-shadow: 0 0 0 3px rgba(16,21,8,.08);
+    }
+    .sidebar-logo span {
+      position: relative;
+      overflow: hidden;
+      font-size: 0 !important;
+    }
+    .sidebar-logo span::after {
+      content: "F";
+      position: relative;
+      z-index: 1;
+      font-size: 19px !important;
+      font-weight: 950;
+      font-style: italic;
+      letter-spacing: -2px;
+      transform: skewX(-8deg);
+    }
+    /* Some icon-only controls were rendering as plain green squares. */
+    button:empty {
+      display: inline-grid;
+      place-items: center;
+      min-width: 40px;
+      min-height: 40px;
+      position: relative;
+      font-size: 0 !important;
+    }
+    button:empty::before {
+      content: "↗";
+      display: block;
+      color: currentColor;
+      font-size: 21px;
+      line-height: 1;
+      font-weight: 800;
+    }
+    button.primary-btn:empty::before,
+    button.ai-send:empty::before {
+      content: "→";
+      font-size: 24px;
+    }
+    @media (max-width: 760px) {
+      .logo-icon { width: 64px; height: 64px; border-radius: 20px; }
+      .logo-icon::before { font-size: 39px; }
+      .logo-icon::after { right: 13px; top: 6px; height: 50px; }
+    }
+  
 </style>
 
 </head>
