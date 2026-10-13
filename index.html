@@ -2429,6 +2429,50 @@ body {
     .fitness-lesson summary small { color:var(--muted); font-size:12px; line-height:1.4; margin-top:3px; }
     .fitness-lesson-body { padding:0 14px 14px 61px; color:var(--muted); font-size:13px; line-height:1.65; }
     @media(max-width:480px) { .fitness-lesson-body { padding-left:14px; } }
+
+/* Dashboard: image-rich, animated onboarding cards */
+.onboarding-card{position:relative;overflow:hidden;padding:clamp(16px,2.3vw,26px);background:radial-gradient(ellipse at 100% 0%,rgba(217,255,63,.075),transparent 40%),var(--card)}
+.onboarding-card:after{content:"";position:absolute;right:-55px;top:-70px;width:190px;height:190px;border-radius:50%;border:1px solid rgba(217,255,63,.09);pointer-events:none}
+.onboarding-heading{position:relative;z-index:1}
+.onboarding-heading h3{font-size:clamp(20px,2vw,26px);letter-spacing:-.035em}
+.onboarding-steps{grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;align-items:stretch}
+.onboarding-step{position:relative;display:flex;flex-direction:column;align-items:stretch;gap:12px;padding:12px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(7,10,14,.4));transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
+.onboarding-step:hover{transform:translateY(-4px);border-color:rgba(217,255,63,.45);box-shadow:0 16px 35px rgba(0,0,0,.22)}
+.onboarding-step-visual{position:relative;isolation:isolate;min-height:145px;border-radius:12px;overflow:hidden;background-color:#202a30;background-position:center;background-size:cover;animation:fitnessPhotoFloat 6s ease-in-out infinite}
+.onboarding-step-visual:before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(5,8,10,.76),rgba(5,8,10,.02) 75%);z-index:-0}
+.step-visual-profile{background-image:url('https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=800&q=85')}
+.step-visual-plan{background-image:url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=800&q=85');animation-delay:-2s}
+.step-visual-start{background-image:url('https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=800&q=85');animation-delay:-4s}
+.visual-chip{position:absolute;left:9px;bottom:9px;padding:6px 8px;border-radius:7px;background:rgba(8,11,16,.78);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:9px;font-weight:900;letter-spacing:1px;backdrop-filter:blur(8px)}
+.onboarding-step-number{width:34px;height:34px;flex-basis:34px;border-radius:10px}
+.onboarding-step-copy strong{font-size:15px}
+.onboarding-step-copy p{font-size:12px;line-height:1.55}
+.onboarding-step button{width:100%;margin-top:auto;white-space:normal;min-height:43px}
+.onboarding-progress{border-color:rgba(217,255,63,.22);color:var(--accent)}
+.mobile-more-section-label{padding:13px 12px 5px;color:var(--muted);font-size:10px;font-weight:850;letter-spacing:1.15px}
+.mobile-more-section-label:not(:first-child){border-top:1px solid var(--border);margin-top:7px}
+.mobile-more-menu button{min-height:43px}
+@keyframes fitnessPhotoFloat{0%,100%{background-position:center 48%;}50%{background-position:center 52%;}}
+@media(max-width:760px){
+ .onboarding-steps{grid-template-columns:1fr;gap:11px}
+ .onboarding-step{display:grid;grid-template-columns:94px 34px minmax(0,1fr);align-items:center;gap:10px;padding:10px}
+ .onboarding-step-visual{grid-row:1 / span 2;grid-column:1;min-height:100px;height:100%;animation:none}
+ .onboarding-step-number{grid-column:2;grid-row:1}
+ .onboarding-step-copy{grid-column:3;grid-row:1 / span 2;flex-basis:auto}
+ .onboarding-step-copy strong{font-size:14px}
+ .onboarding-step-copy p{font-size:11px}
+ .onboarding-step button{grid-column:2 / 4;grid-row:3;width:100%;margin-top:0}
+ .onboarding-heading{flex-direction:row;align-items:center}
+ .onboarding-heading h3{font-size:20px}
+}
+@media(max-width:420px){
+ .onboarding-step{grid-template-columns:78px 30px minmax(0,1fr);gap:8px}
+ .onboarding-step-visual{min-height:90px}
+ .onboarding-step-number{width:30px;height:30px;flex-basis:30px}
+ .onboarding-heading{align-items:flex-start;flex-direction:column}
+}
+@media(prefers-reduced-motion:reduce){.onboarding-step-visual{animation:none}.onboarding-step{transition:none}}
+
 </style>
 
 </head>
@@ -2583,19 +2627,21 @@ body {
         <button class="active" onclick="showTab('dashboard')" data-tab="dashboard" data-quick="true"><span class="nav-icon">⌂</span><span id="quickLabel1">Übersicht</span></button>
         <button onclick="showTab('training')" data-tab="training" data-quick="true"><span class="nav-icon">▥</span><span id="quickLabel2">Trainingsplan</span></button>
         <button onclick="showTab('nutrition')" data-tab="nutrition" data-quick="true"><span class="nav-icon">◒</span><span id="quickLabel3">Ernährung</span></button>
+        <button onclick="navigateMore('progress')" data-tab="progress"><span class="nav-icon">↗</span><span>Mein Fortschritt</span></button>
         <div class="sidebar-more">
-          <div class="sidebar-section-label sidebar-more-label">WEITERE BEREICHE</div>
+          <div class="sidebar-section-label sidebar-more-label">WEITERE FUNKTIONEN</div>
           <button class="sidebar-more-toggle" id="moreMenuToggle" type="button" aria-expanded="false" aria-controls="moreMenu" onclick="toggleMoreMenu()"><span class="nav-icon">•••</span><span>Mehr</span><span style="margin-left:auto">⌄</span></button>
           <div class="more-menu" id="moreMenu" hidden>
-            <div class="sidebar-section-label sidebar-more-label">GEMEINSAM WEITERENTWICKELN</div>
-            <button onclick="navigateMore('feedback')" data-tab="feedback"><span class="nav-icon">✦</span>Ideen &amp; Feedback</button>
-            <button onclick="navigateMore('friends')" data-tab="friends"><span class="nav-icon">◎</span>Community</button>
+            <div class="sidebar-section-label sidebar-more-label">COACH &amp; TRAINING</div>
             <button onclick="navigateMore('ai')" data-tab="ai"><span class="nav-icon">✧</span>KI-Coach</button>
-            <button onclick="navigateMore('progress')" data-tab="progress"><span class="nav-icon">↗</span>Mein Fortschritt</button>
-            <div class="sidebar-section-label sidebar-more-label">TRAINING &amp; KONTO</div>
-            <button id="publicStudioOffersNav" onclick="navigateMore('studioOffersPage')" data-tab="studioOffersPage"><span class="nav-icon">⌂</span>Fitnessstudios</button>
-            <button onclick="navigateMore('music')" data-tab="music"><span class="nav-icon">♫</span>Trainingsmusik</button>
             <button onclick="navigateMore('timer')" data-tab="timer"><span class="nav-icon">◷</span>Pausen-Timer</button>
+            <button onclick="navigateMore('music')" data-tab="music"><span class="nav-icon">♫</span>Trainingsmusik</button>
+            <div class="sidebar-section-label sidebar-more-label">FITNESSSTUDIOS</div>
+            <button id="publicStudioOffersNav" onclick="navigateMore('studioOffersPage')" data-tab="studioOffersPage"><span class="nav-icon">⌂</span>Fitnessstudios &amp; Angebote</button>
+            <div class="sidebar-section-label sidebar-more-label">COMMUNITY</div>
+            <button onclick="navigateMore('friends')" data-tab="friends"><span class="nav-icon">◎</span>Community</button>
+            <button onclick="navigateMore('feedback')" data-tab="feedback"><span class="nav-icon">✦</span>Ideen &amp; Feedback</button>
+            <div class="sidebar-section-label sidebar-more-label">MEIN KONTO</div>
             <button onclick="navigateMore('profile')" data-tab="profile"><span class="nav-icon">○</span>Mein Profil</button>
             <button onclick="navigateMore('settings')" data-tab="settings"><span class="nav-icon">⚙</span>Einstellungen</button>
             <button onclick="navigateMore('about')" data-tab="about"><span class="nav-icon">ⓘ</span>Über FITNESS AI PRO</button>
@@ -2623,7 +2669,10 @@ body {
       <button onclick="toggleMobileMore()" id="mobileMoreNavButton" aria-expanded="false"><span>•••</span>Mehr</button>
     </div>
     <div class="mobile-more-menu" id="mobileMoreMenu" hidden>
-      <button onclick="navigateMore('feedback')">✦ Ideen &amp; Feedback</button><button onclick="navigateMore('friends')">Community</button><button onclick="navigateMore('ai')">KI-Coach</button><button onclick="navigateMore('progress')">Mein Fortschritt</button><button onclick="navigateMore('studioOffersPage')">Fitnessstudios</button><button onclick="navigateMore('music')">Trainingsmusik</button><button onclick="navigateMore('timer')">Pausen-Timer</button><button onclick="navigateMore('profile')">Mein Profil</button><button onclick="navigateMore('settings')">Einstellungen</button><button onclick="navigateMore('about')">Über FITNESS AI PRO</button><button id="mobileAdminNavButton" class="hidden" onclick="navigateMore('admin')">Verwaltung</button><button id="mobileStudioNavButton" class="hidden" onclick="navigateMore('studioAdmin')">Studioverwaltung</button>
+      <div class="mobile-more-section-label">COACH &amp; TRAINING</div><button onclick="navigateMore('ai')">✧ KI-Coach</button><button onclick="navigateMore('timer')">◷ Pausen-Timer</button><button onclick="navigateMore('music')">♫ Trainingsmusik</button>
+      <div class="mobile-more-section-label">FITNESSSTUDIOS</div><button onclick="navigateMore('studioOffersPage')">⌂ Fitnessstudios &amp; Angebote</button>
+      <div class="mobile-more-section-label">COMMUNITY</div><button onclick="navigateMore('friends')">◎ Community</button><button onclick="navigateMore('feedback')">✦ Ideen &amp; Feedback</button>
+      <div class="mobile-more-section-label">MEIN KONTO</div><button onclick="navigateMore('profile')">○ Mein Profil</button><button onclick="navigateMore('settings')">⚙ Einstellungen</button><button onclick="navigateMore('about')">ⓘ Über FITNESS AI PRO</button><button onclick="navigateMore('progress')">↗ Mein Fortschritt</button><button id="mobileAdminNavButton" class="hidden" onclick="navigateMore('admin')">Verwaltung</button><button id="mobileStudioNavButton" class="hidden" onclick="navigateMore('studioAdmin')">Studioverwaltung</button>
     </div>
 
         <!-- MAIN -->
@@ -2662,14 +2711,17 @@ body {
           <p class="card-description">Richte dein Profil ein, erstelle deinen persönlichen Plan und starte dann in deinem Tempo.</p>
           <div class="onboarding-steps">
             <article class="onboarding-step" id="onboardingProfileStep">
+              <div class="onboarding-step-visual step-visual-profile" role="img" aria-label="Sportlerin beim Training mit Hanteln"><span class="visual-chip">DEIN PROFIL</span></div>
               <span class="onboarding-step-number">01</span><div class="onboarding-step-copy"><strong>Profil vervollständigen</strong><p id="onboardingProfileText">Alter, Größe, Ziel und Trainingsort helfen der KI, den Plan passend zu gestalten.</p></div>
               <button class="secondary-btn" type="button" id="onboardingProfileButton" onclick="showTab('profile')">Profil öffnen</button>
             </article>
             <article class="onboarding-step" id="onboardingPlanStep">
+              <div class="onboarding-step-visual step-visual-plan" role="img" aria-label="Sportler beim Krafttraining"><span class="visual-chip">DEIN PLAN</span></div>
               <span class="onboarding-step-number">02</span><div class="onboarding-step-copy"><strong>Trainingsplan erstellen</strong><p id="onboardingPlanText">Erstelle einen Plan, der dein Ziel, dein Level und deinen Trainingsort berücksichtigt.</p></div>
               <button class="secondary-btn" type="button" id="onboardingPlanButton" onclick="showTab('training')">Zum Trainingsplan</button>
             </article>
             <article class="onboarding-step" id="onboardingStartStep">
+              <div class="onboarding-step-visual step-visual-start" role="img" aria-label="Person trainiert an Fitnessgeräten"><span class="visual-chip">LOS GEHT'S</span></div>
               <span class="onboarding-step-number">03</span><div class="onboarding-step-copy"><strong>In deinem Tempo starten</strong><p>Starte mit kontrollierter Technik, nutze die Pausen und höre auf deinen Körper.</p></div>
               <button class="secondary-btn" type="button" onclick="showTab('training')">Training öffnen</button>
             </article>
