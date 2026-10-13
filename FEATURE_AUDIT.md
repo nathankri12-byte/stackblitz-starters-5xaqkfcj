@@ -50,8 +50,8 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 42 | Keine medizinischen Versprechen | Grundschutz ergänzt, Prüfung offen | KI-Anweisungen untersagen medizinische Diagnosen/Heilversprechen und verweisen bei gesundheitlichen Problemen an Eltern oder medizinische Fachpersonen. Weitere UI-/Prompt-Prüfung offen. |
 | 43 | Markenauftritt | Teilweise umgesetzt | Sportfotografie und responsive visuelle Hierarchie ergänzt; Navigation, Typografie und sämtliche Ansichten weiter prüfen. |
 | 44 | Design nicht wie generische KI-Startup-Seite | Teilweise umgesetzt | Positionierung nennt jetzt Training, Technik und Fortschritt als Kern; Training und Workout im Dashboard weiter priorisieren. |
-| 45 | Tonalität | Verbessern | Freundlich, klar, nicht wertend und altersgerecht. |
-| 46 | Fünf Haupttabs | Prüfen | Navigation vorhanden, aber Struktur auf Kernbereiche reduzieren/validieren. |
+| 45 | Tonalität | Teilweise umgesetzt | KI-Leitlinien und Fortschrittstexte sind freundlich, nicht wertend und altersgerecht ausgerichtet. Vollständige Textprüfung der gesamten Oberfläche bleibt offen. |
+| 46 | Navigation und Hauptbereiche | Teilweise umgesetzt | Mobile Navigation nutzt drei konfigurierbare Schnellzugriffe plus Drei-Punkte-Menü, wie gewünscht. Desktop-Navigation und Informationsarchitektur müssen noch im Browser geprüft werden; keine Änderung gegen die mobile Vorgabe. |
 | 47 | Fortschritt direkt im Training | Grundversion umgesetzt | Live-Balken zeigt erledigte Übungen im aktuellen Wochenplan und aktualisiert sich beim Abhaken/Speichern. Browser-E2E offen. |
 | 48 | „Warum diese Übung?“ | Grundversion im Folge-Branch | Jede Trainingskarte hat eine Aktion, die im separaten KI-Coach Ziel, Muskelgruppen, Technik und häufige Fehler erklären lässt. |
 | 49 | Übung tauschen | Grundversion im Feature-Branch | Tauschoptionen für bekannte Übungen, passende Tags und zurückgesetzte Logging-Felder; unbekannte Übungen zeigen einen sicheren Hinweis statt blind zu ersetzen. E2E offen. |
@@ -60,11 +60,11 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 52 | Skills über Gewichte hinaus | Teilweise umgesetzt | Ziele für Technik, Beweglichkeit und Trainingsroutine ergänzt; Fortschrittsübersicht zeigt zusätzlich Wiederholungen und Dauer statt nur Gewichte. Eigenständige Skill-Bewertung bleibt offen. |
 | 53 | Flexible Ziele | Grundversion ergänzt | Ziele können um ein optionales Zieldatum ergänzt werden; Datum wird im Profil gespeichert und in den KI-Planprompt übernommen. E2E-Test offen. |
 | 54 | Sport-spezifische Programme | Grundversion ergänzt | Ziele für Basketball, Tennis, Parkour, Laufen und Fußball ergänzen den KI-Planprompt. Vollständige geprüfte Sportprogramme und gezielte Tests bleiben offen. |
-| 55 | Kein Body-Shaming | Kritisch prüfen | Texte, KI-Prompts und Progress-Anzeigen auf wertfreie Sprache prüfen. |
+| 55 | Kein Body-Shaming | Grundschutz ergänzt, Prüfung offen | KI-Prompt verbietet abwertende Körper-/Gewichtssprache und unnötigen Gewichts-Fokus; Fortschrittstexte priorisieren Routine, Technik und persönliche Entwicklung. Vollständiger Text-Audit noch offen. |
 | 56 | Strukturiertes Feedback | Vorhanden | Bewertung und Nachricht im Feedbackformular vorhanden. |
 | 57 | Microfeedback | Grundversion umgesetzt | Nach Abschluss aller Übungen des aktuellen Tages erscheint freiwilliges Kurzfeedback (zu leicht / genau richtig / zu anstrengend); es wird privat gespeichert und bei der nächsten Planerstellung berücksichtigt. Authentifizierter E2E-Test offen. |
-| 58 | Produktanalytics | Prüfen | Keine belastbare Ereignis-/Funnel-Auswertung in diesem Audit bestätigt. |
-| 59 | North-Star-Metrik | Definieren | Vorschlag: wöchentlich abgeschlossene, protokollierte Trainingseinheiten pro aktivem Nutzer. |
+| 58 | Produktanalytics | Bewusst zurückgestellt | Noch keine Ereignis-/Funnel-Auswertung. Für eine App mit minderjährigen Nutzern erst Einwilligung, Datensparsamkeit, Aufbewahrung und Admin-Zugriff festlegen, bevor Tracking aktiviert wird. |
+| 59 | North-Star-Metrik | Definiert | Vorschlag festgelegt: wöchentlich abgeschlossene, protokollierte Trainingseinheiten pro aktivem Nutzer. Automatische Messung bleibt bis zu einer datenschutzgeprüften Analytics-Entscheidung deaktiviert. |
 | 60 | MVP-Kernablauf | Grundversion implementiert, E2E offen | Profil → Studio verbinden per Name → gerätebewusster KI-Plan → Workout/Logging → Trainingshistorie im Folgeplan → persönliche Meilensteine. Der vollständige Ablauf muss live durchgetestet werden. |
 
 ## Studio-Admin und Verbindung per Studio-Namen (live deployed)\n\n- Plattform-Admin kann ein Studio mit Stadt anlegen und eine Manager-E-Mail zuordnen.\n- Studio-Manager kann Studio-Name, Stadt, Adresse, Telefon, Website, Öffnungszeiten, Beschreibung und separate Geräte-/Ausstattungsliste bearbeiten.
@@ -80,6 +80,26 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 - Supabase Performance Advisor: die Studio-Admin-Policy wurde auf `(select auth.jwt() ->> email)` umgestellt und doppelte permissive SELECT-Policies für veröffentlichte Studios/Angebote wurden zusammengeführt, ohne anonymen Zugriff auf unveröffentlichte Daten zu erweitern. Der Advisor meldet weiterhin eine Auth-RLS-Initialplan-Warnung, 17 bisher ungenutzte Indizes (nicht ohne Last-/Nutzungsanalyse entfernen) und weitere Hinweise.
 - Ein vollständiger End-to-End-Test aller Community-, KI-, Musik- und Trainingsabläufe steht noch aus. Community-Opt-in, RLS-Regeln für Community-Inhalte und Bildspeicher sowie `workout_session_feedback` wurden per SQL/Policy-Abfrage und JavaScript-/HTML-Syntaxcheck geprüft; ein Test mit echtem angemeldetem Nutzer ist noch offen.
 - Feature-Branch ergänzt adaptive Planerstellung anhand eigener Trainingshistorie, First-Gym-Einsteiger-Guide, öffentliche Seite für freigeschaltete Studios/Angebote, Übungserklärungen direkt aus dem Workout, wertfreie Trainings-Meilensteine, speicherbares Erfahrungslevel und Verbindung zum konfigurierten Studio anhand des Namens. JavaScript-Syntax- und HTML-ID-Prüfungen sowie Live-Tests müssen nach Merge/Deploy erneut bestätigt werden.
+
+
+
+## Bewusst zurückgestellt oder externe Voraussetzungen (Teil des 60-Punkte-Audits)
+
+Diese Punkte sind einzeln geprüft und werden nicht als „fertig“ ausgegeben, weil sie externe Daten, Partner, native Plattformrechte oder rechtliche Entscheidungen benötigen:
+
+- **5 QR-Geräte-Scan:** braucht eine verlässliche Geräte-/QR-Datenbank und Studio-Kooperation; bis dahin manuelle Geräte-Liste des Studios.
+- **11 Makrotracking für Erwachsene:** erst nach stabilem Kernablauf und altersabhängiger Produkt-/Datenschutzprüfung; keine restriktiven Ziele für Minderjährige.
+- **12 Blutwerte:** bewusst nicht Teil des MVP.
+- **23 Kamera-Formcheck:** bewusst zurückgestellt wegen sensibler Bilddaten und Fehler-/Sicherheitsrisiken.
+- **25 Spotify API / vollständige Wiedergabe:** Embed und externer Spotify-Link vorhanden. Echte OAuth-/API-Integration braucht eine vom Betreiber erstellte Spotify-Developer-App, Client-ID und Redirect-URI; eine API allein garantiert keine vollständige Wiedergabe im Browser.
+- **29 Apple Health / Health Connect und 30 Wearables:** benötigen passende native App-/Plattformintegration, Nutzerberechtigungen und zusätzliche Datenschutztests; die aktuelle App ist eine PWA/Web-App.
+- **32 Studio-Inhalte:** braucht autorisierte Inhalte und echte Studio-Partnerschaften.
+- **33 White Label:** erst nach bestätigtem B2B-Bedarf und Studio-/Mandantenkonzept.
+- **34 Monetarisierung:** braucht einen ausgewählten Zahlungsanbieter, rechtliche/steuerliche Prüfung und klare Abrechnung; keine Bezahlwand vor stabilem Kernablauf.
+- **35 Empfehlungsprogramm:** Einladungslink/Freundschaftsanfrage existiert; Prämien-/Referral-Tracking wird erst mit Abuse-Schutz und Datenschutzregeln ergänzt.
+- **36 Creator-Programm:** benötigt Geschäftsregeln, Creator-Auswahl und Moderation; kein reiner Code-Schritt.
+- **37 Coach-Marktplatz:** benötigt Anbieterprüfung, Moderation, Haftungs-/Rechtskonzept und Zahlungsabwicklung.
+- **58 Produktanalytics:** bewusst ausgesetzt, bis Einwilligung, Datensparsamkeit und Aufbewahrung für minderjährige Nutzer definiert sind.
 
 ## Reihenfolge für die Umsetzung
 
