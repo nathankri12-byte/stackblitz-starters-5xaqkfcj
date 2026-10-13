@@ -12,16 +12,16 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 4 | Trainingspläne passend zu Studio-Geräten | Grundversion umgesetzt, E2E offen | Admins pflegen Geräte/Ausstattung pro Studio. Nutzer wählen ein freigeschaltetes Studio per Name; dessen Geräte-Liste fließt in den Planprompt ein. |
 | 5 | Geräte per QR-Code scannen | Später | Benötigt zuverlässige Geräte-Datenbank/Studio-Kooperation; kein MVP. |
 | 6 | First Gym Mode | Grundversion umgesetzt im Folge-Branch | Aufklappbarer Einsteiger-Guide mit Geräteeinweisung, leichter Startlast, Pausen und Sicherheits-Hinweisen. |
-| 7 | Kontextsensitiver KI-Coach | Teilweise vorhanden | Profilkontext und KI-Chat existieren; Trainingstage, Verlauf und letzte Einheit stärker einbeziehen. |
+| 7 | Kontextsensitiver KI-Coach | Teilweise umgesetzt | KI-Chat berücksichtigt Profil, bis zu 10 aktuelle Trainingseinträge und die letzten drei Kurzfeedbacks. Adaptive Folgeplanung berücksichtigt bis zu 30 Einträge und die letzten sieben Rückmeldungen. Ende-zu-Ende-Test offen. |
 | 8 | Einfaches Onboarding | Verbessern | Profilfelder und Trainingsort schrittweise statt als lange Form erfassen. |
 | 9 | Geschlecht nur bei echter Relevanz erfassen | Prüfen | Nicht unnötig erfassen; keine geschlechtsbasierten pauschalen Annahmen. |
 | 10 | Sichere Ernährungshinweise für Jugendliche | Grundschutz ergänzt, Prüfung offen | KI-Anweisungen verbieten für Minderjährige restriktive Kalorien-/Makroziele zur Gewichtsabnahme, Crash-Diäten und Druck durch Gewichtszahlen. Ernährungsplan-UI und authentifizierte End-to-End-Tests noch prüfen. |
 | 11 | Ausführliches Makrotracking für Erwachsene | Später | Erst nach Stabilisierung des Trainings-Kernablaufs. |
 | 12 | Keine Blutwerte im MVP | Bewusst zurückgestellt | Nicht implementieren. |
-| 13 | Dashboard vereinfachen | Verbessern | Kernaktionen priorisieren: heutiges Training, Plan, Fortschritt. |
+| 13 | Dashboard vereinfachen | Teilweise umgesetzt | Heutige Einheit und nächste Empfehlung werden aus dem gespeicherten Wochenplan abgeleitet. Gesamtzahl und Reihenfolge der Dashboard-Karten weiter prüfen. |
 | 14 | Fortschritt als positive Geschichten | Grundversion umgesetzt im Folge-Branch | Fortschrittsbereich zeigt abgeschlossene Trainingstage, abgeschlossene Übungen und eigene Bestwerte in wertfreier Sprache. |
 | 15 | Persönliche Rekorde (PRs) | Grundversion umgesetzt im Folge-Branch | Höchste gespeicherte Gewichte je Übung werden im Fortschrittsbereich zusammengefasst; noch kein automatischer PR-Verlauf. |
-| 16 | Nicht-toxische Gamification | Verbessern | Konsistenz und persönliche Bestwerte statt Ranglisten/Druck. |
+| 16 | Nicht-toxische Gamification | Teilweise umgesetzt | Persönliche Meilensteine und wertfreie Texte vorhanden; öffentliche Challenge-Ranglisten entfernt. Weitere Texte und Vergleichselemente prüfen. |
 | 17 | Community | Vorhanden, E2E offen | Community-Tab, Profile, Posts, Likes, Kommentare, Freundschaftsanfragen und Challenges vorhanden. Profil-/Beitrags-Sichtbarkeit ist jetzt standardmäßig privat und muss aktiv freigegeben werden. Authentifizierte End-to-End-Tests offen. |
 | 18 | Gemeinsam trainieren | Später | Benötigt Einladungen/Datenschutzregeln und Missbrauchsschutz. |
 | 19 | Teilbare Fortschrittskarten | Grundversion umgesetzt | Fortschrittskarte als PNG kann freiwillig erstellt/geteilt werden; sensible Profilwerte werden nicht standardmäßig aufgenommen. E2E offen. |
@@ -32,7 +32,7 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 24 | Pausentimer direkt im Training | Umgesetzt im Feature-Branch | 60-Sekunden-Pausentimer mit Pause/Fortsetzen/Neustart direkt an jeder Trainingskarte; Browser-E2E nach Deployment offen. |
 | 25 | Spotify als Nebenfunktion | Teilweise | Musikbereich/Embed vorhanden; Spotify-API und vollständige Wiedergabe nicht bestätigt. |
 | 26 | Personalisierte Schnellzugriffe | Vorhanden | Einstellungen für Schnellzugriffe erkannt; Browser-E2E noch offen. |
-| 27 | Adaptiver Startbildschirm | Verbessern | Dashboard abhängig von Trainingsplan, letztem Training und Tagesstatus gestalten. |
+| 27 | Adaptiver Startbildschirm | Teilweise umgesetzt | Dashboard-Empfehlung reagiert auf vorhandenen Plan, heutige Einheit/Ruhetag und Trainingsziel. Letzten Check-in und letzte absolvierte Einheit noch stärker einbeziehen. |
 | 28 | Erholung/Readiness | Teilweise | Tages-Check-in für Schlaf, Wasser und Schritte existiert; keine medizinische Readiness-Bewertung. |
 | 29 | Apple Health / Health Connect | Später | Plattformintegration und Berechtigungen erforderlich. |
 | 30 | Wearables | Später | Erst nach Kern-MVP und Datenschutzprüfung. |
