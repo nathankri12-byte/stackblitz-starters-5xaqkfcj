@@ -2569,6 +2569,21 @@ body {
 
         </div>
 
+        <div class="card" style="margin-top:22px">
+          <div class="section-header"><div><span class="eyebrow">FIRST GYM MODE</span><h3>Zum ersten Mal im Fitnessstudio?</h3><p class="card-description">Eine kurze Checkliste für einen sicheren und entspannten Start.</p></div><button type="button" class="secondary-btn" onclick="toggleFirstGymGuide()" aria-expanded="false" id="firstGymGuideToggle">Einsteiger-Guide öffnen</button></div>
+          <div id="firstGymGuide" hidden style="margin-top:14px">
+            <ol style="padding-left:22px;line-height:1.8">
+              <li><strong>Lass dir die Geräte zeigen.</strong> Bitte das Studiopersonal um eine kurze Einweisung und frage, wie Sitz, Polster und Startposition eingestellt werden.</li>
+              <li><strong>Beginne leicht.</strong> Wähle zunächst eine Last, mit der du jede Wiederholung ruhig und kontrolliert ausführen kannst. Es geht nicht darum, andere zu beeindrucken.</li>
+              <li><strong>Kontrollierte Bewegung.</strong> Bewege das Gewicht ohne Schwung und halte dich an die gezeigte Technik. Atme gleichmäßig weiter.</li>
+              <li><strong>Frag nach, wenn du unsicher bist.</strong> Eine Frage zu stellen ist völlig normal – das gilt für alle Trainingslevel.</li>
+              <li><strong>Mach Pausen.</strong> Wenn dir schwindelig wird oder du stechende Schmerzen spürst, brich die Übung ab und hole dir Hilfe.</li>
+              <li><strong>Keine Maximalversuche.</strong> Besonders als Jugendliche:r solltest du neue Übungen mit Einweisung und geeigneter Betreuung lernen, statt maximale Gewichte zu testen.</li>
+            </ol>
+            <button type="button" class="primary-btn" onclick="document.getElementById('trainingPreferences').value='Anfänger im Fitnessstudio: bitte eine einfache, sichere Einführung mit leicht erlernbaren Geräten, Technikhinweisen und ausreichenden Pausen. Keine Maximalversuche.'; showTab('training'); generateTrainingPlan();" style="margin-top:8px">Einsteiger-Trainingsplan erstellen</button>
+          </div>
+        </div>
+
         <div class="section-header" style="margin-top:28px">
           <div>
             <span class="eyebrow">ÜBUNGSBIBLIOTHEK</span>
@@ -3278,7 +3293,7 @@ body {
 
 
   <!-- Deine JavaScript-Datei -->
-  <script src="script.js?v=20261013-workout-1"></script>
+  <script src="script.js?v=20261013-adaptive-1"></script>
   <script src="studio-admin.js?v=20261013-1"></script>
   <script src="music.js?v=20261012-1"></script>
 
