@@ -3,6 +3,113 @@ let studioAccessGranted = false;
 let managedStudios = [];
 let activeManagedStudioId = null;
 let studioOffersCache = [];
+let availableStudiosCache = [];
+let availableStudiosLoadPromise = null;
+
+function handleTrainingLocationChange() {
+  const location = document.getElementById("trainingLocation")?.value || "";
+  const field = document.getElementById("gymStudioConnectField");
+  if (field) field.hidden = location !== "Fitnessstudio";
+  if (location === "Fitnessstudio") loadAvailableStudios();
+  if (typeof saveProfile === "function") saveProfile();
+}
+
+async function loadAvailableStudios() {
+  const datalist = document.getElementById("availableStudioNames");
+  if (!datalist || !supabaseClient) return [];
+  if (availableStudiosLoadPromise) return availableStudiosLoadPromise;
+  availableStudiosLoadPromise = (async function() {
+    const statusId = "gymStudioConnectStatus";
+    try {
+      const result = await supabaseClient.from("fitness_studios")
+        .select("id,name,city,description,equipment,is_published")
+        .eq("is_published", true).order("name");
+      if (result.error) throw result.error;
+      availableStudiosCache = result.data || [];
+      datalist.innerHTML = availableStudiosCache.map(function(studio) {
+        return '<option value="' + studioEscape(studio.name) + '">' + studioEscape(studio.city || "") + '</option>';
+      }).join("");
+      const selected = availableStudiosCache.find(function(studio) {
+        return studio.id === currentProfile?.selected_studio_id;
+      });
+      if (selected) {
+        const input = document.getElementById("gymStudioName");
+        if (input && !input.value) input.value = selected.name;
+        currentProfile.studio_name = selected.name || "";
+        currentProfile.studio_city = selected.city || "";
+        currentProfile.studio_description = selected.description || "";
+        currentProfile.studio_equipment = selected.equipment || "";
+        setStudioStatus(statusId, "Verbunden mit " + selected.name + ".", true);
+      } else if (currentProfile?.selected_studio_id) {
+        currentProfile.studio_name = "";
+        currentProfile.studio_city = "";
+        currentProfile.studio_description = "";
+        currentProfile.studio_equipment = "";
+        setStudioStatus(statusId, "Dein bisher verbundenes Studio ist aktuell nicht freigeschaltet. Bitte wähle ein verfügbares Studio.", false);
+      } else if (!availableStudiosCache.length) {
+        setStudioStatus(statusId, "Es sind noch keine Studios freigeschaltet. Du kannst das Studio später verbinden.");
+      }
+      return availableStudiosCache;
+    } catch (error) {
+      console.error("Freigeschaltete Studios konnten nicht geladen werden:", error);
+      setStudioStatus(statusId, "Studios konnten gerade nicht geladen werden. Bitte versuche es erneut.");
+      return [];
+    } finally {
+      availableStudiosLoadPromise = null;
+    }
+  })();
+  return availableStudiosLoadPromise;
+}
+
+async function connectGymStudio() {
+  const input = document.getElementById("gymStudioName");
+  const button = document.getElementById("connectGymStudioButton");
+  const name = String(input?.value || "").trim();
+  if (!currentUser || !supabaseClient) {
+    setStudioStatus("gymStudioConnectStatus", "Bitte melde dich zuerst an.");
+    return;
+  }
+  if (!name) {
+    setStudioStatus("gymStudioConnectStatus", "Bitte gib den Namen deines Fitnessstudios ein.");
+    return;
+  }
+  if (button) { button.disabled = true; button.textContent = "Wird gespeichert …"; }
+  try {
+    await loadAvailableStudios();
+    const studio = availableStudiosCache.find(function(item) {
+      return String(item.name || "").trim().toLocaleLowerCase("de-DE") === name.toLocaleLowerCase("de-DE");
+    });
+    if (!studio) {
+      setStudioStatus("gymStudioConnectStatus", "Kein freigeschaltetes Studio mit genau diesem Namen gefunden. Wähle einen Namen aus der Vorschlagsliste oder kontaktiere den Admin.");
+      return;
+    }
+    const result = await supabaseClient.from("profiles").update({
+      selected_studio_id: studio.id,
+      training_location: "Fitnessstudio"
+    }).eq("user_id", currentUser.id).select("user_id").maybeSingle();
+    if (result.error) throw result.error;
+    if (!result.data) throw new Error("Dein Profil wurde nicht gefunden. Bitte lade die App neu und versuche es erneut.");
+    currentProfile = Object.assign({}, currentProfile || {}, {
+      selected_studio_id: studio.id,
+      training_location: "Fitnessstudio",
+      studio_name: studio.name || "",
+      studio_city: studio.city || "",
+      studio_description: studio.description || "",
+      studio_equipment: studio.equipment || ""
+    });
+    const location = document.getElementById("trainingLocation");
+    if (location) location.value = "Fitnessstudio";
+    const field = document.getElementById("gymStudioConnectField");
+    if (field) field.hidden = false;
+    setStudioStatus("gymStudioConnectStatus", "Gespeichert! Deine KI-Trainingspläne berücksichtigen jetzt " + studio.name + ".", true);
+    if (typeof updateDashboard === "function") updateDashboard();
+  } catch (error) {
+    console.error("Fitnessstudio konnte nicht verbunden werden:", error);
+    setStudioStatus("gymStudioConnectStatus", "Speichern fehlgeschlagen: " + (error.message || "Bitte versuche es erneut."));
+  } finally {
+    if (button) { button.disabled = false; button.textContent = "Fitnessstudio speichern"; }
+  }
+}
 
 function studioEscape(value) {
   return String(value == null ? "" : value).replace(/[&<>"']/g, function(ch) {
@@ -63,7 +170,8 @@ async function selectManagedStudio(studioId) {
   const values = {
     studioName: studio.name, studioCity: studio.city, studioAddress: studio.address,
     studioPhone: studio.phone, studioWebsite: studio.website, studioOpeningHours: studio.opening_hours,
-    studioDescription: studio.description
+    studioDescription: studio.description,
+    studioEquipment: studio.equipment
   };
   Object.entries(values).forEach(function(entry) {
     const el = document.getElementById(entry[0]);
@@ -85,6 +193,7 @@ async function saveStudioProfile(event) {
     website: document.getElementById("studioWebsite").value.trim(),
     opening_hours: document.getElementById("studioOpeningHours").value.trim(),
     description: document.getElementById("studioDescription").value.trim(),
+    equipment: document.getElementById("studioEquipment").value.trim(),
     updated_at: new Date().toISOString()
   };
   try {
@@ -223,7 +332,7 @@ async function loadPublicStudioOffers() {
   target.innerHTML = '<div class="card"><p class="card-description">Studios und Angebote werden geladen …</p></div>';
   try {
     const studioResult = await supabaseClient.from("fitness_studios")
-      .select("id,name,city,address,description,phone,website,opening_hours")
+      .select("id,name,city,address,description,equipment,phone,website,opening_hours")
       .eq("is_published", true).order("name");
     if (studioResult.error) throw studioResult.error;
     const studios = studioResult.data || [];
@@ -253,7 +362,8 @@ async function loadPublicStudioOffers() {
       const phone = studio.phone ? '<p class="card-description">Telefon: ' + studioEscape(studio.phone) + '</p>' : "";
       const hours = studio.opening_hours ? '<p class="card-description"><strong>Öffnungszeiten:</strong><br>' + studioEscape(studio.opening_hours).split("\n").join("<br>") + '</p>' : "";
       return '<article class="card"><span class="eyebrow">FITNESSSTUDIO</span><h3>' + studioEscape(studio.name) + '</h3><p class="card-description">' + studioEscape(address) + '</p>' +
-        (studio.description ? '<p>' + studioEscape(studio.description) + '</p>' : '') + hours + phone + website +
+        (studio.description ? '<p>' + studioEscape(studio.description) + '</p>' : '') +
+        (studio.equipment ? '<p class="card-description"><strong>Geräte &amp; Ausstattung:</strong><br>' + studioEscape(studio.equipment).split("\\n").join("<br>") + '</p>' : '') + hours + phone + website +
         '<div style="margin-top:12px"><h4>Angebote</h4>' + offerMarkup + '</div></article>';
     }).join("");
   } catch (error) {
