@@ -1195,12 +1195,53 @@ function updateDashboard() {
   updateDashboardWorkout();
 }
 
+function updateDashboardOnboarding() {
+  const card = document.getElementById("dashboardOnboarding");
+  if (!card) return;
+
+  const missing = [];
+  if (!currentProfile?.age) missing.push("Alter");
+  if (!currentProfile?.height) missing.push("Größe");
+  if (!currentProfile?.goal) missing.push("Trainingsziel");
+  if (!currentProfile?.training_location) missing.push("Trainingsort");
+
+  const profileReady = missing.length === 0;
+  const planReady = Boolean((localStorage.getItem("fitness_ai_training_plan") || "").trim());
+  const profileStep = document.getElementById("onboardingProfileStep");
+  const planStep = document.getElementById("onboardingPlanStep");
+  const profileText = document.getElementById("onboardingProfileText");
+  const planText = document.getElementById("onboardingPlanText");
+  const profileButton = document.getElementById("onboardingProfileButton");
+  const planButton = document.getElementById("onboardingPlanButton");
+  const progress = document.getElementById("onboardingProgress");
+
+  profileStep?.classList.toggle("is-done", profileReady);
+  planStep?.classList.toggle("is-done", planReady);
+  if (profileText) profileText.textContent = profileReady
+    ? "Die wichtigsten Angaben sind gespeichert. Du kannst sie jederzeit im Profil ändern."
+    : "Bitte ergänze noch: " + missing.join(", ") + ". So kann die KI deinen Plan besser anpassen.";
+  if (planText) planText.textContent = planReady
+    ? "Dein Plan ist gespeichert. Öffne ihn und starte mit einer Übung nach der anderen."
+    : profileReady
+      ? "Dein Profil ist bereit. Öffne Training und erstelle dort deinen persönlichen Plan."
+      : "Vervollständige zuerst dein Profil. Danach kannst du deinen Trainingsplan erstellen.";
+  if (profileButton) profileButton.textContent = profileReady ? "Profil bearbeiten" : "Profil vervollständigen";
+  if (planButton) {
+    planButton.textContent = planReady ? "Plan öffnen" : "Plan erstellen";
+    planButton.disabled = !profileReady;
+    planButton.setAttribute("aria-disabled", String(!profileReady));
+    planButton.title = profileReady ? "" : "Bitte vervollständige zuerst dein Profil.";
+  }
+  if (progress) progress.textContent = (Number(profileReady) + Number(planReady)) + " von 2 vorbereitet";
+}
+
 function updateDashboardWorkout() {
   const element = document.getElementById("dashboardWorkout");
   if (!element) return;
   const recommendation = document.getElementById("dashboardAIRecommendation");
 
   const plan = (localStorage.getItem("fitness_ai_training_plan") || "").trim();
+  updateDashboardOnboarding();
   if (!plan) {
     element.textContent = "Noch kein Trainingsplan erstellt.";
     const missingProfile = [];
