@@ -3841,6 +3841,54 @@ function filterAdminFeedback(query = "") {
 
 
 
+
+
+/* COMMUNITY CHALLENGES — voluntary, positive and non-weight-based */
+function communityChallengeUnitLabel(unit){return ({workouts:"Trainingseinheiten",minutes:"aktive Minuten",active_days:"aktive Tage"})[unit]||"Einheiten";}
+function communityChallengeToday(){return getMealDiaryLocalDate();}
+async function loadCommunityChallenges(){
+ const box=document.getElementById("communityChallengeList");if(!box)return;
+ if(!currentUser||!supabaseClient){box.innerHTML='<p class="community-muted">Melde dich an, um Challenges zu entdecken.</p>';return;}
+ box.innerHTML='<p class="community-muted">Challenges werden geladen …</p>';
+ try{
+  const today=communityChallengeToday();const {data:challenges,error}=await supabaseClient.from("community_challenges").select("id,created_by,title,description,unit,goal_count,start_date,end_date,created_at").gte("end_date",today).order("created_at",{ascending:false}).limit(30);if(error)throw error;
+  communityState.challenges=challenges||[];const ids=communityState.challenges.map(c=>c.id);
+  if(ids.length){const {data:participants,error:participantError}=await supabaseClient.from("community_challenge_participants").select("id,challenge_id,user_id,progress_count,joined_at,updated_at").in("challenge_id",ids);if(participantError)throw participantError;communityState.challengeParticipants=participants||[];}else communityState.challengeParticipants=[];
+  const count=document.getElementById("communityChallengeCount");if(count)count.textContent=String(communityState.challenges.length);
+  if(!communityState.challenges.length){box.innerHTML='<p class="community-muted">Noch keine aktiven Challenges. Du kannst oben die erste erstellen.</p>';return;}
+  const profileMap=new Map(communityState.profiles.map(p=>[p.user_id,p]));
+  box.innerHTML=communityState.challenges.map(ch=>{
+   const participants=communityState.challengeParticipants.filter(p=>p.challenge_id===ch.id).sort((a,b)=>b.progress_count-a.progress_count);
+   const own=participants.find(p=>p.user_id===currentUser.id),percent=own?Math.min(100,Math.round(own.progress_count/Math.max(1,ch.goal_count)*100)):0;
+   const joined=Boolean(own),finished=joined&&own.progress_count>=ch.goal_count,upcoming=ch.start_date>today;
+   const leaders=participants.slice(0,3).map((p,i)=>(i+1)+'. '+communityEscape(profileMap.get(p.user_id)?.display_name||'Mitglied')+' ('+p.progress_count+'/'+ch.goal_count+')').join(' · ');
+   return '<article class="community-challenge"><div class="community-challenge-title"><strong>'+communityEscape(ch.title)+'</strong><small>'+participants.length+' Teilnehmende</small></div>'+(ch.description?'<p class="community-muted">'+communityEscape(ch.description)+'</p>':'')+'<small>'+communityEscape(communityChallengeUnitLabel(ch.unit))+' · bis '+communityEscape(new Date(ch.end_date+'T12:00:00').toLocaleDateString('de-DE'))+(upcoming?' · startet bald':'')+'</small>'+(joined?'<div class="community-challenge-progress" aria-label="Dein Fortschritt"><span style="width:'+percent+'%"></span></div><small>Dein Fortschritt: '+own.progress_count+' / '+ch.goal_count+' '+communityEscape(communityChallengeUnitLabel(ch.unit).toLowerCase())+'</small>':'')+(leaders?'<p class="community-challenge-leaders">'+leaders+'</p>':'')+'<div class="community-challenge-actions">'+(!joined?'<button class="secondary-btn" type="button" onclick="joinCommunityChallenge(\''+communityEscape(ch.id)+'\')">Teilnehmen</button>':finished?'<button class="secondary-btn" type="button" disabled>✓ Ziel erreicht</button>':'<button class="secondary-btn" type="button" onclick="incrementCommunityChallenge(\''+communityEscape(own.id)+'\',\''+communityEscape(ch.unit)+'\',\''+communityEscape(ch.id)+'\')">Fortschritt +'+(ch.unit==='minutes'?'5 Min.':'1')+'</button>')+(ch.created_by===currentUser.id?'<button class="secondary-btn" type="button" onclick="deleteCommunityChallenge(\''+communityEscape(ch.id)+'\')">Löschen</button>':'')+'</div></article>';
+  }).join('');
+ }catch(error){console.error('Community-Challenges konnten nicht geladen werden:',error);box.innerHTML='<p class="community-muted">Challenges konnten nicht geladen werden. Bitte versuche es erneut.</p>';}
+}
+async function createCommunityChallenge(event){
+ event?.preventDefault();if(!currentUser||!supabaseClient){communityStatus('communityChallengeStatus','Bitte melde dich zuerst an.');return;}
+ const title=document.getElementById('communityChallengeTitle')?.value.trim()||'',unit=document.getElementById('communityChallengeUnit')?.value||'workouts',goal=Number(document.getElementById('communityChallengeGoal')?.value),duration=Number(document.getElementById('communityChallengeDuration')?.value||7);
+ if(title.length<3||title.length>100||!['workouts','minutes','active_days'].includes(unit)||!Number.isInteger(goal)||goal<1||goal>1000||![7,14,30].includes(duration)){communityStatus('communityChallengeStatus','Bitte prüfe Titel, Ziel und Dauer.');return;}
+ const start=communityChallengeToday(),endDate=new Date(start+'T12:00:00');endDate.setDate(endDate.getDate()+duration-1);const end=[endDate.getFullYear(),String(endDate.getMonth()+1).padStart(2,'0'),String(endDate.getDate()).padStart(2,'0')].join('-');
+ const button=document.querySelector('#communityChallengeForm button[type=submit]');if(button){button.disabled=true;button.textContent='Wird erstellt …';}
+ try{const {data,error}=await supabaseClient.from('community_challenges').insert({created_by:currentUser.id,title,unit,goal_count:goal,start_date:start,end_date:end,description:'Freiwillige Community-Challenge'}).select('id').single();if(error)throw error;
+  const {error:joinError}=await supabaseClient.from('community_challenge_participants').insert({challenge_id:data.id,user_id:currentUser.id,progress_count:0});if(joinError)console.warn('Challenge erstellt, automatischer Beitritt fehlgeschlagen:',joinError.message);
+  document.getElementById('communityChallengeForm')?.reset();const goalInput=document.getElementById('communityChallengeGoal');if(goalInput)goalInput.value='3';communityStatus('communityChallengeStatus','Challenge erstellt. Mitmachen ist freiwillig.',true);await loadCommunityChallenges();
+ }catch(error){console.error('Challenge konnte nicht erstellt werden:',error);communityStatus('communityChallengeStatus','Challenge konnte nicht erstellt werden. Bitte versuche es erneut.');}
+ finally{if(button){button.disabled=false;button.textContent='Challenge erstellen';}}
+}
+async function joinCommunityChallenge(challengeId){
+ if(!currentUser||!supabaseClient)return;const {error}=await supabaseClient.from('community_challenge_participants').insert({challenge_id:challengeId,user_id:currentUser.id,progress_count:0});if(error){if(error.code!=='23505')console.error('Challenge-Beitritt fehlgeschlagen:',error);communityStatus('communityChallengeStatus',error.code==='23505'?'Du bist bereits dabei.':'Du konntest der Challenge nicht beitreten.');return;}communityStatus('communityChallengeStatus','Du bist dabei! Dein Fortschritt bleibt freiwillig.',true);await loadCommunityChallenges();
+}
+async function incrementCommunityChallenge(participantId,unit,challengeId){
+ if(!currentUser||!supabaseClient)return;const row=communityState.challengeParticipants.find(p=>p.id===participantId&&p.user_id===currentUser.id);if(!row)return;const delta=unit==='minutes'?5:1;const next=Math.min(10000,row.progress_count+delta);
+ const {error}=await supabaseClient.from('community_challenge_participants').update({progress_count:next}).eq('id',participantId).eq('user_id',currentUser.id);if(error){console.error('Challenge-Fortschritt konnte nicht gespeichert werden:',error);communityStatus('communityChallengeStatus','Fortschritt konnte nicht gespeichert werden.');return;}await loadCommunityChallenges();
+}
+async function deleteCommunityChallenge(challengeId){
+ if(!currentUser||!supabaseClient)return;const ch=communityState.challenges.find(c=>c.id===challengeId);if(!ch||ch.created_by!==currentUser.id)return;if(!confirm('Diese Challenge und alle Teilnahmen wirklich löschen?'))return;const {error}=await supabaseClient.from('community_challenges').delete().eq('id',challengeId).eq('created_by',currentUser.id);if(error){console.error('Challenge konnte nicht gelöscht werden:',error);communityStatus('communityChallengeStatus','Challenge konnte nicht gelöscht werden.');return;}await loadCommunityChallenges();
+}
+
 /* COMMUNITY MODERATION — reports are visible to platform admins only */
 async function reportCommunityPost(postId,reportedUserId){
  if(!currentUser||!supabaseClient){communityStatus("communityInviteStatus","Bitte melde dich zuerst an.");return;}
@@ -4213,7 +4261,7 @@ async function init() {
 
 
 /* COMMUNITY — echte Inhalte aus Supabase, keine Demo-Beiträge */
-const communityState = { feed:"all", channelUserId:null, profiles:[], posts:[], following:new Set(), friendRequests:[], likes:new Set(), likeCounts:new Map(), comments:[] };
+const communityState = { feed:"all", channelUserId:null, profiles:[], posts:[], following:new Set(), friendRequests:[], challenges:[], challengeParticipants:[], likes:new Set(), likeCounts:new Map(), comments:[] };
 function communityEscape(value){return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
 function communityInitials(name){const p=String(name||"FP").trim().split(/\s+/).filter(Boolean);return (p.length>1?p[0][0]+p[1][0]:(p[0]||"FP").slice(0,2)).toUpperCase();}
 function communityDate(value){const d=new Date(value);return Number.isNaN(d.getTime())?"":d.toLocaleString("de-DE",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});}
@@ -4271,7 +4319,7 @@ async function loadCommunity(){
    if(a)a.textContent=communityInitials(own.display_name);
   }
   await processCommunityInvite();
-  renderCommunityPeople();renderCommunityFriendRequests();renderCommunityFeed();
+  renderCommunityPeople();renderCommunityFriendRequests();renderCommunityFeed();await loadCommunityChallenges();
  }catch(error){
   console.error("Community konnte nicht geladen werden:",error);
   feed.innerHTML='<div class="card community-empty"><strong>Community konnte nicht geladen werden.</strong><p>Die Daten konnten gerade nicht abgerufen werden. Bitte prüfe deine Verbindung und versuche es erneut.</p><button class="secondary-btn" type="button" onclick="loadCommunity()">Erneut versuchen</button></div>';
