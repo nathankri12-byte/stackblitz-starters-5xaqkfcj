@@ -215,3 +215,39 @@ async function openStudioFromAdmin(studioId) {
   if (select) { select.value = studioId; await selectManagedStudio(studioId); }
   showTab("studioAdmin");
 }
+
+/* Hook into the existing auth/navigation without rewriting the core app. */
+(function installStudioAdminHooks() {
+  const originalCheckAdmin = window.checkAdmin;
+  if (typeof originalCheckAdmin === "function") {
+    window.checkAdmin = async function() {
+      await originalCheckAdmin.apply(this, arguments);
+      studioAccessGranted = Boolean(isCurrentUserAdmin());
+      if (currentUser && supabaseClient && !studioAccessGranted) {
+        try {
+          const result = await supabaseClient.from("studio_admins").select("studio_id").eq("email", String(currentUser.email || "").trim().toLowerCase()).limit(1);
+          if (result.error) console.warn("Studio-Zugriff konnte nicht geprüft werden:", result.error.message);
+          else studioAccessGranted = Boolean(result.data && result.data.length);
+        } catch (error) { console.warn("Studio-Zugriff konnte nicht geprüft werden:", error); }
+      }
+      [document.getElementById("studioNavButton"), document.getElementById("mobileStudioNavButton")].filter(Boolean).forEach(function(button) {
+        button.classList.toggle("hidden", !studioAccessGranted);
+      });
+      if (studioAccessGranted) await loadStudioPortal();
+      if (isCurrentUserAdmin()) await loadAdminStudios();
+    };
+  }
+  const originalShowTab = window.showTab;
+  if (typeof originalShowTab === "function") {
+    window.showTab = function(tabName) {
+      if (tabName === "studioAdmin" && !isCurrentUserAdmin() && !studioAccessGranted) {
+        console.warn("Zugriff auf Studio-Center verweigert.");
+        tabName = "dashboard";
+      }
+      const result = originalShowTab.apply(this, [tabName]);
+      if (tabName === "studioAdmin") loadStudioPortal();
+      if (tabName === "admin" && isCurrentUserAdmin()) loadAdminStudios();
+      return result;
+    };
+  }
+})();
