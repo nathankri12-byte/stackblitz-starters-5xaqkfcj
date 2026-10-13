@@ -77,7 +77,8 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 - Vorhandene Module im Code: KI-Trainingsplan, AI-Chat, Trainingsprotokoll, Gewichtsverlauf, Tages-Check-in, Community, Übungsbibliothek, eigener Timer, Musikbereich, Schnellzugriffe.
 - Supabase Security Advisor meldet: veraltete Tabelle `public."Feedback"` ohne RLS-Policies; zwei `SECURITY DEFINER`-Funktionen sind für `anon` ausführbar; Schutz vor kompromittierten Passwörtern ist deaktiviert. Diese Punkte sollten vor breiter Veröffentlichung behoben werden.
 - Supabase Performance Advisor meldet fehlende Indizes auf zwei Fremdschlüsseln und mehrere permissive Feedback-SELECT-Policies; vor Schemaänderungen prüfen.
-- Ein vollständiger End-to-End-Test aller Community-, KI-, Musik- und Trainingsabläufe steht noch aus.\n- Folge-Branch ergänzt adaptive Planerstellung anhand eigener Trainingshistorie, First-Gym-Einsteiger-Guide und öffentliche Seite für freigeschaltete Studios/Angebote. JavaScript-Syntax- und HTML-ID-Prüfungen bestanden; Live-Test nach Deployment offen.
+- Ein vollständiger End-to-End-Test aller Community-, KI-, Musik- und Trainingsabläufe steht noch aus.
+- Folge-Branch ergänzt adaptive Planerstellung anhand eigener Trainingshistorie, First-Gym-Einsteiger-Guide und öffentliche Seite für freigeschaltete Studios/Angebote. JavaScript-Syntax- und HTML-ID-Prüfungen bestanden; Live-Test nach Deployment offen.
 
 ## Reihenfolge für die Umsetzung
 
