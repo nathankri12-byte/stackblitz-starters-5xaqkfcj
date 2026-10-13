@@ -4160,7 +4160,9 @@ function communityStatus(id,message,success=false){const el=document.getElementB
 async function ensureCommunityProfile(){
  if(!supabaseClient||!currentUser)return;
  const name=currentProfile?.name||currentUser.user_metadata?.name||currentUser.email?.split("@")[0]||"Mitglied";
- const {error}=await supabaseClient.from("community_profiles").upsert({user_id:currentUser.id,display_name:String(name).slice(0,40)},{onConflict:"user_id",ignoreDuplicates:true});
+ const emailBase=String(currentUser.email?.split("@")[0]||"mitglied").toLowerCase().replace(/[^a-z0-9_-]+/g,"-").replace(/^[^a-z0-9]+/,"").slice(0,22)||"mitglied";
+ const username=emailBase+"-"+String(currentUser.id).replace(/-/g,"").slice(0,5);
+ const {error}=await supabaseClient.from("community_profiles").upsert({user_id:currentUser.id,username,display_name:String(name).slice(0,40)},{onConflict:"user_id",ignoreDuplicates:true});
  if(error)console.warn("Community-Profil konnte nicht initialisiert werden:",error.message);
 }
 async function loadCommunity(){
@@ -4170,7 +4172,7 @@ async function loadCommunity(){
  try{
   await ensureCommunityProfile();
   const [pr,po,fo,li]=await Promise.all([
-   supabaseClient.from("community_profiles").select("user_id,display_name,bio,avatar_url,created_at").order("created_at",{ascending:true}).limit(300),
+   supabaseClient.from("community_profiles").select("user_id,username,display_name,bio,avatar_url,created_at").order("created_at",{ascending:true}).limit(300),
    supabaseClient.from("community_posts").select("id,user_id,body,image_path,created_at,updated_at").order("created_at",{ascending:false}).limit(60),
    supabaseClient.from("community_follows").select("following_id").eq("follower_id",currentUser.id),
    supabaseClient.from("community_likes").select("post_id").eq("user_id",currentUser.id)
@@ -4199,7 +4201,8 @@ async function loadCommunity(){
   }else{communityState.comments=[];communityState.likeCounts=new Map();}
   const own=communityState.profiles.find(p=>p.user_id===currentUser.id);
   if(own){
-   const n=document.getElementById("communityDisplayName"),b=document.getElementById("communityBio"),a=document.getElementById("communityMyAvatar");
+   const u=document.getElementById("communityUsername"),n=document.getElementById("communityDisplayName"),b=document.getElementById("communityBio"),a=document.getElementById("communityMyAvatar");
+   if(u&&document.activeElement!==u)u.value=own.username||"";
    if(n&&document.activeElement!==n)n.value=own.display_name||"";
    if(b&&document.activeElement!==b)b.value=own.bio||"";
    if(a)a.textContent=communityInitials(own.display_name);
@@ -4230,16 +4233,16 @@ function renderCommunityFeed(){
 }
 function renderCommunityPeople(){
  const box=document.getElementById("communityPeople");if(!box)return;
- const query=(document.getElementById("communityPeopleSearch")?.value||"").trim().toLocaleLowerCase("de-DE");
+ const query=(document.getElementById("communityPeopleSearch")?.value||"").trim().replace(/^@/,"").toLocaleLowerCase("de-DE");
  const allPeople=communityState.profiles.filter(p=>p.user_id!==currentUser?.id);
- const people=allPeople.filter(p=>!query||String(p.display_name||"").toLocaleLowerCase("de-DE").includes(query));
+ const people=allPeople.filter(p=>!query||String(p.username||"").toLocaleLowerCase("de-DE").includes(query)||String(p.display_name||"").toLocaleLowerCase("de-DE").includes(query));
  const count=document.getElementById("communityMemberCount");
  if(count)count.textContent=String(allPeople.length);
  if(!allPeople.length){box.innerHTML='<p class="community-muted">Noch keine weiteren Kanäle. Sobald andere Nutzer ein Profil angelegt haben, erscheinen ihre echten Kanäle hier.</p>';return;}
  if(!people.length){box.innerHTML='<p class="community-muted">Kein Profil mit diesem Namen gefunden. Prüfe die Schreibweise oder lade Freunde mit deinem Link ein.</p>';return;}
  box.innerHTML=people.map(p=>{
   const yes=communityState.following.has(p.user_id),posts=communityState.posts.filter(post=>post.user_id===p.user_id).length;
-  return '<div class="community-person"><div class="community-avatar" style="width:36px;height:36px;flex-basis:36px;font-size:11px">'+communityEscape(communityInitials(p.display_name))+'</div><div class="community-person-info"><button type="button" class="community-channel-name" onclick="viewCommunityChannel(\''+communityEscape(p.user_id)+'\')">'+communityEscape(p.display_name||"Mitglied")+'</button><small>'+communityEscape(p.bio||"Fitness-Kanal")+'</small></div><button type="button" class="community-follow-btn '+(yes?"following":"")+'" onclick="followCommunityUser(\''+communityEscape(p.user_id)+'\')">'+(yes?"Verbunden":"Hinzufügen")+'</button><small class="community-channel-post-count">'+posts+" Beiträge</small></div>";
+  return '<div class="community-person"><div class="community-avatar" style="width:36px;height:36px;flex-basis:36px;font-size:11px">'+communityEscape(communityInitials(p.display_name))+'</div><div class="community-person-info"><button type="button" class="community-channel-name" onclick="viewCommunityChannel(\''+communityEscape(p.user_id)+'\')">'+communityEscape(p.display_name||"Mitglied")+'</button><small>@'+communityEscape(p.username||"mitglied")+' · '+communityEscape(p.bio||"Fitness-Kanal")+'</small></div><button type="button" class="community-follow-btn '+(yes?"following":"")+'" onclick="followCommunityUser(\''+communityEscape(p.user_id)+'\')">'+(yes?"Verbunden":"Hinzufügen")+'</button><small class="community-channel-post-count">'+posts+" Beiträge</small></div>";
  }).join("");
 }
 async function shareCommunityInvite(){
@@ -4266,6 +4269,7 @@ async function processCommunityInvite(){
  try{
   const {error}=await supabaseClient.from("community_follows").upsert({follower_id:currentUser.id,following_id:inviterId},{onConflict:"follower_id,following_id",ignoreDuplicates:true});
   if(error)throw error;
+  communityState.following.add(inviterId);
   localStorage.setItem(key,"done");
   communityStatus("communityInviteStatus","Du hast dich über den Einladungslink verbunden.",true);
   url.searchParams.delete("communityInvite");
@@ -4274,9 +4278,10 @@ async function processCommunityInvite(){
 }
 async function saveCommunityProfile(){
  if(!supabaseClient||!currentUser){communityStatus("communityProfileStatus","Bitte melde dich zuerst an.");return;}
- const name=document.getElementById("communityDisplayName")?.value.trim()||"",bio=document.getElementById("communityBio")?.value.trim()||"";
+ const username=(document.getElementById("communityUsername")?.value||"").trim().toLowerCase(),name=document.getElementById("communityDisplayName")?.value.trim()||"",bio=document.getElementById("communityBio")?.value.trim()||"";
+ if(!/^[a-z0-9][a-z0-9_-]{2,29}$/.test(username)){communityStatus("communityProfileStatus","Der Benutzername muss 3–30 Zeichen lang sein und darf nur Kleinbuchstaben, Zahlen, _ und - enthalten.");return;}
  if(!name||name.length>40||bio.length>180){communityStatus("communityProfileStatus","Bitte gib einen Anzeigenamen (1–40 Zeichen) und eine Bio mit höchstens 180 Zeichen ein.");return;}
- const {error}=await supabaseClient.from("community_profiles").upsert({user_id:currentUser.id,display_name:name,bio,updated_at:new Date().toISOString()},{onConflict:"user_id"});
+ const {error}=await supabaseClient.from("community_profiles").upsert({user_id:currentUser.id,username,display_name:name,bio,updated_at:new Date().toISOString()},{onConflict:"user_id"});
  if(error){console.error(error);communityStatus("communityProfileStatus","Profil konnte nicht gespeichert werden. Bitte erneut versuchen.");return;}
  communityStatus("communityProfileStatus","Community-Profil gespeichert.",true);await loadCommunity();
 }
