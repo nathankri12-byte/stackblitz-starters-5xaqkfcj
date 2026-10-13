@@ -4158,9 +4158,16 @@ body {
     }
     function navigateMore(tab){
       showTab(tab);
-      const menu=document.getElementById("moreMenu"),btn=document.getElementById("moreMenuToggle");if(menu)menu.hidden=true;if(btn)btn.setAttribute("aria-expanded","false");
-      const mobile=document.getElementById("mobileMoreMenu");if(mobile)mobile.hidden=true;
-      const mb=document.getElementById("mobileMoreToggle"),nb=document.getElementById("mobileMoreNavButton");if(mb)mb.setAttribute("aria-expanded","false");if(nb)nb.setAttribute("aria-expanded","false");
+      // Beim Wechsel des Bereichs bleibt die Navigation geöffnet, damit
+      // weitere Bereiche direkt erreichbar sind.
+      const menu=document.getElementById("moreMenu"),btn=document.getElementById("moreMenuToggle");
+      if(menu)menu.hidden=false;
+      if(btn)btn.setAttribute("aria-expanded","true");
+      const mobile=document.getElementById("mobileMoreMenu");
+      if(mobile)mobile.hidden=false;
+      const mb=document.getElementById("mobileMoreToggle"),nb=document.getElementById("mobileMoreNavButton");
+      if(mb)mb.setAttribute("aria-expanded","true");
+      if(nb)nb.setAttribute("aria-expanded","true");
     }
     function saveAppSettings(){
       const old=readUiSettings();const theme=document.getElementById("themeMode")?.value||"dark";
