@@ -2208,6 +2208,25 @@ async function generateTrainingPlan(customPrompt = "") {
     console.warn("Trainingshistorie konnte nicht für die adaptive Planung geladen werden:", historyError);
   }
 
+  let sessionFeedbackContext = "Noch kein gespeichertes Trainings-Kurzfeedback vorhanden.";
+  try {
+    const feedbackResult = await supabaseClient.from("workout_session_feedback")
+      .select("training_date,rating,note")
+      .eq("user_id", currentUser.id)
+      .order("training_date", { ascending: false })
+      .limit(7);
+    if (feedbackResult.error) throw feedbackResult.error;
+    const ratingLabels = { too_easy: "eher zu leicht", right: "genau richtig", too_hard: "eher zu anstrengend" };
+    const feedbackRows = feedbackResult.data || [];
+    if (feedbackRows.length) {
+      sessionFeedbackContext = feedbackRows.map(row =>
+        row.training_date + " | " + (ratingLabels[row.rating] || "Rückmeldung") + (row.note ? " | " + String(row.note).slice(0, 300) : "")
+      ).join("\n");
+    }
+  } catch (feedbackError) {
+    console.warn("Trainings-Kurzfeedback konnte nicht für die adaptive Planung geladen werden:", feedbackError);
+  }
+
   const prompt = `
 Du bist ein persönlicher Trainingsplaner. Erstelle einen WIRKLICH INDIVIDUELLEN, vollständigen Wochenplan für genau diesen Nutzer. Ein allgemeiner Standardplan ist ausdrücklich nicht erlaubt. Nutze alle folgenden Daten aktiv und mache die Entscheidungen im Trainingsplan sichtbar.
 
@@ -2230,6 +2249,10 @@ ${requestedPreferences || "Keine zusätzlichen Wünsche. Passe den Plan dennoch 
 
 BISHERIGER TRAININGSVERLAUF (neueste Einträge zuerst):
 ${trainingHistoryContext}
+
+KURZFEEDBACK ZU BISHERIGEN EINHEITEN:
+${sessionFeedbackContext}
+Berücksichtige wiederkehrendes „eher zu anstrengend“ mit weniger Volumen/leichteren Varianten und ausreichend Erholung. Bei „eher zu leicht“ nur kleine, sichere Anpassungen erwägen. Bei „genau richtig“ den Umfang grundsätzlich beibehalten. Eine Rückmeldung ist keine medizinische Diagnose.
 Nutze den Verlauf, um den nächsten Plan sinnvoll anzupassen. Wenn eine Übung mehrfach mit stabilen Werten abgeschlossen wird, darfst du eine kleine, sichere Steigerung oder leichte Variation vorschlagen. Erhöhe Belastungen nicht automatisch stark. Bei unvollständigen Einträgen oder wenig Erfahrung bleibe konservativ. Erfinde keine Daten und diagnostiziere keine Beschwerden.
 
 VERBINDLICHE REGELN:
@@ -2914,15 +2937,19 @@ async function loadSavedTrainingEntries() {
   }
 }
 
+let workoutFeedbackLoadedDate = "";
+
 function updateWorkoutLiveProgress() {
   const checkboxes = Array.from(document.querySelectorAll(".training-exercise-checkbox"));
   const text = document.getElementById("workoutLiveProgressText");
   const count = document.getElementById("workoutLiveProgressCount");
   const bar = document.getElementById("workoutLiveProgressBar");
+  const panel = document.getElementById("workoutFeedbackPanel");
   if (!checkboxes.length) {
     if (text) text.textContent = "Erstelle einen Plan, um deinen Trainingsfortschritt hier live zu sehen.";
     if (count) count.textContent = "0%";
     if (bar) bar.style.width = "0%";
+    if (panel) panel.hidden = true;
     return;
   }
   const completed = checkboxes.filter(item => item.checked).length;
@@ -2932,6 +2959,78 @@ function updateWorkoutLiveProgress() {
     : completed + " von " + checkboxes.length + " Übungen in deinem aktuellen Wochenplan erledigt.";
   if (count) count.textContent = percent + "%";
   if (bar) bar.style.width = percent + "%";
+
+  const dayNames = ["SONNTAG", "MONTAG", "DIENSTAG", "MITTWOCH", "DONNERSTAG", "FREITAG", "SAMSTAG"];
+  const todayName = dayNames[new Date().getDay()];
+  const todayExercises = checkboxes.filter(item => item.dataset.day === todayName);
+  const todayComplete = todayExercises.length > 0 && todayExercises.every(item => item.checked);
+  if (panel) panel.hidden = !todayComplete;
+  if (todayComplete && currentUser && supabaseClient) {
+    const date = getTrainingDateForDay(todayName);
+    if (date) void loadWorkoutSessionFeedback(date);
+  }
+}
+
+async function loadWorkoutSessionFeedback(date) {
+  if (!date || !currentUser || !supabaseClient || workoutFeedbackLoadedDate === date) return;
+  workoutFeedbackLoadedDate = date;
+  const status = document.getElementById("workoutFeedbackStatus");
+  const button = document.getElementById("saveWorkoutFeedbackButton");
+  try {
+    const { data, error } = await supabaseClient.from("workout_session_feedback")
+      .select("rating,note").eq("user_id", currentUser.id).eq("training_date", date).maybeSingle();
+    if (error) throw error;
+    const rating = document.getElementById("workoutFeedbackRating");
+    const note = document.getElementById("workoutFeedbackNote");
+    if (data) {
+      if (rating) rating.value = data.rating;
+      if (note) note.value = data.note || "";
+      if (status) status.textContent = "Dein Kurzfeedback für heute ist gespeichert. Du kannst es aktualisieren.";
+      if (button) button.textContent = "Feedback aktualisieren";
+    } else {
+      if (status) status.textContent = "";
+      if (button) button.textContent = "Feedback speichern";
+    }
+  } catch (error) {
+    console.error("Trainings-Kurzfeedback konnte nicht geladen werden:", error);
+    if (status) status.textContent = "Das bisherige Kurzfeedback konnte nicht geladen werden.";
+  }
+}
+
+async function saveWorkoutSessionFeedback() {
+  if (!currentUser || !supabaseClient) {
+    const status = document.getElementById("workoutFeedbackStatus");
+    if (status) status.textContent = "Bitte melde dich zuerst an.";
+    return;
+  }
+  const dayNames = ["SONNTAG", "MONTAG", "DIENSTAG", "MITTWOCH", "DONNERSTAG", "FREITAG", "SAMSTAG"];
+  const todayName = dayNames[new Date().getDay()];
+  const date = getTrainingDateForDay(todayName);
+  const status = document.getElementById("workoutFeedbackStatus");
+  const button = document.getElementById("saveWorkoutFeedbackButton");
+  const rating = document.getElementById("workoutFeedbackRating")?.value || "right";
+  const note = (document.getElementById("workoutFeedbackNote")?.value || "").trim();
+  if (!date) return;
+  if (button) { button.disabled = true; button.textContent = "Speichert …"; }
+  try {
+    const { error } = await supabaseClient.from("workout_session_feedback").upsert({
+      user_id: currentUser.id,
+      training_date: date,
+      rating,
+      note,
+      updated_at: new Date().toISOString()
+    }, { onConflict: "user_id,training_date" });
+    if (error) throw error;
+    workoutFeedbackLoadedDate = date;
+    if (status) status.textContent = "Danke! Dein Feedback wird beim nächsten Trainingsplan berücksichtigt.";
+    if (button) button.textContent = "Feedback aktualisieren";
+  } catch (error) {
+    console.error("Trainings-Kurzfeedback konnte nicht gespeichert werden:", error);
+    if (status) status.textContent = "Feedback konnte nicht gespeichert werden. Bitte versuche es erneut.";
+    if (button) button.textContent = "Erneut versuchen";
+  } finally {
+    if (button) button.disabled = false;
+  }
 }
 
 async function saveTrainingPerformance(button) {
