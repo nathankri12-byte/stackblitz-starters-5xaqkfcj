@@ -7,7 +7,7 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | Nr. | Punkt | Status | Befund / nächster Schritt |
 |---:|---|---|---|
 | 1 | Klare USP: persönlicher KI-Gym-Coach für Einsteiger | Teilweise umgesetzt | Anmeldebereich nennt jetzt den KI-Gym-Coach für Training, Technik und Fortschritt; Dashboard-Überschrift vereinheitlicht. Vollständige Onboarding-Prüfung offen. |
-| 2 | Zielgruppe Einsteiger/Jugendliche klar definieren | Teilweise umgesetzt | KI erhält jetzt altersabhängige Leitlinien für 14–15, 16–17 und 18+ sowie konservative Vorgaben bei unbekanntem Alter. Sichtbarkeit im Onboarding und Privatsphäre-UX noch prüfen. |
+| 2 | Zielgruppe Einsteiger/Jugendliche klar definieren | Teilweise umgesetzt | KI erhält jetzt altersabhängige Leitlinien für unter 14, 14–15, 16–17 und 18+ sowie konservative Vorgaben bei unbekanntem Alter. Sichtbarkeit im Onboarding und Privatsphäre-UX noch prüfen. |
 | 3 | Adaptive Trainingspläne | Grundversion umgesetzt im Folge-Branch | Die Planerstellung lädt bis zu 30 eigene Trainingseinträge und übergibt die neuesten 20 als Kontext an die KI; sichere, kleine Anpassungen statt großer automatischer Steigerungen. E2E offen. |
 | 4 | Trainingspläne passend zu Studio-Geräten | Grundversion umgesetzt, E2E offen | Admins pflegen Geräte/Ausstattung pro Studio. Nutzer wählen ein freigeschaltetes Studio per Name; dessen Geräte-Liste fließt in den Planprompt ein. |
 | 5 | Geräte per QR-Code scannen | Später | Benötigt zuverlässige Geräte-Datenbank/Studio-Kooperation; kein MVP. |
@@ -26,7 +26,7 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 18 | Gemeinsam trainieren | Grundversion umgesetzt | Nutzer können den heutigen Trainingsschwerpunkt und Übungen ohne persönliche Profilwerte über die native Teilen-Funktion an Freunde senden. Gemeinsame Live-Sessions/Terminplanung bleiben offen. |
 | 19 | Teilbare Fortschrittskarten | Grundversion umgesetzt | Fortschrittskarte als PNG kann freiwillig erstellt/geteilt werden; sensible Profilwerte werden nicht standardmäßig aufgenommen. E2E offen. |
 | 20 | Privacy-by-default für Minderjährige | Teilweise umgesetzt, weiter kritisch prüfen | Community-Profile sind standardmäßig privat; Freigabe ist explizit per Checkbox erforderlich. RLS beschränkt Profile, Beiträge, Kommentare, Likes, Follows und Challenge-Teilnahmen auf sichtbare Mitglieder bzw. eigene Daten. Der private Bildspeicher erlaubt Lesen nur für eigene Bilder oder Bilder freigegebener Mitglieder. Moderation und authentifizierte E2E-Prüfung bleiben offen. |
-| 21 | Altersmodi 14–15, 16–17, 18+ | Grundversion umgesetzt | KI-Coach schaltet anhand des Profilalters automatisch auf Leitlinien für 14–15, 16–17 oder 18+; bei fehlendem/ungültigem Alter gilt eine konservative Fallback-Regel. UI-Test offen. |
+| 21 | Altersmodi 14–15, 16–17, 18+ | Grundversion umgesetzt | KI-Coach schaltet anhand des Profilalters automatisch auf Leitlinien für unter 14, 14–15, 16–17 oder 18+; bei fehlendem/ungültigem Alter gilt eine konservative Fallback-Regel. UI-Test offen. |
 | 22 | Übungserklärungen/Videos | Vorhanden | Übungsbibliothek mit YouTube-Suche und KI-Erklärungsaktion erkannt. |
 | 23 | Kamera-Formcheck | Später | Hohe Datenschutz-/Fehleranforderungen; nicht im MVP. |
 | 24 | Pausentimer direkt im Training | Umgesetzt im Feature-Branch | 60-Sekunden-Pausentimer mit Pause/Fortsetzen/Neustart direkt an jeder Trainingskarte; Browser-E2E nach Deployment offen. |
@@ -100,6 +100,9 @@ Diese Punkte sind einzeln geprüft und werden nicht als „fertig“ ausgegeben,
 - **36 Creator-Programm:** benötigt Geschäftsregeln, Creator-Auswahl und Moderation; kein reiner Code-Schritt.
 - **37 Coach-Marktplatz:** benötigt Anbieterprüfung, Moderation, Haftungs-/Rechtskonzept und Zahlungsabwicklung.
 - **58 Produktanalytics:** bewusst ausgesetzt, bis Einwilligung, Datensparsamkeit und Aufbewahrung für minderjährige Nutzer definiert sind.
+- **Auth-Sicherheit:** „Leaked Password Protection“ ist im Supabase-Auth-Dashboard noch zu aktivieren; die aktuelle Integration bietet dafür keine sichere direkte Chat-Aktion.
+- **Apple-Anmeldung:** Schaltfläche ist im Code vorhanden, echte Anmeldung benötigt Apple-Developer-Konfiguration und passende Supabase-OAuth-Einstellungen.
+- **Authentifizierte End-to-End-Tests:** benötigen einen angemeldeten Testlauf im Browser des Betreibers. Keine Passwörter im Chat teilen; nach dem Login können die Abläufe gezielt getestet werden.
 
 ## Reihenfolge für die Umsetzung
 
