@@ -44,7 +44,7 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 36 | Creator-Programm | Später | Kein MVP. |
 | 37 | Coach-Marktplatz | Später | Benötigt Anbieterprüfung, Moderation und rechtliche Klärung. |
 | 38 | Challenges | Grundversion vorhanden, Datenschutz ergänzt | Freiwillige Challenges zählen Einheiten/Minuten/aktive Tage, nicht Körpergewicht. Teilnahme und Fortschritt werden nur für eigene Daten bzw. freigegebene Community-Mitglieder sichtbar; Tonalität und E2E weiter prüfen. |
-| 39 | Fitness-Ausbildung/Erklärinhalte | Teilweise umgesetzt | Übungserklärungen und First-Gym-Hinweise vorhanden; KI-Anweisungen betonen Technik, Pausen, Progression und sichere Erholung. Strukturierte Lernmodule bleiben offen. |
+| 39 | Fitness-Ausbildung/Erklärinhalte | Grundversion umgesetzt, Ausbau möglich | Neben Übungserklärungen und First-Gym-Hinweisen gibt es jetzt vier aufklappbare Lernmodule: Technik, kleine Progressionsschritte, Erholung und Aufwärmen. Weitere Inhalte können ergänzt werden. |
 | 40 | KI korrigiert Fitness-Mythen | Teilweise umgesetzt | KI-Prompt fordert freundliche, evidenzorientierte Korrektur verbreiteter Fitness-Mythen und klare Unsicherheit; gezielte Testfälle fehlen. |
 | 41 | Quellenangaben | Teilweise umgesetzt | KI soll nur zuverlässig bekannte Quellen/Organisationen nennen und keine Studien/Links erfinden. Verifizierte Quellenabrufe bzw. automatische Quellenprüfung sind nicht integriert. |
 | 42 | Keine medizinischen Versprechen | Grundschutz ergänzt, Prüfung offen | KI-Anweisungen untersagen medizinische Diagnosen/Heilversprechen und verweisen bei gesundheitlichen Problemen an Eltern oder medizinische Fachpersonen. Weitere UI-/Prompt-Prüfung offen. |
@@ -136,3 +136,5 @@ Diese Punkte sind einzeln geprüft und werden nicht als „fertig“ ausgegeben,
 - Öffentliche Landingpage: Tablet-Breakpoint von 860 auf 1024 CSS-Pixel erweitert, damit das Hero-/Login-Layout auf schmalen iPads in eine Spalte wechselt.
 - Live-Test nach Deployment bei ungefähr 980 CSS-Pixeln: keine horizontale Scrollleiste, keine abgeschnittenen Ränder, drei Feature-Karten und Login-Formular sichtbar.
 - Syntaxcheck vor der letzten Onboarding-Änderung: `script.js`, `studio-admin.js`, `music.js`, `service-worker.js` sowie beide Inline-Scripts bestanden; keine doppelten HTML-IDs. Nach der Onboarding-Änderung wird erneut geprüft.
+
+- Fitnesswissen: vier aufklappbare Grundlagen-Lektionen im Trainingsbereich ergänzt; Inhalt ist allgemein, sicherheitsorientiert und ohne medizinische Versprechen.
