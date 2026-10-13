@@ -1734,6 +1734,20 @@ function updateLastAIMessage(text) {
 
   chat.scrollTop = chat.scrollHeight;
 }
+function getAgeModeGuidance(ageValue) {
+  const age = Number(ageValue);
+  if (!Number.isFinite(age) || age < 1 || age > 120) {
+    return "ALTERSMODUS: Alter unbekannt. Wähle besonders vorsichtige, allgemeine Empfehlungen und frage bei altersabhängigen Entscheidungen zuerst nach dem Alter.";
+  }
+  if (age <= 15) {
+    return "ALTERSMODUS 14–15: Fokus auf Techniklernen, Freude an Bewegung, ausgewogene Ernährung, Schlaf und Erholung. Keine Gewichtsabnahme-Ziele, keine Kalorien- oder Makroziele zur Restriktion, keine Maximalversuche. Bei Übungen mit Gewichten leichte kontrollierbare Belastungen und fachkundige Aufsicht empfehlen.";
+  }
+  if (age <= 17) {
+    return "ALTERSMODUS 16–17: Altersgerechte, konservative Trainingsplanung mit Technik und Erholung im Mittelpunkt. Keine Crash-Diäten, keine aggressiven Kalorienziele oder Maximalversuche. Bei schwerem Krafttraining Betreuung durch eine qualifizierte erwachsene Person empfehlen.";
+  }
+  return "ALTERSMODUS 18+: Gib ausgewogene, evidenzorientierte Fitnesshinweise. Vermeide extreme Diäten, riskante Trainingsmethoden und medizinische Versprechen. Bei Beschwerden an medizinische Fachpersonen verweisen.";
+}
+
 /* =========================================================
    AI CHAT
 ========================================================= */
@@ -1845,9 +1859,8 @@ async function askGemini(
   const defaultSystemInstruction = `
 Du bist FITNESS AI PRO, ein freundlicher und sicherer Fitness-Coach.
 
-Der Nutzer ist minderjährig.
-
 Antworte altersgerecht, verständlich und motivierend.
+${getAgeModeGuidance(profile.age)}
 
 Deine Aufgaben:
 - Training erklären
@@ -1866,6 +1879,9 @@ Wichtig:
 - Keine leistungssteigernden Substanzen
 - Keine gefährlichen Trainingsmethoden
 - Keine ungesunden Essensregeln
+- Bei Minderjährigen keine Kalorienziele zur Gewichtsabnahme und keine restriktiven Makroziele erstellen.
+- Bei Minderjährigen keine Körperbewertung oder Druck durch Gewichtszahlen; Gesundheit, Energie und Gewohnheiten stehen im Vordergrund.
+- Keine medizinischen Diagnosen oder Heilversprechen.
 - Fokus auf gesundes Wachstum
 - Fokus auf ausreichend Energie
 - Fokus auf Technik
