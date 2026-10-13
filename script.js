@@ -2605,7 +2605,7 @@ function renderTrainingPlan(text) {
           '<div class="field"><label>Gewicht (kg)</label><input type="number" min="0" step="0.5" placeholder="z. B. 20" class="training-weight-input" inputmode="decimal"></div>' +
           '<div class="field"><label>Wiederholungen</label><input type="number" min="0" step="1" placeholder="z. B. 10" class="training-reps-input" inputmode="numeric"></div>' +
           '<div class="field"><label>Dauer (Sek.)</label><input type="number" min="0" step="1" placeholder="z. B. 60" class="training-duration-input" inputmode="numeric"></div>' +
-          '</div><button type="button" class="primary-btn save-performance-btn" onclick="saveTrainingPerformance(this)">Werte speichern</button></article>'
+          '</div><div class="training-exercise-actions" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0"><button type="button" class="secondary-btn" onclick="startRestTimer(60)">⏱ 60 s Pause</button><button type="button" class="secondary-btn" onclick="swapTrainingExercise(this)">Übung tauschen</button></div><button type="button" class="primary-btn save-performance-btn" onclick="saveTrainingPerformance(this)">Werte speichern</button></article>'
         ).join("") + '</div>'
       : '<p class="card-description training-rest-day">Für diesen Tag sind keine Übungen eingeplant.</p>') +
     '</section>'
@@ -2613,6 +2613,132 @@ function renderTrainingPlan(text) {
 
   void loadSavedTrainingEntries();
   updateDashboardWorkout();
+}
+
+
+/* In-workout rest timer */
+let restTimerInterval = null;
+let restTimerEnd = 0;
+let restTimerLeft = 0;
+let restTimerRunning = false;
+function startRestTimer(seconds = 60) {
+  const duration = Math.max(1, Math.min(600, Math.round(Number(seconds) || 60)));
+  restTimerLeft = duration;
+  restTimerEnd = Date.now() + duration * 1000;
+  restTimerRunning = true;
+  if (restTimerInterval) clearInterval(restTimerInterval);
+  let panel = document.getElementById("workoutRestTimer");
+  if (!panel) {
+    panel = document.createElement("div");
+    panel.id = "workoutRestTimer";
+    panel.setAttribute("role", "status");
+    panel.setAttribute("aria-live", "polite");
+    panel.style.cssText = "position:fixed;right:16px;bottom:16px;z-index:9999;width:min(320px,calc(100vw - 32px));padding:16px;border:1px solid var(--border);border-radius:16px;background:var(--card);color:var(--text);box-shadow:0 12px 40px #0008";
+    document.body.appendChild(panel);
+  }
+  panel.style.display = "block";
+  panel.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><small>PAUSE ZWISCHEN SÄTZEN</small><div id="workoutRestTimerDisplay" style="font-size:36px;font-weight:800;font-variant-numeric:tabular-nums">01:00</div><p id="workoutRestTimerStatus">Gute Erholung – du bestimmst dein Tempo.</p></div><button type="button" onclick="stopRestTimer()" aria-label="Timer schließen">×</button></div><div style="display:flex;gap:8px"><button id="workoutRestTimerToggle" class="secondary-btn" type="button" onclick="toggleRestTimer()">Pause</button><button class="secondary-btn" type="button" onclick="startRestTimer(' + duration + ')">Neu starten</button></div>';
+  updateRestTimerDisplay();
+  restTimerInterval = window.setInterval(updateRestTimerDisplay, 250);
+}
+function updateRestTimerDisplay() {
+  if (!restTimerRunning) return;
+  restTimerLeft = Math.max(0, Math.ceil((restTimerEnd - Date.now()) / 1000));
+  const display = document.getElementById("workoutRestTimerDisplay");
+  if (display) display.textContent = String(Math.floor(restTimerLeft / 60)).padStart(2, "0") + ":" + String(restTimerLeft % 60).padStart(2, "0");
+  if (restTimerLeft <= 0) {
+    restTimerRunning = false;
+    if (restTimerInterval) clearInterval(restTimerInterval);
+    restTimerInterval = null;
+    const status = document.getElementById("workoutRestTimerStatus");
+    const toggle = document.getElementById("workoutRestTimerToggle");
+    if (status) status.textContent = "Pause vorbei – bereit für den nächsten Satz?";
+    if (toggle) toggle.textContent = "Fertig";
+    try { if ("vibrate" in navigator) navigator.vibrate([120, 60, 120]); } catch (_) {}
+  }
+}
+function toggleRestTimer() {
+  const toggle = document.getElementById("workoutRestTimerToggle");
+  if (restTimerRunning) {
+    restTimerLeft = Math.max(0, Math.ceil((restTimerEnd - Date.now()) / 1000));
+    restTimerRunning = false;
+    if (restTimerInterval) clearInterval(restTimerInterval);
+    restTimerInterval = null;
+    if (toggle) toggle.textContent = "Weiter";
+    const status = document.getElementById("workoutRestTimerStatus");
+    if (status) status.textContent = "Timer pausiert.";
+  } else if (restTimerLeft > 0) {
+    restTimerEnd = Date.now() + restTimerLeft * 1000;
+    restTimerRunning = true;
+    if (toggle) toggle.textContent = "Pause";
+    const status = document.getElementById("workoutRestTimerStatus");
+    if (status) status.textContent = "Timer läuft.";
+    restTimerInterval = window.setInterval(updateRestTimerDisplay, 250);
+  } else stopRestTimer();
+}
+function stopRestTimer() {
+  if (restTimerInterval) clearInterval(restTimerInterval);
+  restTimerInterval = null; restTimerRunning = false; restTimerLeft = 0;
+  const panel = document.getElementById("workoutRestTimer");
+  if (panel) panel.style.display = "none";
+}
+
+/* Simple exercise alternatives that keep the target muscle group broadly similar. */
+function swapTrainingExercise(button) {
+  const card = button && button.closest(".training-exercise-card");
+  const checkbox = card && card.querySelector(".training-exercise-checkbox");
+  const title = card && card.querySelector(".training-exercise-title h4");
+  const tags = card && card.querySelector(".exercise-tags");
+  if (!card || !checkbox || !title) return;
+  const gym = String(currentProfile && currentProfile.training_location || document.getElementById("trainingLocation")?.value || "").toLowerCase().includes("studio");
+  const alternatives = {
+    "Bankdrücken": ["Brustpresse", "Liegestütze"],
+    "Brustpresse": ["Bankdrücken", "Liegestütze"],
+    "Kurzhantel-Bankdrücken": ["Brustpresse", "Liegestütze"],
+    "Liegestütze": ["Knie-Liegestütze", "Brustpresse"],
+    "Knie-Liegestütze": ["Liegestütze", "Brustpresse"],
+    "Latzug": ["Assistierter Klimmzug", "Rudermaschine"],
+    "Klimmzüge": ["Latzug", "Rudermaschine"],
+    "Rudern": ["Rudermaschine", "Einarmiges Kurzhantelrudern"],
+    "Rudermaschine": ["Latzug", "Einarmiges Kurzhantelrudern"],
+    "Beinpresse": ["Kniebeugen", "Goblet Squat"],
+    "Kniebeugen": gym ? ["Beinpresse", "Goblet Squat"] : ["Sit-to-Stand", "Ausfallschritte"],
+    "Goblet Squat": ["Kniebeugen", "Beinpresse"],
+    "Plank": ["Dead Bug", "Bird Dog"],
+    "Unterarmstütz": ["Dead Bug", "Bird Dog"],
+    "Dead Bug": ["Plank", "Bird Dog"],
+    "Bird Dog": ["Dead Bug", "Plank"],
+    "Ausfallschritte": ["Kniebeugen", "Glute Bridge"],
+    "Glute Bridge": ["Ausfallschritte", "Kniebeugen"],
+    "Schulterdrücken": ["Seitheben", "Schulterpresse"],
+    "Schulterpresse": ["Schulterdrücken", "Seitheben"],
+    "Seitheben": ["Schulterpresse", "Schulterdrücken"],
+    "Mountain Climbers": ["Marching Plank", "Plank"]
+  };
+  const currentName = title.textContent.trim();
+  const choices = alternatives[currentName];
+  if (!choices || !choices.length) {
+    window.alert("Für diese Übung ist noch keine passende Alternative hinterlegt. Lass dir die Übung bitte vom KI-Coach erklären oder behalte sie bei.");
+    return;
+  }
+  const nextName = choices[0];
+  title.textContent = nextName;
+  checkbox.dataset.exercise = nextName;
+  checkbox.checked = false;
+  card.querySelectorAll(".training-weight-input,.training-reps-input,.training-duration-input").forEach(function(input) { input.value = ""; });
+  const tagMap = {
+    "Bankdrücken":["Brust","Schulter","Trizeps"],"Brustpresse":["Brust","Trizeps"],"Liegestütze":["Brust","Schulter","Trizeps"],"Knie-Liegestütze":["Brust","Schulter","Trizeps"],
+    "Latzug":["Rücken","Bizeps"],"Assistierter Klimmzug":["Rücken","Bizeps"],"Klimmzüge":["Rücken","Bizeps"],"Rudern":["Rücken","Bizeps"],"Rudermaschine":["Rücken","Bizeps"],"Einarmiges Kurzhantelrudern":["Rücken","Bizeps"],
+    "Beinpresse":["Beine","Po"],"Kniebeugen":["Beine","Po"],"Goblet Squat":["Beine","Po"],"Sit-to-Stand":["Beine","Po"],"Ausfallschritte":["Beine","Po"],"Glute Bridge":["Po","Beine"],
+    "Plank":["Core","Bauch"],"Unterarmstütz":["Core","Bauch"],"Dead Bug":["Core","Bauch"],"Bird Dog":["Core","Rücken"],"Mountain Climbers":["Core","Ausdauer"],"Marching Plank":["Core","Ausdauer"],
+    "Schulterdrücken":["Schulter","Trizeps"],"Schulterpresse":["Schulter","Trizeps"],"Seitheben":["Schulter"]
+  };
+  if (tags) tags.innerHTML = (tagMap[nextName] || []).map(function(tag) { return '<span class="tag">' + escape(tag) + '</span>'; }).join("");
+  const notice = document.createElement("p");
+  notice.className = "card-description exercise-swap-notice";
+  notice.textContent = "Alternative gewählt: " + nextName + ". Bitte Technik und Belastung neu prüfen.";
+  card.querySelector(".exercise-swap-notice")?.remove();
+  card.appendChild(notice);
 }
 
 function readTrainingNumber(input, label, integer = false) {
