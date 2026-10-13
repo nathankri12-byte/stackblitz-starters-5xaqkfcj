@@ -206,8 +206,9 @@
       cursor: pointer;
     }
 
-    @media (max-width: 860px) {
-      #authScreen { align-items: flex-start; padding: 22px 16px 34px; }
+    @media (max-width: 1024px) {
+      #authScreen { width: 100%; box-sizing: border-box; align-items: flex-start; padding: 22px 16px 34px; }
+      .auth-layout, .auth-container { min-width: 0; }
       .auth-layout { max-width: 560px; grid-template-columns: minmax(0, 1fr); gap: 28px; }
       .auth-story { padding: 0; }
       .auth-story h2 { font-size: clamp(36px, 9vw, 54px); }
