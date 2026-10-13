@@ -29,14 +29,14 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 21 | Altersmodi 14–15, 16–17, 18+ | Fehlt | Altersgerechte Modi und passende Grenzen implementieren. |
 | 22 | Übungserklärungen/Videos | Vorhanden | Übungsbibliothek mit YouTube-Suche und KI-Erklärungsaktion erkannt. |
 | 23 | Kamera-Formcheck | Später | Hohe Datenschutz-/Fehleranforderungen; nicht im MVP. |
-| 24 | Pausentimer direkt im Training | Teilweise | Allgemeine Timer-Seite existiert; direkter Timer in Trainingskarten fehlt. |
+| 24 | Pausentimer direkt im Training | Umgesetzt im Feature-Branch | 60-Sekunden-Pausentimer mit Pause/Fortsetzen/Neustart direkt an jeder Trainingskarte; Browser-E2E nach Deployment offen. |
 | 25 | Spotify als Nebenfunktion | Teilweise | Musikbereich/Embed vorhanden; Spotify-API und vollständige Wiedergabe nicht bestätigt. |
 | 26 | Personalisierte Schnellzugriffe | Vorhanden | Einstellungen für Schnellzugriffe erkannt; Browser-E2E noch offen. |
 | 27 | Adaptiver Startbildschirm | Verbessern | Dashboard abhängig von Trainingsplan, letztem Training und Tagesstatus gestalten. |
 | 28 | Erholung/Readiness | Teilweise | Tages-Check-in für Schlaf, Wasser und Schritte existiert; keine medizinische Readiness-Bewertung. |
 | 29 | Apple Health / Health Connect | Später | Plattformintegration und Berechtigungen erforderlich. |
 | 30 | Wearables | Später | Erst nach Kern-MVP und Datenschutzprüfung. |
-| 31 | Studio-Dashboard | Später | B2B-Funktion, nicht für persönlichen MVP nötig. |
+| 31 | Studio-Dashboard | Teilweise umgesetzt im Feature-Branch | Studio-Center für Studio-Admins mit Profil-/Öffnungszeiten-/Ausstattungsdaten; Plattform-Admin kann Studios anlegen und Manager zuordnen. Live-E2E offen. |
 | 32 | Studio-Inhalte | Später | Benötigt autorisierte Inhalte und Studio-Partnerschaft. |
 | 33 | White Label | Später | Erst bei validiertem B2B-Bedarf. |
 | 34 | Monetarisierungsstufen | Später / prüfen | Keine Bezahlwand vor funktionierendem Kernablauf. |
@@ -54,7 +54,7 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 46 | Fünf Haupttabs | Prüfen | Navigation vorhanden, aber Struktur auf Kernbereiche reduzieren/validieren. |
 | 47 | Fortschritt direkt im Training | Teilweise | Trainingskarten speichern Werte; Live-Fortschritt im Workout ergänzen. |
 | 48 | „Warum diese Übung?“ | Teilweise | KI-Erklärung ist erreichbar; gezielte Erklärung direkt an jeder Planübung fehlt. |
-| 49 | Übung tauschen | Fehlt | Sichere, orts- und muskelgruppenpassende Alternativen ermöglichen. |
+| 49 | Übung tauschen | Grundversion im Feature-Branch | Tauschoptionen für bekannte Übungen, passende Tags und zurückgesetzte Logging-Felder; unbekannte Übungen zeigen einen sicheren Hinweis statt blind zu ersetzen. E2E offen. |
 | 50 | Gym-Confidence-Modus | Fehlt | Kurze Gerätehinweise und diskrete Schritt-für-Schritt-Anleitung. |
 | 51 | Skill-Level | Teilweise | KI soll Anfänger berücksichtigen; explizite Levelauswahl fehlt/prüfen. |
 | 52 | Skills über Gewichte hinaus | Verbessern | Technik, Mobilität, Ausdauer und Trainingsroutine abbilden. |
@@ -67,10 +67,10 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 59 | North-Star-Metrik | Definieren | Vorschlag: wöchentlich abgeschlossene, protokollierte Trainingseinheiten pro aktivem Nutzer. |
 | 60 | MVP-Kernablauf | Teilweise vorhanden | Onboarding → Ort → KI-Plan → Workout/Erklärungen → Logging → adaptive nächste Einheit → Fortschritt. Adaptivität ist die größte funktionale Lücke. |
 
-## Verifizierte technische Checks
+## Neue Studio-Admin-Funktion (im Feature-Branch vorbereitet und Datenbank angelegt)\n\n- Plattform-Admin kann ein Studio mit Stadt anlegen und eine Manager-E-Mail zuordnen.\n- Studio-Manager kann Studio-Name, Stadt, Adresse, Telefon, Website, Öffnungszeiten, Beschreibung/Ausstattung bearbeiten.\n- Studio-Manager kann Angebote mit Preis/Vorteil, Beschreibung, Start-/Enddatum erstellen, pausieren/aktivieren und löschen.\n- Veröffentlichung bleibt dem Plattform-Admin vorbehalten; ein Datenbank-Trigger blockiert Änderungen am Veröffentlichungsstatus durch Studio-Manager.\n- Neue Tabellen: `fitness_studios`, `studio_admins`, `studio_offers`; RLS aktiviert, Policies: 5/4/5. `anon` kann nur veröffentlichte Studios und gültige aktive Angebote lesen.\n- Browser-End-to-End-Test der Studio-Verwaltung nach Deployment steht noch aus.\n\n## Verifizierte technische Checks
 
-- `script.js` besteht den JavaScript-Syntaxcheck.
-- `index.html` hat keine doppelten `id`-Attribute.
+- `script.js` und `studio-admin.js` bestehen den JavaScript-Syntaxcheck.
+- `index.html` hat keine doppelten `id`-Attribute; Inline-JavaScript besteht den Syntaxcheck.
 - Live-Browser: Anmeldung erfolgreich; Profilseite mit Name, Alter, Größe und Ernährungsweise sichtbar.
 - Live-Browser: „Profil speichern“ mit unveränderten Werten zeigte „Profil erfolgreich gespeichert.“
 - Live-Browser: Feedbackformular mit 1–5-Bewertung und Nachricht vorhanden; es wurde kein Testfeedback gesendet.
