@@ -2008,6 +2008,8 @@ body {
     .community-challenge-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
     .community-challenge-actions button{font-size:12px;padding:7px 9px}
     .community-challenge-leaders{font-size:11px;color:var(--muted);line-height:1.5;margin-top:7px}
+    .progress-share-name{display:flex;align-items:center;gap:8px;margin:8px 0 12px;color:var(--muted);font-size:13px}
+    .progress-share-name input{accent-color:var(--accent)}
 </style>
 
   <style>
@@ -3045,6 +3047,14 @@ body {
           <div id="trainingProgressCharts" style="margin-top:14px">
             <p class="card-description">Noch keine Trainingswerte vorhanden.</p>
           </div>
+        </div>
+
+        <div class="card progress-share-card" style="margin-top:18px">
+          <div class="section-header"><div><h3>Erfolgskarte teilen</h3><p class="card-description">Teile einen positiven Trainingsmoment. Gewichts- oder Gesundheitsdaten werden nicht auf der Karte angezeigt.</p></div></div>
+          <div class="field" style="margin-top:14px"><label for="progressCardMessage">Dein Meilenstein</label><select id="progressCardMessage"><option>Ich habe mein Training heute abgeschlossen.</option><option>Ich bleibe dran – Schritt für Schritt.</option><option>Ich habe eine persönliche Bestleistung erreicht.</option><option>Ich habe mir Zeit für Bewegung genommen.</option><option>Ich habe eine neue Trainingsroutine aufgebaut.</option></select></div>
+          <label class="progress-share-name"><input id="progressCardShowName" type="checkbox"> Meinen Anzeigenamen auf der Karte zeigen</label>
+          <button class="primary-btn" type="button" onclick="shareProgressCard()">Erfolgskarte erstellen &amp; teilen</button>
+          <p id="progressCardStatus" class="settings-message" role="status" aria-live="polite"></p>
         </div>
 
       </section>
