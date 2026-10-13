@@ -1176,10 +1176,14 @@ function updateDashboard() {
 function updateDashboardWorkout() {
   const element = document.getElementById("dashboardWorkout");
   if (!element) return;
+  const recommendation = document.getElementById("dashboardAIRecommendation");
 
   const plan = (localStorage.getItem("fitness_ai_training_plan") || "").trim();
   if (!plan) {
     element.textContent = "Noch kein Trainingsplan erstellt.";
+    if (recommendation) recommendation.textContent = currentProfile?.goal
+      ? "Dein nächster Schritt: Erstelle einen Plan für dein Ziel „" + currentProfile.goal + "“. Die KI berücksichtigt deinen Trainingsort und dein Erfahrungslevel."
+      : "Ergänze dein Profil und erstelle deinen individuellen Trainingsplan. Technik und Erholung stehen im Mittelpunkt.";
     return;
   }
 
@@ -1194,6 +1198,7 @@ function updateDashboardWorkout() {
 
   if (startIndex === -1) {
     element.innerHTML = '<p>Trainingsplan vorhanden.</p><button class="secondary-btn" type="button" onclick="showTab(\'training\')">Trainingsplan öffnen</button>';
+    if (recommendation) recommendation.textContent = "Dein Wochenplan ist gespeichert. Öffne Training, um deine nächsten Einheiten zu prüfen und in deinem Tempo zu starten.";
     return;
   }
 
@@ -1211,9 +1216,13 @@ function updateDashboardWorkout() {
   }
 
   const safe = value => String(value).replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+  const isRestDay = workoutLines.some(line => /Ruhetag|Erholung/i.test(line));
   element.innerHTML = '<p><strong>' + safe(focus || todayName) + '</strong></p>' +
     (workoutLines.length ? '<ul>' + workoutLines.map(line => '<li>' + safe(line) + '</li>').join("") + '</ul>' : '<p>Dein Plan ist gespeichert. Öffne Training für alle Details.</p>') +
     '<button class="secondary-btn" type="button" onclick="showTab(\'training\')">Trainingsplan öffnen</button>';
+  if (recommendation) recommendation.textContent = isRestDay
+    ? "Heute ist Erholung eingeplant. Ein Spaziergang oder leichte Mobilität sind optional – du musst nichts nachholen."
+    : "Deine heutige Einheit: " + (focus || todayName) + ". Starte kontrolliert, achte auf saubere Technik und nutze Pausen nach Bedarf.";
 }
 
 
