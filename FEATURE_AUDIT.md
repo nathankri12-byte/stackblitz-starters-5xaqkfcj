@@ -30,7 +30,7 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 22 | Übungserklärungen/Videos | Vorhanden | Übungsbibliothek mit YouTube-Suche und KI-Erklärungsaktion erkannt. |
 | 23 | Kamera-Formcheck | Später | Hohe Datenschutz-/Fehleranforderungen; nicht im MVP. |
 | 24 | Pausentimer direkt im Training | Umgesetzt im Feature-Branch | 60-Sekunden-Pausentimer mit Pause/Fortsetzen/Neustart direkt an jeder Trainingskarte; Browser-E2E nach Deployment offen. |
-| 25 | Spotify als Nebenfunktion | Teilweise | Musikbereich/Embed vorhanden; Spotify-API und vollständige Wiedergabe nicht bestätigt. |
+| 25 | Spotify als Nebenfunktion | Embed verbessert, API noch offen | Spotify-/Apple-Music-Embed und externer Vollwiedergabe-Link vorhanden; Erkennung einzelner Titel korrigiert. Die Spotify-Web-API/OAuth braucht noch eine vom Betreiber angelegte Developer-App und Berechtigungen; vollständige Wiedergabe im Embed ist nicht garantiert. |
 | 26 | Personalisierte Schnellzugriffe | Vorhanden | Einstellungen für Schnellzugriffe erkannt; Browser-E2E noch offen. |
 | 27 | Adaptiver Startbildschirm | Teilweise umgesetzt | Dashboard-Empfehlung reagiert auf vorhandenen Plan, heutige Einheit/Ruhetag und Trainingsziel. Letzten Check-in und letzte absolvierte Einheit noch stärker einbeziehen. |
 | 28 | Erholung/Readiness | Teilweise | Tages-Check-in für Schlaf, Wasser und Schritte existiert; keine medizinische Readiness-Bewertung. |
