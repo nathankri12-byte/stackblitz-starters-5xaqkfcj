@@ -168,6 +168,32 @@ async function signInWithGoogle() {
   }
 }
 
+async function signInWithApple() {
+  if (!supabaseClient) { setAuthMessage("Supabase ist noch nicht verbunden."); return; }
+  setAuthMessage("Apple-Anmeldung wird geöffnet …");
+  try {
+    const redirectTo = window.location.origin + window.location.pathname;
+    const { error } = await supabaseClient.auth.signInWithOAuth({
+      provider: "apple",
+      options: { redirectTo }
+    });
+    if (error) {
+      console.error("Apple OAuth:", error);
+      const details = String(error.message || "").toLowerCase();
+      if (details.includes("provider is not enabled") || details.includes("unsupported provider")) {
+        setAuthMessage("Apple-Anmeldung ist noch nicht aktiviert. Dafür muss Apple in Supabase eingerichtet und mit einem Apple-Developer-Konto verbunden werden.");
+      } else if (details.includes("redirect") || details.includes("callback")) {
+        setAuthMessage("Die Rücksprungadresse ist in Supabase noch nicht freigegeben. Füge die App-Adresse bei den Redirect URLs hinzu.");
+      } else {
+        setAuthMessage("Apple-Anmeldung fehlgeschlagen: " + (error.message || "Bitte versuche es erneut."));
+      }
+    }
+  } catch (error) {
+    console.error("Apple OAuth:", error);
+    setAuthMessage("Apple-Anmeldung fehlgeschlagen: " + (error.message || "Bitte versuche es erneut."));
+  }
+}
+
 /* =========================================================
    OBSERVER MODE
    Read-only UI preview. This does not grant access to user data.
@@ -4314,15 +4340,17 @@ async function processCommunityInvite(){
  if(localStorage.getItem(key)==="done")return;
  try{
   const relation=communityFriendRelation(inviterId);
-  if(!relation||relation.status==="declined"&&relation.sender_id===currentUser.id){
+  if(!relation||relation.status==="declined"){
    const {error}=await supabaseClient.from("community_friend_requests").insert({sender_id:currentUser.id,recipient_id:inviterId,status:"pending"});
    if(error&&error.code!=="23505")throw error;
   }
+  const {data:updatedRequests,error:requestError}=await supabaseClient.from("community_friend_requests").select("id,sender_id,recipient_id,status,created_at,updated_at").or("sender_id.eq."+currentUser.id+",recipient_id.eq."+currentUser.id).order("created_at",{ascending:false}).limit(100);
+  if(requestError)throw requestError;
+  communityState.friendRequests=updatedRequests||[];
   localStorage.setItem(key,"done");
-  communityStatus("communityInviteStatus","Freundschaftsanfrage gesendet. Die andere Person kann sie jetzt annehmen.",true);
+  communityStatus("communityInviteStatus",relation?.status==="accepted"?"Ihr seid bereits befreundet.":"Freundschaftsanfrage gesendet. Die andere Person kann sie jetzt annehmen.",true);
   url.searchParams.delete("communityInvite");
   history.replaceState({}, "", url.pathname+url.search+url.hash);
-  await loadCommunity();
  }catch(error){console.warn("Community-Einladung konnte nicht verarbeitet werden:",error.message);}
 }
 async function saveCommunityProfile(){
