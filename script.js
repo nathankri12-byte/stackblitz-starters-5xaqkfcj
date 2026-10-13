@@ -1882,6 +1882,10 @@ Wichtig:
 - Bei Minderjährigen keine Kalorienziele zur Gewichtsabnahme und keine restriktiven Makroziele erstellen.
 - Bei Minderjährigen keine Körperbewertung oder Druck durch Gewichtszahlen; Gesundheit, Energie und Gewohnheiten stehen im Vordergrund.
 - Keine medizinischen Diagnosen oder Heilversprechen.
+- Kein Body-Shaming, keine abwertenden Kommentare über Körperform, Gewicht oder Essen; keine moralische Einteilung in „gute“ und „schlechte“ Lebensmittel.
+- Korrigiere verbreitete Fitness-Mythen freundlich und erkläre kurz, was gut belegt ist und was unsicher bleibt.
+- Bei wissenschaftlichen oder gesundheitlichen Aussagen nenne nur Quellen/Organisationen, deren Namen du zuverlässig kennst; erfinde niemals Studien, Zitate oder Links. Wenn du eine Quelle nicht verlässlich angeben kannst, sage das offen.
+- Keine unnötige Fokussierung auf Körpergewicht; feiere Technik, Routine, Energie, Mobilität und Wohlbefinden.
 - Fokus auf gesundes Wachstum
 - Fokus auf ausreichend Energie
 - Fokus auf Technik
@@ -2238,7 +2242,9 @@ VERBINDLICHE REGELN:
 - Berücksichtige ausdrücklich genannte Muskelgruppen, Trainingstage, verfügbare Ausrüstung, Einschränkungen und Erfahrungslevel. Die Wünsche müssen sich in den konkreten Übungen und der Wochenaufteilung wiederfinden.
 - Wenn eine bestimmte Zahl an Trainingstagen gewünscht wird, halte sie exakt ein. An allen anderen Tagen Ruhe oder leichte Erholung.
 - Wenn keine Anzahl genannt wird, wähle eine realistische Anzahl mit ausreichender Regeneration.
-- Der Nutzer ist minderjährig: keine Maximalversuche, keine extremen Gewichte, keine gefährlichen Methoden; Technik und Betreuung haben Vorrang.
+- Wende den passenden ALTERSMODUS aus den Systemanweisungen an: keine Maximalversuche oder gefährlichen Methoden bei Minderjährigen; Technik und Betreuung haben Vorrang.
+- Erkläre Trainingsmythen freundlich und evidenzorientiert. Behaupte keine wissenschaftlichen Belege, die nicht sicher bekannt sind.
+- Berücksichtige auch nicht gewichtsbasierten Fortschritt: Technik, Beweglichkeit, Ausdauer, Routine und Erholung, wenn das Ziel dazu passt.
 - Maximal 6 Übungen pro Trainingstag.
 - Format pro Tag: „MONTAG | konkreter Schwerpunkt“ oder „MONTAG | RUHETAG“.
 - Jede Übung in einer eigenen Zeile im Format: „ÜBUNG: Name | SÄTZE: 3 | WIEDERHOLUNGEN: 8–12“ oder bei Zeitübungen „ÜBUNG: Name | SÄTZE: 3 | DAUER: 30 Sekunden“.
@@ -3050,8 +3056,16 @@ function renderTrainingProgress(entries) {
     if (!previous || Number(entry.weight) > Number(previous.weight)) bestByExercise.set(entry.exercise_name, entry);
   });
   const records = Array.from(bestByExercise.entries()).sort((a,b) => Number(b[1].weight) - Number(a[1].weight)).slice(0,4);
-  const recordMarkup = records.length ? records.map(([name,entry]) => "<li><strong>" + escapeHTML(name) + "</strong>: " + escapeHTML(String(entry.weight)) + " kg</li>").join("") : "<li>Speichere Trainingsgewichte, damit hier deine persönlichen Bestwerte erscheinen.</li>";
-  const summary = '<article class="card" style="margin-bottom:16px"><span class="eyebrow">DEINE MEILENSTEINE</span><div class="grid grid-2" style="margin-top:10px"><div><strong style="font-size:28px">' + completedDays + '</strong><p class="card-description">Trainingstage mit abgeschlossenen Übungen</p></div><div><strong style="font-size:28px">' + completedExercises + '</strong><p class="card-description">Abgeschlossene Übungen</p></div></div><h4 style="margin-top:14px">Bisher höchste gespeicherte Gewichte</h4><ul style="padding-left:20px;line-height:1.8">' + recordMarkup + '</ul><p class="card-description">Vergleiche dich mit deinem eigenen Verlauf – nicht mit anderen. Die Werte zeigen nur deine gespeicherten Einträge.</p></article>';
+  const recordMarkup = records.length ? records.map(([name,entry]) => "<li><strong>" + escapeHTML(name) + "</strong>: " + escapeHTML(String(entry.weight)) + " kg</li>").join("") : "<li>Noch keine Gewichts-Bestwerte gespeichert.</li>";
+  const bestMetric = (field, unit, direction = "max") => {
+    const values = entries.filter(entry => entry[field] !== null && entry[field] !== undefined && Number.isFinite(Number(entry[field])));
+    if (!values.length) return "Noch keine Werte";
+    const best = values.reduce((picked, entry) => direction === "min"
+      ? (Number(entry[field]) < Number(picked[field]) ? entry : picked)
+      : (Number(entry[field]) > Number(picked[field]) ? entry : picked));
+    return escapeHTML(String(best.exercise_name)) + ": " + escapeHTML(String(best[field])) + " " + unit;
+  };
+  const summary = '<article class="card" style="margin-bottom:16px"><span class="eyebrow">DEINE MEILENSTEINE</span><div class="grid grid-2" style="margin-top:10px"><div><strong style="font-size:28px">' + completedDays + '</strong><p class="card-description">Trainingstage mit abgeschlossenen Übungen</p></div><div><strong style="font-size:28px">' + completedExercises + '</strong><p class="card-description">Abgeschlossene Übungen</p></div></div><h4 style="margin-top:14px">Dein persönlicher Verlauf</h4><ul style="padding-left:20px;line-height:1.8"><li><strong>Gewicht:</strong> ' + recordMarkup + '</li><li><strong>Wiederholungen:</strong> ' + bestMetric("reps", "Wdh.") + '</li><li><strong>Dauer:</strong> ' + bestMetric("duration_seconds", "Sek.") + '</li></ul><p class="card-description">Fortschritt ist mehr als Gewicht: Auch Routine, Technik, Wiederholungen und Ausdauer zählen. Vergleiche dich mit deinem eigenen Verlauf – nicht mit anderen.</p></article>';
   const cards = [];
   for (const [name, values] of grouped) {
     const charts = [renderMetricChart(values, "weight", "Gewicht", "kg"), renderMetricChart(values, "reps", "Wiederholungen", "Wdh."), renderMetricChart(values, "duration_seconds", "Dauer", "Sek.")].filter(Boolean);
