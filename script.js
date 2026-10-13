@@ -3843,6 +3843,25 @@ function filterAdminFeedback(query = "") {
 
 
 
+/* SHAREABLE SUCCESS CARD — excludes body measurements */
+async function shareProgressCard(){
+ const status=document.getElementById("progressCardStatus"),message=document.getElementById("progressCardMessage")?.value||"Ich bleibe dran – Schritt für Schritt.",showName=Boolean(document.getElementById("progressCardShowName")?.checked);
+ try{
+  const canvas=document.createElement("canvas");canvas.width=1200;canvas.height=630;const ctx=canvas.getContext("2d");if(!ctx)throw new Error("Canvas nicht verfügbar");
+  const gradient=ctx.createLinearGradient(0,0,1200,630);gradient.addColorStop(0,"#080b10");gradient.addColorStop(1,"#17212b");ctx.fillStyle=gradient;ctx.fillRect(0,0,1200,630);
+  ctx.strokeStyle="#d9ff3f";ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(72,72,1056,486,30);ctx.stroke();
+  ctx.fillStyle="#d9ff3f";ctx.font="700 26px Arial";ctx.fillText("FITNESS AI PRO",110,132);
+  ctx.fillStyle="#f5f7fa";ctx.font="700 54px Arial";const words=String(message).split(/\s+/);let lines=[],line="";for(const word of words){const candidate=line?line+" "+word:word;if(ctx.measureText(candidate).width>880&&line){lines.push(line);line=word;}else line=candidate;}if(line)lines.push(line);lines.slice(0,3).forEach((txt,i)=>ctx.fillText(txt,110,245+i*68));
+  ctx.fillStyle="#a7b2bf";ctx.font="24px Arial";ctx.fillText("Kleine Schritte zählen. Mach es auf deine Weise.",110,470);
+  if(showName){const name=String(currentProfile?.name||currentUser?.user_metadata?.name||"").trim().slice(0,40);if(name){ctx.fillStyle="#d9ff3f";ctx.font="600 22px Arial";ctx.fillText(name,110,520);}}
+  ctx.fillStyle="#8793a1";ctx.font="18px Arial";ctx.fillText("Dein Training. Dein Tempo.",110,590);
+  const blob=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error("Bild konnte nicht erstellt werden")),"image/png"));
+  const file=new File([blob],"fitness-ai-pro-erfolg.png",{type:"image/png"});
+  if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){await navigator.share({title:"Mein FITNESS AI PRO Meilenstein",text:"Kleine Schritte zählen.",files:[file]});if(status)status.textContent="Deine Erfolgskarte wurde zum Teilen geöffnet.";}
+  else{const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="fitness-ai-pro-erfolg.png";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);if(status)status.textContent="Deine Erfolgskarte wurde erstellt. Du kannst sie jetzt aus deinen Downloads teilen.";}
+ }catch(error){if(error?.name==="AbortError")return;console.error("Erfolgskarte konnte nicht erstellt werden:",error);if(status)status.textContent="Die Erfolgskarte konnte nicht erstellt werden. Bitte versuche es erneut.";}
+}
+
 /* COMMUNITY CHALLENGES — voluntary, positive and non-weight-based */
 function communityChallengeUnitLabel(unit){return ({workouts:"Trainingseinheiten",minutes:"aktive Minuten",active_days:"aktive Tage"})[unit]||"Einheiten";}
 function communityChallengeToday(){return getMealDiaryLocalDate();}
