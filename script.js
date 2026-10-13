@@ -1067,6 +1067,7 @@ function showTab(tabName) {
     "admin"
   ) {
     loadAllFeedback();
+    loadCommunityReports();
   }
 
   if (
@@ -3838,6 +3839,39 @@ function filterAdminFeedback(query = "") {
   `).join("");
 }
 
+
+
+/* COMMUNITY MODERATION — reports are visible to platform admins only */
+async function reportCommunityPost(postId,reportedUserId){
+ if(!currentUser||!supabaseClient){communityStatus("communityInviteStatus","Bitte melde dich zuerst an.");return;}
+ if(!postId||!reportedUserId||reportedUserId===currentUser.id)return;
+ const details=prompt("Warum möchtest du diesen Beitrag melden? Bitte beschreibe kurz das Problem. Teile keine privaten Daten.");
+ if(details===null)return;
+ const clean=details.trim();if(!clean){communityStatus("communityInviteStatus","Bitte gib einen kurzen Meldegrund an.");return;}
+ if(clean.length>500){communityStatus("communityInviteStatus","Der Meldegrund darf höchstens 500 Zeichen enthalten.");return;}
+ const {error}=await supabaseClient.from("community_reports").insert({reporter_id:currentUser.id,reported_user_id:reportedUserId,post_id:postId,reason:"other",details:clean,status:"open"});
+ if(error){console.error("Community-Meldung konnte nicht gesendet werden:",error);communityStatus("communityInviteStatus","Meldung konnte nicht gesendet werden. Bitte versuche es erneut.");return;}
+ communityStatus("communityInviteStatus","Danke. Deine Meldung wurde vertraulich an die Administration gesendet.",true);
+}
+async function loadCommunityReports(){
+ const list=document.getElementById("communityReportsList");if(!list)return;
+ if(!currentUser||!supabaseClient||!isCurrentUserAdmin()){list.innerHTML='<p class="card-description">Nur die Plattform-Administration kann Meldungen prüfen.</p>';return;}
+ list.innerHTML='<p class="card-description">Meldungen werden geladen …</p>';
+ try{
+  const {data,error}=await supabaseClient.from("community_reports").select("id,reporter_id,reported_user_id,post_id,reason,details,status,created_at,updated_at").order("created_at",{ascending:false}).limit(100);if(error)throw error;
+  if(!data?.length){list.innerHTML='<p class="card-description">Keine Community-Meldungen vorhanden.</p>';return;}
+  const postIds=[...new Set(data.map(r=>r.post_id).filter(Boolean))];let postMap=new Map();
+  if(postIds.length){const {data:posts,error:postError}=await supabaseClient.from("community_posts").select("id,body").in("id",postIds);if(postError)console.warn("Gemeldete Beitragstexte konnten nicht geladen werden:",postError.message);else postMap=new Map((posts||[]).map(p=>[p.id,p.body]));}
+  list.innerHTML=data.map(r=>'<article class="community-report-row"><strong>'+communityEscape(({open:"Offen",reviewing:"In Bearbeitung",resolved:"Erledigt",dismissed:"Abgewiesen"})[r.status]||r.status)+' · '+communityEscape(({spam:"Spam",harassment:"Belästigung",inappropriate:"Unangemessener Inhalt",privacy:"Datenschutz",other:"Sonstiges"})[r.reason]||r.reason)+'</strong><p>'+communityEscape(r.details||"Kein zusätzlicher Text")+'</p><p><small>Gemeldet: '+communityEscape(new Date(r.created_at).toLocaleString("de-DE"))+' · Beitrags-ID: '+communityEscape(r.post_id||"nicht verfügbar")+'</small></p>'+(r.post_id&&postMap.get(r.post_id)?'<p><strong>Gemeldeter Beitrag:</strong> '+communityEscape(postMap.get(r.post_id))+'</p>':'')+'<div class="community-report-actions"><button class="secondary-btn" type="button" onclick="updateCommunityReport(\''+communityEscape(r.id)+'\',\'reviewing\')">In Bearbeitung</button><button class="secondary-btn" type="button" onclick="updateCommunityReport(\''+communityEscape(r.id)+'\',\'resolved\')">Erledigt</button><button class="secondary-btn" type="button" onclick="updateCommunityReport(\''+communityEscape(r.id)+'\',\'dismissed\')">Abweisen</button></div></article>').join("");
+ }catch(error){console.error("Community-Meldungen konnten nicht geladen werden:",error);list.innerHTML='<p class="card-description">Meldungen konnten nicht geladen werden. Bitte prüfe die Admin-Berechtigung und versuche es erneut.</p>';}
+}
+async function updateCommunityReport(reportId,status){
+ if(!currentUser||!supabaseClient||!isCurrentUserAdmin()||!["reviewing","resolved","dismissed"].includes(status))return;
+ const {error}=await supabaseClient.from("community_reports").update({status,updated_at:new Date().toISOString()}).eq("id",reportId);
+ if(error){console.error("Community-Meldung konnte nicht aktualisiert werden:",error);communityStatus("communityReportsStatus","Status konnte nicht gespeichert werden.");return;}
+ communityStatus("communityReportsStatus","Meldungsstatus gespeichert.",true);await loadCommunityReports();
+}
+
 async function loadAllFeedback() {
   const container = document.getElementById("allFeedback");
   if (!container || !currentUser || !supabaseClient) return;
@@ -4257,7 +4291,7 @@ function renderCommunityFeed(){
   const comments=communityState.comments.filter(c=>c.post_id===post.id);
   const image=post.image_url||"";
   const commentHtml=comments.map(c=>'<div class="community-comment"><div class="community-avatar" style="width:28px;height:28px;flex-basis:28px;font-size:9px">'+communityEscape(communityInitials(map.get(c.user_id)?.display_name||"FP"))+'</div><div><strong>'+communityEscape(map.get(c.user_id)?.display_name||"Mitglied")+'</strong><span>'+communityEscape(c.body)+'</span></div></div>').join("");
-  return '<article class="card community-post" data-post-id="'+communityEscape(post.id)+'"><div class="community-post-head"><div class="community-avatar">'+communityEscape(communityInitials(name))+'</div><div class="community-post-author"><strong>'+communityEscape(name)+'</strong><small>'+communityEscape(communityDate(post.created_at))+'</small></div>'+(mine?'<button class="community-post-menu" type="button" aria-label="Beitrag löschen" title="Beitrag löschen" onclick="deleteCommunityPost(\''+communityEscape(post.id)+'\')">×</button>':'')+'</div>'+(post.body?'<div class="community-post-body">'+communityEscape(post.body)+'</div>':'')+(image?'<img class="community-post-image" src="'+communityEscape(image)+'" alt="Bild zum Community-Beitrag" loading="lazy">':'')+'<div class="community-post-stats">'+(communityState.likeCounts.get(post.id)||0)+' Likes · '+comments.length+' Kommentare</div><div class="community-post-actions"><button type="button" class="'+(liked?"liked":"")+'" onclick="toggleCommunityLike(\''+communityEscape(post.id)+'\')">'+(liked?" Gefällt dir":" Gefällt mir")+'</button><button type="button" onclick="document.getElementById(\'communityComment-'+communityEscape(post.id)+'\')?.focus()">▢ Kommentieren</button>'+(mine?"":'<button type="button" onclick="followCommunityUser(\''+communityEscape(post.user_id)+'\')">'+(communityState.following.has(post.user_id)?"✓ Abonniert":"+ Abonnieren")+'</button>')+'</div><div class="community-comments">'+(commentHtml||'<p class="community-muted">Noch keine Kommentare.</p>')+'<form class="community-comment-form" onsubmit="event.preventDefault();submitCommunityComment(\''+communityEscape(post.id)+'\',this)"><label class="sr-only" for="communityComment-'+communityEscape(post.id)+'">Kommentar schreiben</label><input id="communityComment-'+communityEscape(post.id)+'" name="comment" maxlength="500" placeholder="Schreibe einen Kommentar …" required><button type="submit">Senden</button></form></div></article>';
+  return '<article class="card community-post" data-post-id="'+communityEscape(post.id)+'"><div class="community-post-head"><div class="community-avatar">'+communityEscape(communityInitials(name))+'</div><div class="community-post-author"><strong>'+communityEscape(name)+'</strong><small>'+communityEscape(communityDate(post.created_at))+'</small></div>'+(mine?'<button class="community-post-menu" type="button" aria-label="Beitrag löschen" title="Beitrag löschen" onclick="deleteCommunityPost(\''+communityEscape(post.id)+'\')">×</button>':'<button class="community-report-btn" type="button" aria-label="Beitrag melden" title="Beitrag melden" onclick="reportCommunityPost(\''+communityEscape(post.id)+'\',\''+communityEscape(post.user_id)+'\')">Melden</button>')+'</div>'+(post.body?'<div class="community-post-body">'+communityEscape(post.body)+'</div>':'')+(image?'<img class="community-post-image" src="'+communityEscape(image)+'" alt="Bild zum Community-Beitrag" loading="lazy">':'')+'<div class="community-post-stats">'+(communityState.likeCounts.get(post.id)||0)+' Likes · '+comments.length+' Kommentare</div><div class="community-post-actions"><button type="button" class="'+(liked?"liked":"")+'" onclick="toggleCommunityLike(\''+communityEscape(post.id)+'\')">'+(liked?" Gefällt dir":" Gefällt mir")+'</button><button type="button" onclick="document.getElementById(\'communityComment-'+communityEscape(post.id)+'\')?.focus()">▢ Kommentieren</button>'+(mine?"":'<button type="button" onclick="followCommunityUser(\''+communityEscape(post.user_id)+'\')">'+(communityState.following.has(post.user_id)?"✓ Abonniert":"+ Abonnieren")+'</button>')+'</div><div class="community-comments">'+(commentHtml||'<p class="community-muted">Noch keine Kommentare.</p>')+'<form class="community-comment-form" onsubmit="event.preventDefault();submitCommunityComment(\''+communityEscape(post.id)+'\',this)"><label class="sr-only" for="communityComment-'+communityEscape(post.id)+'">Kommentar schreiben</label><input id="communityComment-'+communityEscape(post.id)+'" name="comment" maxlength="500" placeholder="Schreibe einen Kommentar …" required><button type="submit">Senden</button></form></div></article>';
  }).join("");
 }
 function communityFriendRelation(userId){
