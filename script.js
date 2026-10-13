@@ -4316,7 +4316,7 @@ async function loadCommunity(){
  try{
   await ensureCommunityProfile();
   const [pr,po,fo,li,fr]=await Promise.all([
-   supabaseClient.from("community_profiles").select("user_id,username,display_name,bio,avatar_url,created_at").order("created_at",{ascending:true}).limit(300),
+   supabaseClient.from("community_profiles").select("user_id,username,display_name,bio,avatar_url,community_visible,created_at").order("created_at",{ascending:true}).limit(300),
    supabaseClient.from("community_posts").select("id,user_id,body,image_path,created_at,updated_at").order("created_at",{ascending:false}).limit(60),
    supabaseClient.from("community_follows").select("following_id").eq("follower_id",currentUser.id),
    supabaseClient.from("community_likes").select("post_id").eq("user_id",currentUser.id),
@@ -4351,6 +4351,7 @@ async function loadCommunity(){
    if(u&&document.activeElement!==u)u.value=own.username||"";
    if(n&&document.activeElement!==n)n.value=own.display_name||"";
    if(b&&document.activeElement!==b)b.value=own.bio||"";
+   const visibleToggle=document.getElementById("communityVisible");if(visibleToggle&&document.activeElement!==visibleToggle)visibleToggle.checked=own.community_visible===true;
    if(a)a.textContent=communityInitials(own.display_name);
   }
   await processCommunityInvite();
@@ -4472,10 +4473,10 @@ async function processCommunityInvite(){
 }
 async function saveCommunityProfile(){
  if(!supabaseClient||!currentUser){communityStatus("communityProfileStatus","Bitte melde dich zuerst an.");return;}
- const username=(document.getElementById("communityUsername")?.value||"").trim().toLowerCase(),name=document.getElementById("communityDisplayName")?.value.trim()||"",bio=document.getElementById("communityBio")?.value.trim()||"";
+ const username=(document.getElementById("communityUsername")?.value||"").trim().toLowerCase(),name=document.getElementById("communityDisplayName")?.value.trim()||"",bio=document.getElementById("communityBio")?.value.trim()||"",communityVisible=document.getElementById("communityVisible")?.checked===true;
  if(!/^[a-z0-9][a-z0-9_-]{2,29}$/.test(username)){communityStatus("communityProfileStatus","Der Benutzername muss 3–30 Zeichen lang sein und darf nur Kleinbuchstaben, Zahlen, _ und - enthalten.");return;}
  if(!name||name.length>40||bio.length>180){communityStatus("communityProfileStatus","Bitte gib einen Anzeigenamen (1–40 Zeichen) und eine Bio mit höchstens 180 Zeichen ein.");return;}
- const {error}=await supabaseClient.from("community_profiles").upsert({user_id:currentUser.id,username,display_name:name,bio,updated_at:new Date().toISOString()},{onConflict:"user_id"});
+ const {error}=await supabaseClient.from("community_profiles").upsert({user_id:currentUser.id,username,display_name:name,bio,community_visible:communityVisible,updated_at:new Date().toISOString()},{onConflict:"user_id"});
  if(error){console.error(error);communityStatus("communityProfileStatus","Profil konnte nicht gespeichert werden. Bitte erneut versuchen.");return;}
  communityStatus("communityProfileStatus","Community-Profil gespeichert.",true);await loadCommunity();
 }
@@ -4494,6 +4495,8 @@ function clearCommunityImage(){communitySelectedImage=null;if(communityPreviewUr
 async function publishCommunityPost(){
  const text=document.getElementById("communityPostText")?.value.trim()||"",status="communityPostStatus",button=document.getElementById("communityPublishBtn");
  if(!supabaseClient||!currentUser){communityStatus(status,"Bitte melde dich an, bevor du etwas veröffentlichst.");return;}
+ const ownCommunityProfile=communityState.profiles.find(p=>p.user_id===currentUser.id);
+ if(!ownCommunityProfile?.community_visible){communityStatus(status,"Dein Community-Profil ist noch privat. Aktiviere die Sichtbarkeit und speichere dein Profil, bevor du etwas veröffentlichst.");return;}
  if(!text&&!communitySelectedImage){communityStatus(status,"Schreibe etwas oder füge ein Bild hinzu.");return;}
  if(text.length>1200){communityStatus(status,"Dein Beitrag darf höchstens 1.200 Zeichen enthalten.");return;}
  if(button){button.disabled=true;button.textContent="Wird veröffentlicht …";}communityStatus(status,"Beitrag wird gespeichert …",true);
