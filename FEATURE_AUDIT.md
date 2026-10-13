@@ -19,8 +19,8 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 11 | Ausführliches Makrotracking für Erwachsene | Später | Erst nach Stabilisierung des Trainings-Kernablaufs. |
 | 12 | Keine Blutwerte im MVP | Bewusst zurückgestellt | Nicht implementieren. |
 | 13 | Dashboard vereinfachen | Verbessern | Kernaktionen priorisieren: heutiges Training, Plan, Fortschritt. |
-| 14 | Fortschritt als positive Geschichten | Teilweise vorhanden | Gewicht-/Trainingsverlauf existiert; positive, nicht wertende Zusammenfassung ergänzen. |
-| 15 | Persönliche Rekorde (PRs) | Teilweise / prüfen | Trainingswerte existieren; PR-Erkennung nicht bestätigt. |
+| 14 | Fortschritt als positive Geschichten | Grundversion umgesetzt im Folge-Branch | Fortschrittsbereich zeigt abgeschlossene Trainingstage, abgeschlossene Übungen und eigene Bestwerte in wertfreier Sprache. |
+| 15 | Persönliche Rekorde (PRs) | Grundversion umgesetzt im Folge-Branch | Höchste gespeicherte Gewichte je Übung werden im Fortschrittsbereich zusammengefasst; noch kein automatischer PR-Verlauf. |
 | 16 | Nicht-toxische Gamification | Verbessern | Konsistenz und persönliche Bestwerte statt Ranglisten/Druck. |
 | 17 | Community | Vorhanden, nicht E2E getestet | Community-Tab, Profile, Posts, Likes und Kommentare im Code vorhanden. |
 | 18 | Gemeinsam trainieren | Später | Benötigt Einladungen/Datenschutzregeln und Missbrauchsschutz. |
@@ -53,7 +53,7 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 45 | Tonalität | Verbessern | Freundlich, klar, nicht wertend und altersgerecht. |
 | 46 | Fünf Haupttabs | Prüfen | Navigation vorhanden, aber Struktur auf Kernbereiche reduzieren/validieren. |
 | 47 | Fortschritt direkt im Training | Teilweise | Trainingskarten speichern Werte; Live-Fortschritt im Workout ergänzen. |
-| 48 | „Warum diese Übung?“ | Teilweise | KI-Erklärung ist erreichbar; gezielte Erklärung direkt an jeder Planübung fehlt. |
+| 48 | „Warum diese Übung?“ | Grundversion im Folge-Branch | Jede Trainingskarte hat eine Aktion, die im separaten KI-Coach Ziel, Muskelgruppen, Technik und häufige Fehler erklären lässt. |
 | 49 | Übung tauschen | Grundversion im Feature-Branch | Tauschoptionen für bekannte Übungen, passende Tags und zurückgesetzte Logging-Felder; unbekannte Übungen zeigen einen sicheren Hinweis statt blind zu ersetzen. E2E offen. |
 | 50 | Gym-Confidence-Modus | Fehlt | Kurze Gerätehinweise und diskrete Schritt-für-Schritt-Anleitung. |
 | 51 | Skill-Level | Teilweise | KI soll Anfänger berücksichtigen; explizite Levelauswahl fehlt/prüfen. |
@@ -78,7 +78,7 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 - Supabase Security Advisor meldet: veraltete Tabelle `public."Feedback"` ohne RLS-Policies; zwei `SECURITY DEFINER`-Funktionen sind für `anon` ausführbar; Schutz vor kompromittierten Passwörtern ist deaktiviert. Diese Punkte sollten vor breiter Veröffentlichung behoben werden.
 - Supabase Performance Advisor meldet fehlende Indizes auf zwei Fremdschlüsseln und mehrere permissive Feedback-SELECT-Policies; vor Schemaänderungen prüfen.
 - Ein vollständiger End-to-End-Test aller Community-, KI-, Musik- und Trainingsabläufe steht noch aus.
-- Folge-Branch ergänzt adaptive Planerstellung anhand eigener Trainingshistorie, First-Gym-Einsteiger-Guide und öffentliche Seite für freigeschaltete Studios/Angebote. JavaScript-Syntax- und HTML-ID-Prüfungen bestanden; Live-Test nach Deployment offen.
+- Folge-Branch ergänzt adaptive Planerstellung anhand eigener Trainingshistorie, First-Gym-Einsteiger-Guide, öffentliche Seite für freigeschaltete Studios/Angebote, Übungserklärungen direkt aus dem Workout und wertfreie Trainings-Meilensteine. JavaScript-Syntax- und HTML-ID-Prüfungen bestanden; Live-Test nach Deployment offen.
 
 ## Reihenfolge für die Umsetzung
 
