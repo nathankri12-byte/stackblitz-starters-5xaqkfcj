@@ -6,8 +6,8 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 
 | Nr. | Punkt | Status | Befund / nächster Schritt |
 |---:|---|---|---|
-| 1 | Klare USP: persönlicher KI-Gym-Coach für Einsteiger | Verbessern | Positionierung in Dashboard und Onboarding konsistent machen. |
-| 2 | Zielgruppe Einsteiger/Jugendliche klar definieren | Verbessern | Altersgerechte Sprache, Belastungsgrenzen und Privatsphäre klarer sichtbar machen. |
+| 1 | Klare USP: persönlicher KI-Gym-Coach für Einsteiger | Teilweise umgesetzt | Anmeldebereich nennt jetzt den KI-Gym-Coach für Training, Technik und Fortschritt; Dashboard-Überschrift vereinheitlicht. Vollständige Onboarding-Prüfung offen. |
+| 2 | Zielgruppe Einsteiger/Jugendliche klar definieren | Teilweise umgesetzt | KI erhält jetzt altersabhängige Leitlinien für 14–15, 16–17 und 18+ sowie konservative Vorgaben bei unbekanntem Alter. Sichtbarkeit im Onboarding und Privatsphäre-UX noch prüfen. |
 | 3 | Adaptive Trainingspläne | Grundversion umgesetzt im Folge-Branch | Die Planerstellung lädt bis zu 30 eigene Trainingseinträge und übergibt die neuesten 20 als Kontext an die KI; sichere, kleine Anpassungen statt großer automatischer Steigerungen. E2E offen. |
 | 4 | Trainingspläne passend zu Studio-Geräten | Grundversion umgesetzt, E2E offen | Admins pflegen Geräte/Ausstattung pro Studio. Nutzer wählen ein freigeschaltetes Studio per Name; dessen Geräte-Liste fließt in den Planprompt ein. |
 | 5 | Geräte per QR-Code scannen | Später | Benötigt zuverlässige Geräte-Datenbank/Studio-Kooperation; kein MVP. |
@@ -15,7 +15,7 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 7 | Kontextsensitiver KI-Coach | Teilweise vorhanden | Profilkontext und KI-Chat existieren; Trainingstage, Verlauf und letzte Einheit stärker einbeziehen. |
 | 8 | Einfaches Onboarding | Verbessern | Profilfelder und Trainingsort schrittweise statt als lange Form erfassen. |
 | 9 | Geschlecht nur bei echter Relevanz erfassen | Prüfen | Nicht unnötig erfassen; keine geschlechtsbasierten pauschalen Annahmen. |
-| 10 | Sichere Ernährungshinweise für Jugendliche | Prüfen / begrenzen | Keine aggressiven Diäten oder Kalorienziele für Minderjährige; altersgerechte Hinweise priorisieren. |
+| 10 | Sichere Ernährungshinweise für Jugendliche | Grundschutz ergänzt, Prüfung offen | KI-Anweisungen verbieten für Minderjährige restriktive Kalorien-/Makroziele zur Gewichtsabnahme, Crash-Diäten und Druck durch Gewichtszahlen. Ernährungsplan-UI und authentifizierte End-to-End-Tests noch prüfen. |
 | 11 | Ausführliches Makrotracking für Erwachsene | Später | Erst nach Stabilisierung des Trainings-Kernablaufs. |
 | 12 | Keine Blutwerte im MVP | Bewusst zurückgestellt | Nicht implementieren. |
 | 13 | Dashboard vereinfachen | Verbessern | Kernaktionen priorisieren: heutiges Training, Plan, Fortschritt. |
@@ -26,7 +26,7 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 18 | Gemeinsam trainieren | Später | Benötigt Einladungen/Datenschutzregeln und Missbrauchsschutz. |
 | 19 | Teilbare Fortschrittskarten | Später | Nur freiwillig, ohne sensible Profilwerte standardmäßig zu teilen. |
 | 20 | Privacy-by-default für Minderjährige | Kritisch prüfen | Community ist vorhanden; Sichtbarkeit, Altersregeln und Bildfreigaben gründlich prüfen. |
-| 21 | Altersmodi 14–15, 16–17, 18+ | Fehlt | Altersgerechte Modi und passende Grenzen implementieren. |
+| 21 | Altersmodi 14–15, 16–17, 18+ | Grundversion umgesetzt | KI-Coach schaltet anhand des Profilalters automatisch auf Leitlinien für 14–15, 16–17 oder 18+; bei fehlendem/ungültigem Alter gilt eine konservative Fallback-Regel. UI-Test offen. |
 | 22 | Übungserklärungen/Videos | Vorhanden | Übungsbibliothek mit YouTube-Suche und KI-Erklärungsaktion erkannt. |
 | 23 | Kamera-Formcheck | Später | Hohe Datenschutz-/Fehleranforderungen; nicht im MVP. |
 | 24 | Pausentimer direkt im Training | Umgesetzt im Feature-Branch | 60-Sekunden-Pausentimer mit Pause/Fortsetzen/Neustart direkt an jeder Trainingskarte; Browser-E2E nach Deployment offen. |
@@ -47,9 +47,9 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 39 | Fitness-Ausbildung/Erklärinhalte | Verbessern | Kurze, sichere Erklärungen zu Technik, Pausen und Progression ergänzen. |
 | 40 | KI korrigiert Fitness-Mythen | Verbessern | Evidenzorientierte Antworten, Unsicherheit nennen und keine Diagnosen stellen. |
 | 41 | Quellenangaben | Verbessern | Bei wissenschaftlichen/gesundheitlichen Aussagen nachvollziehbare Quellen anzeigen. |
-| 42 | Keine medizinischen Versprechen | Kritisch prüfen | KI-Prompts und UI müssen Grenzen klar machen. |
-| 43 | Markenauftritt | Verbessern | Einheitliche Typografie, Navigation und visuelle Hierarchie. |
-| 44 | Design nicht wie generische KI-Startup-Seite | Verbessern | Training als Hauptprodukt zeigen; KI als unterstützendes Werkzeug. |
+| 42 | Keine medizinischen Versprechen | Grundschutz ergänzt, Prüfung offen | KI-Anweisungen untersagen medizinische Diagnosen/Heilversprechen und verweisen bei gesundheitlichen Problemen an Eltern oder medizinische Fachpersonen. Weitere UI-/Prompt-Prüfung offen. |
+| 43 | Markenauftritt | Teilweise umgesetzt | Sportfotografie und responsive visuelle Hierarchie ergänzt; Navigation, Typografie und sämtliche Ansichten weiter prüfen. |
+| 44 | Design nicht wie generische KI-Startup-Seite | Teilweise umgesetzt | Positionierung nennt jetzt Training, Technik und Fortschritt als Kern; Training und Workout im Dashboard weiter priorisieren. |
 | 45 | Tonalität | Verbessern | Freundlich, klar, nicht wertend und altersgerecht. |
 | 46 | Fünf Haupttabs | Prüfen | Navigation vorhanden, aber Struktur auf Kernbereiche reduzieren/validieren. |
 | 47 | Fortschritt direkt im Training | Teilweise | Trainingskarten speichern Werte; Live-Fortschritt im Workout ergänzen. |
@@ -76,8 +76,8 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 - Live-Browser: „Profil speichern“ mit unveränderten Werten zeigte „Profil erfolgreich gespeichert.“
 - Live-Browser: Feedbackformular mit 1–5-Bewertung und Nachricht vorhanden; es wurde kein Testfeedback gesendet.
 - Vorhandene Module im Code: KI-Trainingsplan, AI-Chat, Trainingsprotokoll, Gewichtsverlauf, Tages-Check-in, Community, Übungsbibliothek, eigener Timer, Musikbereich, Schnellzugriffe.
-- Supabase Security Advisor meldet: veraltete Tabelle `public."Feedback"` hat RLS ohne Policies (Zugriff auf `anon`/`authenticated` wurde widerrufen); drei `SECURITY DEFINER`-Funktionen sind für angemeldete Nutzer ausführbar. `is_app_admin` und `is_studio_manager` werden für Berechtigungsprüfungen in RLS benötigt; `admin_list_profile_names` muss weiterhin intern Admin-Rechte prüfen. Schutz vor kompromittierten Passwörtern ist deaktiviert und sollte in den Supabase-Auth-Einstellungen aktiviert werden.
-- Supabase Performance Advisor meldet fehlende Indizes auf zwei Community-Fremdschlüsseln, eine Studio-Admin-RLS-Policy mit unnötiger Auth-Neuberechnung und mehrere permissive SELECT-Policies. Vor Optimierungen deren bestehende Zugriffsbedeutung prüfen.
+- Supabase Security Advisor meldet: veraltete Tabelle `public."Feedback"` hat RLS ohne Policies; Tabellenrechte für `PUBLIC`, `anon` und `authenticated` wurden entzogen, da die App die separate Tabelle `public.feedback` nutzt. Drei `SECURITY DEFINER`-Funktionen bleiben für angemeldete Nutzer ausführbar; ihre Verwendung ist vor Änderung sorgfältig zu prüfen, da `is_app_admin`/`is_studio_manager` in RLS genutzt werden und `admin_list_profile_names` intern Admin-Rechte prüft. Schutz vor kompromittierten Passwörtern ist weiterhin deaktiviert und muss in den Supabase-Auth-Einstellungen aktiviert werden.
+- Supabase Performance Advisor: die Studio-Admin-Policy wurde auf `(select auth.jwt() ->> email)` umgestellt und doppelte permissive SELECT-Policies für veröffentlichte Studios/Angebote wurden zusammengeführt, ohne anonymen Zugriff auf unveröffentlichte Daten zu erweitern. Der Advisor meldet weiterhin eine Auth-RLS-Initialplan-Warnung, 17 bisher ungenutzte Indizes (nicht ohne Last-/Nutzungsanalyse entfernen) und weitere Hinweise.
 - Ein vollständiger End-to-End-Test aller Community-, KI-, Musik- und Trainingsabläufe steht noch aus.
 - Feature-Branch ergänzt adaptive Planerstellung anhand eigener Trainingshistorie, First-Gym-Einsteiger-Guide, öffentliche Seite für freigeschaltete Studios/Angebote, Übungserklärungen direkt aus dem Workout, wertfreie Trainings-Meilensteine, speicherbares Erfahrungslevel und Verbindung zum konfigurierten Studio anhand des Namens. JavaScript-Syntax- und HTML-ID-Prüfungen sowie Live-Tests müssen nach Merge/Deploy erneut bestätigt werden.
 
