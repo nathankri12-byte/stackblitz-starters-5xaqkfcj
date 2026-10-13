@@ -1,4 +1,4 @@
-const CACHE_NAME = "fitness-ai-pro-shell-v38";
+const CACHE_NAME = "fitness-ai-pro-shell-v39";
 const APP_SHELL = ["/", "/manifest.webmanifest", "/icons/icon-192.svg", "/icons/icon-512.svg"];
 
 self.addEventListener("install", (event) => {
