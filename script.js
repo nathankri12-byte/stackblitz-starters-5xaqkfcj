@@ -2103,6 +2103,26 @@ async function generateTrainingPlan(customPrompt = "") {
     container.innerHTML = '<div class="card"><p class="card-description">Dein persönlicher Trainingsplan wird anhand deiner Angaben erstellt …</p></div>';
   }
 
+  let trainingHistoryContext = "Noch keine gespeicherten Trainingseinheiten vorhanden. Starte mit einem vorsichtigen Anfängerplan.";
+  try {
+    const historyResult = await supabaseClient.from("training_entries")
+      .select("exercise_name, training_date, completed, weight, reps, duration_seconds")
+      .eq("user_id", currentUser.id).order("training_date", { ascending: false }).limit(30);
+    if (historyResult.error) throw historyResult.error;
+    const history = historyResult.data || [];
+    if (history.length) {
+      trainingHistoryContext = history.slice(0, 20).map(entry => {
+        const metrics = [];
+        if (entry.weight !== null && entry.weight !== undefined) metrics.push(entry.weight + " kg");
+        if (entry.reps !== null && entry.reps !== undefined) metrics.push(entry.reps + " Wdh.");
+        if (entry.duration_seconds !== null && entry.duration_seconds !== undefined) metrics.push(entry.duration_seconds + " Sek.");
+        return entry.training_date + " | " + entry.exercise_name + " | " + (entry.completed ? "abgeschlossen" : "nicht als abgeschlossen markiert") + (metrics.length ? " | " + metrics.join(", ") : "");
+      }).join("\n");
+    }
+  } catch (historyError) {
+    console.warn("Trainingshistorie konnte nicht für die adaptive Planung geladen werden:", historyError);
+  }
+
   const prompt = `
 Du bist ein persönlicher Trainingsplaner. Erstelle einen WIRKLICH INDIVIDUELLEN, vollständigen Wochenplan für genau diesen Nutzer. Ein allgemeiner Standardplan ist ausdrücklich nicht erlaubt. Nutze alle folgenden Daten aktiv und mache die Entscheidungen im Trainingsplan sichtbar.
 
@@ -2117,6 +2137,10 @@ Ernährungsweise: ${profile.diet || "nicht angegeben"}
 
 PERSÖNLICHE WÜNSCHE, die konkret im Plan umgesetzt werden müssen:
 ${requestedPreferences || "Keine zusätzlichen Wünsche. Passe den Plan dennoch konkret an Ziel, Alter und Trainingsort an."}
+
+BISHERIGER TRAININGSVERLAUF (neueste Einträge zuerst):
+${trainingHistoryContext}
+Nutze den Verlauf, um den nächsten Plan sinnvoll anzupassen. Wenn eine Übung mehrfach mit stabilen Werten abgeschlossen wird, darfst du eine kleine, sichere Steigerung oder leichte Variation vorschlagen. Erhöhe Belastungen nicht automatisch stark. Bei unvollständigen Einträgen oder wenig Erfahrung bleibe konservativ. Erfinde keine Daten und diagnostiziere keine Beschwerden.
 
 VERBINDLICHE REGELN:
 - Erstelle sieben Abschnitte von MONTAG bis SONNTAG.
