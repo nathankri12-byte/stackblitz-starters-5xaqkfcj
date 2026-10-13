@@ -1181,11 +1181,20 @@ function updateDashboardWorkout() {
   const plan = (localStorage.getItem("fitness_ai_training_plan") || "").trim();
   if (!plan) {
     element.textContent = "Noch kein Trainingsplan erstellt.";
-    if (recommendation) recommendation.textContent = currentProfile?.goal
-      ? "Dein nächster Schritt: Erstelle einen Plan für dein Ziel „" + currentProfile.goal + "“. Die KI berücksichtigt deinen Trainingsort und dein Erfahrungslevel."
-      : "Ergänze dein Profil und erstelle deinen individuellen Trainingsplan. Technik und Erholung stehen im Mittelpunkt.";
+    const missingProfile = [];
+    if (!currentProfile?.age) missingProfile.push("Alter");
+    if (!currentProfile?.height) missingProfile.push("Größe");
+    if (!currentProfile?.goal) missingProfile.push("Trainingsziel");
+    if (!currentProfile?.training_location) missingProfile.push("Trainingsort");
+    const completeButton = document.getElementById("dashboardProfileCompleteButton");
+    if (completeButton) completeButton.hidden = missingProfile.length === 0;
+    if (recommendation) recommendation.textContent = missingProfile.length
+      ? "Bevor du deinen Plan erstellst, ergänze bitte im Profil: " + missingProfile.join(", ") + ". So kann die KI den Plan passend und sicher gestalten."
+      : "Dein Profil ist bereit. Erstelle jetzt einen Plan für dein Ziel „" + currentProfile.goal + "“. Trainingsort, Erfahrungslevel und Erholung werden berücksichtigt.";
     return;
   }
+  const completeButton = document.getElementById("dashboardProfileCompleteButton");
+  if (completeButton) completeButton.hidden = true;
 
   const weekdayNames = ["SONNTAG", "MONTAG", "DIENSTAG", "MITTWOCH", "DONNERSTAG", "FREITAG", "SAMSTAG"];
   const todayName = weekdayNames[new Date().getDay()];
