@@ -3367,13 +3367,13 @@ body {
 
               <label>Bewertung</label>
 
-              <div id="feedbackRating" class="rating">
+              <div id="feedbackRating" class="rating" role="group" aria-label="Bewertung von 1 bis 5">
 
-                <button onclick="selectRating(1)">1</button>
-                <button onclick="selectRating(2)">2</button>
-                <button onclick="selectRating(3)">3</button>
-                <button onclick="selectRating(4)">4</button>
-                <button onclick="selectRating(5)">5</button>
+                <button type="button" onclick="selectRating(1)" aria-label="1 von 5">1</button>
+                <button type="button" onclick="selectRating(2)" aria-label="2 von 5">2</button>
+                <button type="button" onclick="selectRating(3)" aria-label="3 von 5">3</button>
+                <button type="button" onclick="selectRating(4)" aria-label="4 von 5">4</button>
+                <button type="button" onclick="selectRating(5)" aria-label="5 von 5">5</button>
 
               </div>
 
@@ -3394,6 +3394,7 @@ body {
 
 
             <button
+              type="button"
               class="primary-btn"
               onclick="sendFeedback()"
             >
@@ -3403,6 +3404,8 @@ body {
             <div
               id="feedbackStatus"
               class="auth-message"
+              role="status"
+              aria-live="polite"
             ></div>
 
           </div>
@@ -3703,7 +3706,7 @@ body {
 
 
   <!-- Deine JavaScript-Datei -->
-  <script src="script.js?v=20261013-readiness-2"></script>
+  <script src="script.js?v=20261013-feedback-1"></script>
   <script src="studio-admin.js?v=20261013-gym-1"></script>
   <script src="music.js?v=20261013-regex-fix-1"></script>
 
