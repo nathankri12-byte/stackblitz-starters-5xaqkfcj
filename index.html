@@ -2162,6 +2162,48 @@ body {
     .community-challenge-leaders{font-size:11px;color:var(--muted);line-height:1.5;margin-top:7px}
     .progress-share-name{display:flex;align-items:center;gap:8px;margin:8px 0 12px;color:var(--muted);font-size:13px}
     .progress-share-name input{accent-color:var(--accent)}
+/* Cleaner grouped navigation: open a category only when needed. */
+.category-menu{display:grid;gap:7px;padding:0;margin-top:8px}
+.nav-category{border:1px solid var(--border);border-radius:13px;background:rgba(18,24,32,.45);overflow:hidden}
+.nav-category>summary{display:flex;align-items:center;gap:9px;min-height:44px;padding:10px 11px;cursor:pointer;list-style:none;color:var(--text);font-size:12px;font-weight:750}
+.nav-category>summary::-webkit-details-marker{display:none}
+.nav-category>summary .category-chevron{margin-left:auto;color:var(--muted);transition:transform .18s ease}
+.nav-category[open]>summary{color:var(--accent);background:rgba(217,255,63,.055);border-bottom:1px solid var(--border)}
+.nav-category[open]>summary .category-chevron{transform:rotate(180deg)}
+.nav-category>button{display:flex;align-items:center;gap:9px;width:100%;min-height:39px;padding:9px 12px 9px 16px;border:0;border-radius:0;background:transparent;color:var(--muted);font-size:12px;text-align:left}
+.nav-category>button:hover,.nav-category>button.active{background:rgba(217,255,63,.08);color:var(--accent)}
+.mobile-more-menu{max-height:min(72dvh,620px);overflow-y:auto;overscroll-behavior:contain}
+.mobile-more-menu .nav-category{margin:3px 0}
+.mobile-more-menu .nav-category>button{width:100%;text-align:left;border-radius:0;padding-left:18px}
+@media(min-width:761px){.sidebar .nav{display:block}.sidebar .sidebar-more{border-top:1px solid var(--border);padding-top:12px}.sidebar .category-menu{padding-bottom:8px}}
+@media(prefers-reduced-motion:reduce){.nav-category>summary .category-chevron{transition:none}}
+
+/* Image-forward onboarding inspired by polished fitness apps */
+.onboarding-card{overflow:hidden;background:linear-gradient(145deg,rgba(21,27,18,.96),rgba(13,17,15,.98))}
+.onboarding-steps{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.onboarding-step{display:flex;flex-direction:column;align-items:stretch;gap:12px;padding:11px;background:rgba(8,11,9,.56);overflow:hidden}
+.onboarding-step-visual{position:relative;isolation:isolate;display:block;width:100%;height:150px;min-height:150px;flex:0 0 auto;overflow:hidden;border-radius:12px;background-color:#202a30;background-position:center;background-size:cover;animation:fitnessPhotoFloat 8s ease-in-out infinite}
+.onboarding-step-visual:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,rgba(5,8,10,.42),transparent 65%);pointer-events:none}
+.step-visual-profile{background-image:url('https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=85')}
+.step-visual-plan{background-image:url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=85');animation-delay:-2.5s}
+.step-visual-start{background-image:url('https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=85');animation-delay:-5s}
+.onboarding-step-number{align-self:flex-start}
+.onboarding-step-copy{flex:1}
+.onboarding-step button{width:100%;margin-top:auto}
+@keyframes fitnessPhotoFloat{0%,100%{background-position:center 45%;transform:translateY(0)}50%{background-position:center 58%;transform:translateY(-2px)}}
+@media(max-width:900px){.onboarding-steps{grid-template-columns:1fr}.onboarding-step{display:grid;grid-template-columns:110px 34px minmax(0,1fr);align-items:center}.onboarding-step-visual{grid-row:1/span 2;grid-column:1;height:110px;min-height:110px}.onboarding-step-number{grid-column:2;grid-row:1}.onboarding-step-copy{grid-column:3;grid-row:1/span 2}.onboarding-step button{grid-column:2/4;grid-row:3}}
+@media(max-width:600px){.onboarding-step{grid-template-columns:88px 30px minmax(0,1fr);gap:9px;padding:9px}.onboarding-step-visual{height:100px;min-height:100px}.onboarding-step-copy strong{font-size:13px}.onboarding-step-copy p{font-size:11px}}
+
+.auth-photo-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+.auth-photo-tile{position:relative;min-height:106px;overflow:hidden;border:1px solid rgba(255,255,255,.13);border-radius:14px;background-color:#1b2228;background-position:center;background-size:cover;animation:fitnessPhotoFloat 8s ease-in-out infinite}
+.auth-photo-tile:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(4,7,9,.78),transparent 75%)}
+.auth-photo-tile span{position:absolute;z-index:1;bottom:10px;left:10px;font-size:10px;font-weight:900;letter-spacing:1px;color:#fff}
+.auth-photo-one{background-image:url('https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=650&q=80')}
+.auth-photo-two{background-image:url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=650&q=80');animation-delay:-2.5s}
+.auth-photo-three{background-image:url('https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=650&q=80');animation-delay:-5s}
+@media(max-width:1024px){.auth-photo-tile{min-height:88px}.auth-story-points{margin-top:12px}}
+@media(prefers-reduced-motion:reduce){.auth-photo-tile,.onboarding-step-visual{animation:none}}
+
 </style>
 
   <style>
@@ -2495,6 +2537,11 @@ body {
             <span>FITNESS AI PRO</span>
           </div>
         </div>
+        <div class="auth-photo-strip" aria-label="Einblicke ins Training">
+          <div class="auth-photo-tile auth-photo-one"><span>KRAFT</span></div>
+          <div class="auth-photo-tile auth-photo-two"><span>FOKUS</span></div>
+          <div class="auth-photo-tile auth-photo-three"><span>FORTSCHRITT</span></div>
+        </div>
         <div class="auth-story-points">
           <div class="auth-story-point"><b>01 · Persönlich</b><span>Pläne passend zu deinem Ziel und deinem Erfahrungslevel.</span></div>
           <div class="auth-story-point"><b>02 · Verständlich</b><span>Übungshilfe, Pausentimer und sichere Einstiegs-Tipps.</span></div>
@@ -2622,31 +2669,41 @@ body {
         FITNESS AI PRO
       </div>
 
-      <div class="sidebar-section-label">HAUPTMENÜ</div>
+      <div class="sidebar-section-label">SCHNELLZUGRIFF</div>
       <nav class="nav" aria-label="Hauptnavigation">
         <button class="active" onclick="showTab('dashboard')" data-tab="dashboard" data-quick="true"><span class="nav-icon">⌂</span><span id="quickLabel1">Übersicht</span></button>
         <button onclick="showTab('training')" data-tab="training" data-quick="true"><span class="nav-icon">▥</span><span id="quickLabel2">Trainingsplan</span></button>
         <button onclick="showTab('nutrition')" data-tab="nutrition" data-quick="true"><span class="nav-icon">◒</span><span id="quickLabel3">Ernährung</span></button>
-        <button onclick="navigateMore('progress')" data-tab="progress"><span class="nav-icon">↗</span><span>Mein Fortschritt</span></button>
         <div class="sidebar-more">
-          <div class="sidebar-section-label sidebar-more-label">WEITERE FUNKTIONEN</div>
-          <button class="sidebar-more-toggle" id="moreMenuToggle" type="button" aria-expanded="false" aria-controls="moreMenu" onclick="toggleMoreMenu()"><span class="nav-icon">•••</span><span>Mehr</span><span style="margin-left:auto">⌄</span></button>
-          <div class="more-menu" id="moreMenu" hidden>
-            <div class="sidebar-section-label sidebar-more-label">COACH &amp; TRAINING</div>
-            <button onclick="navigateMore('ai')" data-tab="ai"><span class="nav-icon">✧</span>KI-Coach</button>
-            <button onclick="navigateMore('timer')" data-tab="timer"><span class="nav-icon">◷</span>Pausen-Timer</button>
-            <button onclick="navigateMore('music')" data-tab="music"><span class="nav-icon">♫</span>Trainingsmusik</button>
-            <div class="sidebar-section-label sidebar-more-label">FITNESSSTUDIOS</div>
-            <button id="publicStudioOffersNav" onclick="navigateMore('studioOffersPage')" data-tab="studioOffersPage"><span class="nav-icon">⌂</span>Fitnessstudios &amp; Angebote</button>
-            <div class="sidebar-section-label sidebar-more-label">COMMUNITY</div>
-            <button onclick="navigateMore('friends')" data-tab="friends"><span class="nav-icon">◎</span>Community</button>
-            <button onclick="navigateMore('feedback')" data-tab="feedback"><span class="nav-icon">✦</span>Ideen &amp; Feedback</button>
-            <div class="sidebar-section-label sidebar-more-label">MEIN KONTO</div>
-            <button onclick="navigateMore('profile')" data-tab="profile"><span class="nav-icon">○</span>Mein Profil</button>
-            <button onclick="navigateMore('settings')" data-tab="settings"><span class="nav-icon">⚙</span>Einstellungen</button>
-            <button onclick="navigateMore('about')" data-tab="about"><span class="nav-icon">ⓘ</span>Über FITNESS AI PRO</button>
-            <button id="adminNavButton" class="hidden" onclick="navigateMore('admin')" data-tab="admin"><span class="nav-icon">▤</span>Admin</button>
-            <button id="studioNavButton" class="hidden" onclick="navigateMore('studioAdmin')" data-tab="studioAdmin"><span class="nav-icon">⌂</span>Studioverwaltung</button>
+          <div class="sidebar-section-label sidebar-more-label">ALLE BEREICHE</div>
+          <div class="more-menu category-menu" id="moreMenu">
+            <details class="nav-category" open>
+              <summary><span>🏋️</span> Training &amp; Coach <span class="category-chevron">⌄</span></summary>
+              <button onclick="navigateMore('ai')" data-tab="ai"><span class="nav-icon">✧</span>KI-Coach</button>
+              <button onclick="navigateMore('timer')" data-tab="timer"><span class="nav-icon">◷</span>Pausen-Timer</button>
+              <button onclick="navigateMore('music')" data-tab="music"><span class="nav-icon">♫</span>Trainingsmusik</button>
+            </details>
+            <details class="nav-category">
+              <summary><span>📈</span> Fortschritt <span class="category-chevron">⌄</span></summary>
+              <button onclick="navigateMore('progress')" data-tab="progress"><span class="nav-icon">↗</span>Mein Fortschritt</button>
+            </details>
+            <details class="nav-category">
+              <summary><span>🏢</span> Fitnessstudios <span class="category-chevron">⌄</span></summary>
+              <button id="publicStudioOffersNav" onclick="navigateMore('studioOffersPage')" data-tab="studioOffersPage"><span class="nav-icon">⌂</span>Studios &amp; Angebote</button>
+              <button id="studioNavButton" class="hidden" onclick="navigateMore('studioAdmin')" data-tab="studioAdmin"><span class="nav-icon">⌂</span>Studioverwaltung</button>
+            </details>
+            <details class="nav-category">
+              <summary><span>👥</span> Community <span class="category-chevron">⌄</span></summary>
+              <button onclick="navigateMore('friends')" data-tab="friends"><span class="nav-icon">◎</span>Community</button>
+              <button onclick="navigateMore('feedback')" data-tab="feedback"><span class="nav-icon">✦</span>Ideen &amp; Feedback</button>
+            </details>
+            <details class="nav-category">
+              <summary><span>⚙️</span> Konto &amp; Verwaltung <span class="category-chevron">⌄</span></summary>
+              <button onclick="navigateMore('profile')" data-tab="profile"><span class="nav-icon">○</span>Mein Profil</button>
+              <button onclick="navigateMore('settings')" data-tab="settings"><span class="nav-icon">⚙</span>Einstellungen</button>
+              <button onclick="navigateMore('about')" data-tab="about"><span class="nav-icon">ⓘ</span>Über FITNESS AI PRO</button>
+              <button id="adminNavButton" class="hidden" onclick="navigateMore('admin')" data-tab="admin"><span class="nav-icon">▤</span>Admin</button>
+            </details>
           </div>
         </div>
       </nav>
@@ -2669,10 +2726,11 @@ body {
       <button onclick="toggleMobileMore()" id="mobileMoreNavButton" aria-expanded="false"><span>•••</span>Mehr</button>
     </div>
     <div class="mobile-more-menu" id="mobileMoreMenu" hidden>
-      <div class="mobile-more-section-label">COACH &amp; TRAINING</div><button onclick="navigateMore('ai')">✧ KI-Coach</button><button onclick="navigateMore('timer')">◷ Pausen-Timer</button><button onclick="navigateMore('music')">♫ Trainingsmusik</button>
-      <div class="mobile-more-section-label">FITNESSSTUDIOS</div><button onclick="navigateMore('studioOffersPage')">⌂ Fitnessstudios &amp; Angebote</button>
-      <div class="mobile-more-section-label">COMMUNITY</div><button onclick="navigateMore('friends')">◎ Community</button><button onclick="navigateMore('feedback')">✦ Ideen &amp; Feedback</button>
-      <div class="mobile-more-section-label">MEIN KONTO</div><button onclick="navigateMore('profile')">○ Mein Profil</button><button onclick="navigateMore('settings')">⚙ Einstellungen</button><button onclick="navigateMore('about')">ⓘ Über FITNESS AI PRO</button><button onclick="navigateMore('progress')">↗ Mein Fortschritt</button><button id="mobileAdminNavButton" class="hidden" onclick="navigateMore('admin')">Verwaltung</button><button id="mobileStudioNavButton" class="hidden" onclick="navigateMore('studioAdmin')">Studioverwaltung</button>
+      <details class="nav-category" open><summary><span>🏋️</span> Training &amp; Coach <span class="category-chevron">⌄</span></summary><button onclick="navigateMore('ai')">✧ KI-Coach</button><button onclick="navigateMore('timer')">◷ Pausen-Timer</button><button onclick="navigateMore('music')">♫ Trainingsmusik</button></details>
+      <details class="nav-category"><summary><span>📈</span> Fortschritt <span class="category-chevron">⌄</span></summary><button onclick="navigateMore('progress')">↗ Mein Fortschritt</button></details>
+      <details class="nav-category"><summary><span>🏢</span> Fitnessstudios <span class="category-chevron">⌄</span></summary><button onclick="navigateMore('studioOffersPage')">⌂ Studios &amp; Angebote</button><button id="mobileStudioNavButton" class="hidden" onclick="navigateMore('studioAdmin')">Studioverwaltung</button></details>
+      <details class="nav-category"><summary><span>👥</span> Community <span class="category-chevron">⌄</span></summary><button onclick="navigateMore('friends')">◎ Community</button><button onclick="navigateMore('feedback')">✦ Ideen &amp; Feedback</button></details>
+      <details class="nav-category"><summary><span>⚙️</span> Konto &amp; Verwaltung <span class="category-chevron">⌄</span></summary><button onclick="navigateMore('profile')">○ Mein Profil</button><button onclick="navigateMore('settings')">⚙ Einstellungen</button><button onclick="navigateMore('about')">ⓘ Über FITNESS AI PRO</button><button id="mobileAdminNavButton" class="hidden" onclick="navigateMore('admin')">Verwaltung</button></details>
     </div>
 
         <!-- MAIN -->
