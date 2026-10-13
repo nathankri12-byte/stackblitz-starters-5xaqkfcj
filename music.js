@@ -77,7 +77,7 @@
     empty.classList.add("hidden");
     external.href = result.external;
     external.classList.remove("hidden");
-    const isSingleTrack = /\\/(track|song)\\//i.test(new URL(result.external).pathname);
+    const isSingleTrack = /\/(track|song)\//i.test(new URL(result.external).pathname);
     external.textContent = provider === "spotify"
       ? (isSingleTrack ? "Vollständig in Spotify abspielen ↗" : "Playlist vollständig in Spotify öffnen ↗")
       : (isSingleTrack ? "Vollständig in Apple Music abspielen ↗" : "In Apple Music öffnen ↗");
