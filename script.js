@@ -444,6 +444,11 @@ async function createProfile(
 ) {
   if (!supabaseClient || !userId) return;
 
+  if (goalTargetDate && goalTargetDate < new Date().toISOString().slice(0, 10)) {
+    setInlineStatus("profileStatus", "Das Ziel-Datum liegt in der Vergangenheit. Wähle heute oder ein zukünftiges Datum.");
+    return;
+  }
+
   const profileData = {
     user_id: userId,
     Name: name || "User",
@@ -545,6 +550,9 @@ async function loadProfile() {
 
         goal:
           data.Goal || "",
+
+        goal_target_date:
+          data.goal_target_date || "",
 
         diet:
           data.Diet || "",
@@ -660,6 +668,8 @@ function fillProfileUI() {
     currentProfile.goal
   );
 
+  setValue("goalTargetDate", currentProfile.goal_target_date || "");
+
   if (typeof handleTrainingLocationChange === "function") handleTrainingLocationChange(false);
   if (typeof loadAvailableStudios === "function") loadAvailableStudios();
 
@@ -721,6 +731,8 @@ async function saveProfile() {
       )
       ?.value || "";
 
+  const goalTargetDate = document.getElementById("goalTargetDate")?.value || null;
+
   // Eingaben vor dem Schreiben in die Datenbank validieren.
   if (name.length > 80) {
     setInlineStatus("profileStatus", "Der Name darf höchstens 80 Zeichen lang sein.");
@@ -766,6 +778,8 @@ async function saveProfile() {
 
     Goal:
       goal,
+
+    goal_target_date: goalTargetDate,
 
     email:
       currentUser.email || ""
@@ -1638,6 +1652,7 @@ function buildAIContext() {
     `Größe: ${currentProfile.height || "unbekannt"} cm`,
     `Gewicht: ${currentProfile.weight || "unbekannt"} kg`,
     `Ziel: ${currentProfile.goal || "nicht angegeben"}`,
+    `Ziel-Zeitraum: ${currentProfile.goal_target_date || "kein Datum festgelegt"}`,
     `Trainingsort: ${currentProfile.training_location || "nicht angegeben"}`,
     `Fitnessstudio: ${currentProfile.studio_name || "nicht verbunden"}`,
     `Studio-Stadt: ${currentProfile.studio_city || "nicht angegeben"}`,
@@ -2199,6 +2214,7 @@ async function generateTrainingPlan(customPrompt = "") {
     height: document.getElementById("profileHeight")?.value !== undefined && document.getElementById("profileHeight")?.value !== ""
       ? Number(document.getElementById("profileHeight").value) : savedProfile.height,
     goal: document.getElementById("goal")?.value || savedProfile.goal || "",
+    goal_target_date: document.getElementById("goalTargetDate")?.value || savedProfile.goal_target_date || "",
     training_location: document.getElementById("trainingLocation")?.value || savedProfile.training_location || "",
     training_level: document.getElementById("trainingLevel")?.value || savedProfile.training_level || "Anfänger"
   };
@@ -2228,6 +2244,7 @@ async function generateTrainingPlan(customPrompt = "") {
       Age: Number(profile.age),
       Height: Number(profile.height),
       Goal: profile.goal,
+      goal_target_date: profile.goal_target_date || null,
       training_location: profile.training_location,
       selected_studio_id: profile.selected_studio_id || null,
       training_level: profile.training_level || "Anfänger",
@@ -2296,6 +2313,7 @@ Alter: ${profile.age} Jahre
 Größe: ${profile.height} cm
 Gewicht: ${profile.weight || "nicht angegeben"} kg
 Trainingsziel: ${profile.goal}
+Ziel-Zeitraum: ${profile.goal_target_date || "kein Datum festgelegt"}
 Trainingsort: ${profile.training_location}
 Verbundenes Fitnessstudio: ${profile.studio_name || "kein Studio verbunden"}
 Stadt des Fitnessstudios: ${profile.studio_city || "nicht angegeben"}
