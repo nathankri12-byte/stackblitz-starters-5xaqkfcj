@@ -1069,6 +1069,7 @@ function showTab(tabName) {
     "nutrition"
   ) {
     loadSavedMealPlan();
+    loadMealDiary();
   }
 }
 
@@ -4152,7 +4153,7 @@ async function init() {
 
 
 /* COMMUNITY — echte Inhalte aus Supabase, keine Demo-Beiträge */
-const communityState = { feed:"all", channelUserId:null, profiles:[], posts:[], following:new Set(), likes:new Set(), likeCounts:new Map(), comments:[] };
+const communityState = { feed:"all", channelUserId:null, profiles:[], posts:[], following:new Set(), friendRequests:[], likes:new Set(), likeCounts:new Map(), comments:[] };
 function communityEscape(value){return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
 function communityInitials(name){const p=String(name||"FP").trim().split(/\s+/).filter(Boolean);return (p.length>1?p[0][0]+p[1][0]:(p[0]||"FP").slice(0,2)).toUpperCase();}
 function communityDate(value){const d=new Date(value);return Number.isNaN(d.getTime())?"":d.toLocaleString("de-DE",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});}
@@ -4171,13 +4172,14 @@ async function loadCommunity(){
  feed.innerHTML='<div class="card community-empty"><span class="community-loading-dot"></span><p>Gespeicherte Beiträge werden geladen …</p></div>';
  try{
   await ensureCommunityProfile();
-  const [pr,po,fo,li]=await Promise.all([
+  const [pr,po,fo,li,fr]=await Promise.all([
    supabaseClient.from("community_profiles").select("user_id,username,display_name,bio,avatar_url,created_at").order("created_at",{ascending:true}).limit(300),
    supabaseClient.from("community_posts").select("id,user_id,body,image_path,created_at,updated_at").order("created_at",{ascending:false}).limit(60),
    supabaseClient.from("community_follows").select("following_id").eq("follower_id",currentUser.id),
-   supabaseClient.from("community_likes").select("post_id").eq("user_id",currentUser.id)
+   supabaseClient.from("community_likes").select("post_id").eq("user_id",currentUser.id),
+   supabaseClient.from("community_friend_requests").select("id,sender_id,recipient_id,status,created_at,updated_at").or("sender_id.eq."+currentUser.id+",recipient_id.eq."+currentUser.id).order("created_at",{ascending:false}).limit(100)
   ]);
-  for(const r of [pr,po,fo,li])if(r.error)throw r.error;
+  for(const r of [pr,po,fo,li,fr])if(r.error)throw r.error;
   communityState.profiles=pr.data||[];
   communityState.posts=await Promise.all((po.data||[]).map(async post=>{
    if(!post.image_path)return post;
@@ -4186,6 +4188,7 @@ async function loadCommunity(){
    return {...post,image_url:data?.signedUrl||null};
   }));
   communityState.following=new Set((fo.data||[]).map(x=>x.following_id));
+  communityState.friendRequests=fr.data||[];
   communityState.likes=new Set((li.data||[]).map(x=>x.post_id));
   const ids=communityState.posts.map(p=>p.id);
   if(ids.length){
@@ -4208,7 +4211,7 @@ async function loadCommunity(){
    if(a)a.textContent=communityInitials(own.display_name);
   }
   await processCommunityInvite();
-  renderCommunityPeople();renderCommunityFeed();
+  renderCommunityPeople();renderCommunityFriendRequests();renderCommunityFeed();
  }catch(error){
   console.error("Community konnte nicht geladen werden:",error);
   feed.innerHTML='<div class="card community-empty"><strong>Community konnte nicht geladen werden.</strong><p>Die Daten konnten gerade nicht abgerufen werden. Bitte prüfe deine Verbindung und versuche es erneut.</p><button class="secondary-btn" type="button" onclick="loadCommunity()">Erneut versuchen</button></div>';
@@ -4231,19 +4234,62 @@ function renderCommunityFeed(){
   return '<article class="card community-post" data-post-id="'+communityEscape(post.id)+'"><div class="community-post-head"><div class="community-avatar">'+communityEscape(communityInitials(name))+'</div><div class="community-post-author"><strong>'+communityEscape(name)+'</strong><small>'+communityEscape(communityDate(post.created_at))+'</small></div>'+(mine?'<button class="community-post-menu" type="button" aria-label="Beitrag löschen" title="Beitrag löschen" onclick="deleteCommunityPost(\''+communityEscape(post.id)+'\')">×</button>':'')+'</div>'+(post.body?'<div class="community-post-body">'+communityEscape(post.body)+'</div>':'')+(image?'<img class="community-post-image" src="'+communityEscape(image)+'" alt="Bild zum Community-Beitrag" loading="lazy">':'')+'<div class="community-post-stats">'+(communityState.likeCounts.get(post.id)||0)+' Likes · '+comments.length+' Kommentare</div><div class="community-post-actions"><button type="button" class="'+(liked?"liked":"")+'" onclick="toggleCommunityLike(\''+communityEscape(post.id)+'\')">'+(liked?" Gefällt dir":" Gefällt mir")+'</button><button type="button" onclick="document.getElementById(\'communityComment-'+communityEscape(post.id)+'\')?.focus()">▢ Kommentieren</button>'+(mine?"":'<button type="button" onclick="followCommunityUser(\''+communityEscape(post.user_id)+'\')">'+(communityState.following.has(post.user_id)?"✓ Abonniert":"+ Abonnieren")+'</button>')+'</div><div class="community-comments">'+(commentHtml||'<p class="community-muted">Noch keine Kommentare.</p>')+'<form class="community-comment-form" onsubmit="event.preventDefault();submitCommunityComment(\''+communityEscape(post.id)+'\',this)"><label class="sr-only" for="communityComment-'+communityEscape(post.id)+'">Kommentar schreiben</label><input id="communityComment-'+communityEscape(post.id)+'" name="comment" maxlength="500" placeholder="Schreibe einen Kommentar …" required><button type="submit">Senden</button></form></div></article>';
  }).join("");
 }
+function communityFriendRelation(userId){
+ const rows=communityState.friendRequests.filter(r=>(r.sender_id===currentUser?.id&&r.recipient_id===userId)||(r.sender_id===userId&&r.recipient_id===currentUser?.id));
+ return rows.find(r=>r.status==="accepted")||rows.find(r=>r.status==="pending")||rows[0]||null;
+}
 function renderCommunityPeople(){
  const box=document.getElementById("communityPeople");if(!box)return;
  const query=(document.getElementById("communityPeopleSearch")?.value||"").trim().replace(/^@/,"").toLocaleLowerCase("de-DE");
  const allPeople=communityState.profiles.filter(p=>p.user_id!==currentUser?.id);
  const people=allPeople.filter(p=>!query||String(p.username||"").toLocaleLowerCase("de-DE").includes(query)||String(p.display_name||"").toLocaleLowerCase("de-DE").includes(query));
- const count=document.getElementById("communityMemberCount");
- if(count)count.textContent=String(allPeople.length);
- if(!allPeople.length){box.innerHTML='<p class="community-muted">Noch keine weiteren Kanäle. Sobald andere Nutzer ein Profil angelegt haben, erscheinen ihre echten Kanäle hier.</p>';return;}
+ const count=document.getElementById("communityMemberCount");if(count)count.textContent=String(allPeople.length);
+ if(!allPeople.length){box.innerHTML='<p class="community-muted">Noch keine weiteren Kanäle. Lade Freunde ein, damit sie sich anmelden und ein Profil erstellen können.</p>';return;}
  if(!people.length){box.innerHTML='<p class="community-muted">Kein Profil mit diesem Namen gefunden. Prüfe die Schreibweise oder lade Freunde mit deinem Link ein.</p>';return;}
  box.innerHTML=people.map(p=>{
+  const relation=communityFriendRelation(p.user_id);
+  const isFriend=relation?.status==="accepted";
+  const outgoing=relation?.status==="pending"&&relation.sender_id===currentUser?.id;
+  const incoming=relation?.status==="pending"&&relation.recipient_id===currentUser?.id;
   const yes=communityState.following.has(p.user_id),posts=communityState.posts.filter(post=>post.user_id===p.user_id).length;
-  return '<div class="community-person"><div class="community-avatar" style="width:36px;height:36px;flex-basis:36px;font-size:11px">'+communityEscape(communityInitials(p.display_name))+'</div><div class="community-person-info"><button type="button" class="community-channel-name" onclick="viewCommunityChannel(\''+communityEscape(p.user_id)+'\')">'+communityEscape(p.display_name||"Mitglied")+'</button><small>@'+communityEscape(p.username||"mitglied")+' · '+communityEscape(p.bio||"Fitness-Kanal")+'</small></div><button type="button" class="community-follow-btn '+(yes?"following":"")+'" onclick="followCommunityUser(\''+communityEscape(p.user_id)+'\')">'+(yes?"Verbunden":"Hinzufügen")+'</button><small class="community-channel-post-count">'+posts+" Beiträge</small></div>";
+  const label=isFriend?"✓ Freunde":outgoing?"Anfrage gesendet":incoming?"Anfrage erhalten":"Freund hinzufügen";
+  const disabled=isFriend||outgoing||incoming;
+  return '<div class="community-person"><div class="community-avatar" style="width:36px;height:36px;flex-basis:36px;font-size:11px">'+communityEscape(communityInitials(p.display_name))+'</div><div class="community-person-info"><button type="button" class="community-channel-name" onclick="viewCommunityChannel(\''+communityEscape(p.user_id)+'\')">'+communityEscape(p.display_name||"Mitglied")+'</button><small>@'+communityEscape(p.username||"mitglied")+' · '+communityEscape(p.bio||"Fitness-Kanal")+'</small></div><button type="button" class="community-follow-btn '+((isFriend||yes)?"following":"")+'" '+(disabled?'disabled aria-disabled="true"':'')+' onclick="sendCommunityFriendRequest(\''+communityEscape(p.user_id)+'\')">'+label+'</button><small class="community-channel-post-count">'+posts+" Beiträge</small></div>";
  }).join("");
+}
+function renderCommunityFriendRequests(){
+ const box=document.getElementById("communityFriendRequests"),count=document.getElementById("communityRequestCount");if(!box)return;
+ const incoming=communityState.friendRequests.filter(r=>r.recipient_id===currentUser?.id&&r.status==="pending");
+ const outgoing=communityState.friendRequests.filter(r=>r.sender_id===currentUser?.id&&r.status==="pending");
+ const accepted=communityState.friendRequests.filter(r=>r.status==="accepted"&&(r.sender_id===currentUser?.id||r.recipient_id===currentUser?.id));
+ if(count)count.textContent=String(incoming.length);
+ const profileMap=new Map(communityState.profiles.map(p=>[p.user_id,p]));
+ const incomingHtml=incoming.map(r=>{const p=profileMap.get(r.sender_id);return '<div class="community-friend-request"><div class="community-avatar" style="width:36px;height:36px;flex-basis:36px">'+communityEscape(communityInitials(p?.display_name||"Mitglied"))+'</div><div class="community-friend-request-info"><strong>'+communityEscape(p?.display_name||"Community-Mitglied")+'</strong><small>@'+communityEscape(p?.username||"mitglied")+' möchte dein Freund sein.</small></div><div class="community-request-actions"><button class="primary-btn" type="button" onclick="answerCommunityFriendRequest(\''+communityEscape(r.id)+'\',\'accepted\')">Annehmen</button><button class="secondary-btn" type="button" onclick="answerCommunityFriendRequest(\''+communityEscape(r.id)+'\',\'declined\')">Ablehnen</button></div></div>';}).join("");
+ const outgoingHtml=outgoing.map(r=>{const p=profileMap.get(r.recipient_id);return '<div class="community-friend-request"><div class="community-friend-request-info"><strong>'+communityEscape(p?.display_name||"Community-Mitglied")+'</strong><small>Deine Anfrage wartet auf eine Antwort.</small></div><div class="community-request-actions"><button class="secondary-btn" type="button" onclick="cancelCommunityFriendRequest(\''+communityEscape(r.id)+'\')">Zurückziehen</button></div></div>';}).join("");
+ const acceptedHtml=accepted.map(r=>{const id=r.sender_id===currentUser?.id?r.recipient_id:r.sender_id,p=profileMap.get(id);return '<div class="community-friend-request"><div class="community-friend-request-info"><strong>✓ '+communityEscape(p?.display_name||"Freund")+'</strong><small>@'+communityEscape(p?.username||"mitglied")+' · Ihr seid befreundet.</small></div><div class="community-request-actions"><button class="secondary-btn" type="button" onclick="viewCommunityChannel(\''+communityEscape(id)+'\')">Kanal ansehen</button></div></div>';}).join("");
+ box.innerHTML=(incomingHtml+outgoingHtml+acceptedHtml)||'<p class="community-muted">Noch keine Freundschaftsanfragen. Suche oben nach einem Benutzernamen oder teile deinen Einladungslink.</p>';
+}
+async function sendCommunityFriendRequest(userId){
+ if(!supabaseClient||!currentUser){communityStatus("communityInviteStatus","Bitte melde dich zuerst an.");return;}
+ if(!userId||userId===currentUser.id)return;
+ const existing=communityFriendRelation(userId);
+ if(existing?.status==="accepted"){communityStatus("communityInviteStatus","Ihr seid bereits befreundet.");return;}
+ if(existing?.status==="pending"){communityStatus("communityInviteStatus",existing.sender_id===currentUser.id?"Deine Anfrage wartet bereits auf eine Antwort.":"Diese Person hat dir bereits eine Anfrage gesendet.");return;}
+ const {error}=await supabaseClient.from("community_friend_requests").insert({sender_id:currentUser.id,recipient_id:userId,status:"pending"});
+ if(error){console.error("Freundschaftsanfrage fehlgeschlagen:",error);communityStatus("communityInviteStatus","Die Anfrage konnte nicht gesendet werden. Bitte aktualisiere die Community und versuche es erneut.");return;}
+ communityStatus("communityInviteStatus","Freundschaftsanfrage gesendet.",true);await loadCommunity();
+}
+async function answerCommunityFriendRequest(requestId,status){
+ if(!supabaseClient||!currentUser||!["accepted","declined"].includes(status))return;
+ const {error}=await supabaseClient.from("community_friend_requests").update({status}).eq("id",requestId).eq("recipient_id",currentUser.id).eq("status","pending");
+ if(error){console.error("Freundschaftsanfrage konnte nicht beantwortet werden:",error);communityStatus("communityInviteStatus","Die Anfrage konnte nicht aktualisiert werden. Bitte erneut versuchen.");return;}
+ communityStatus("communityInviteStatus",status==="accepted"?"Freundschaftsanfrage angenommen.":"Freundschaftsanfrage abgelehnt.",true);await loadCommunity();
+}
+async function cancelCommunityFriendRequest(requestId){
+ if(!supabaseClient||!currentUser)return;
+ const {error}=await supabaseClient.from("community_friend_requests").delete().eq("id",requestId).eq("sender_id",currentUser.id).eq("status","pending");
+ if(error){console.error("Freundschaftsanfrage konnte nicht zurückgezogen werden:",error);communityStatus("communityInviteStatus","Die Anfrage konnte nicht zurückgezogen werden.");return;}
+ await loadCommunity();
 }
 async function shareCommunityInvite(){
  if(!currentUser){communityStatus("communityInviteStatus","Bitte melde dich zuerst an.");return;}
@@ -4267,13 +4313,16 @@ async function processCommunityInvite(){
  const key="fitness-ai-community-invite-"+inviterId;
  if(localStorage.getItem(key)==="done")return;
  try{
-  const {error}=await supabaseClient.from("community_follows").upsert({follower_id:currentUser.id,following_id:inviterId},{onConflict:"follower_id,following_id",ignoreDuplicates:true});
-  if(error)throw error;
-  communityState.following.add(inviterId);
+  const relation=communityFriendRelation(inviterId);
+  if(!relation||relation.status==="declined"&&relation.sender_id===currentUser.id){
+   const {error}=await supabaseClient.from("community_friend_requests").insert({sender_id:currentUser.id,recipient_id:inviterId,status:"pending"});
+   if(error&&error.code!=="23505")throw error;
+  }
   localStorage.setItem(key,"done");
-  communityStatus("communityInviteStatus","Du hast dich über den Einladungslink verbunden.",true);
+  communityStatus("communityInviteStatus","Freundschaftsanfrage gesendet. Die andere Person kann sie jetzt annehmen.",true);
   url.searchParams.delete("communityInvite");
   history.replaceState({}, "", url.pathname+url.search+url.hash);
+  await loadCommunity();
  }catch(error){console.warn("Community-Einladung konnte nicht verarbeitet werden:",error.message);}
 }
 async function saveCommunityProfile(){
@@ -4341,6 +4390,38 @@ async function deleteCommunityPost(postId){
  await loadCommunity();
 }
 
+
+
+
+/* PRIVATES ERNÄHRUNGSTAGEBUCH — keine Kalorienziele oder Diätbewertung */
+function getMealDiaryLocalDate(){const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-");}
+function mealDiaryTypeLabel(type){return ({breakfast:"Frühstück",lunch:"Mittagessen",dinner:"Abendessen",snack:"Snack"})[type]||"Mahlzeit";}
+async function loadMealDiary(){
+ const list=document.getElementById("mealDiaryEntries");if(!list)return;
+ const dateInput=document.getElementById("mealDiaryDate");if(dateInput&&!dateInput.value)dateInput.value=getMealDiaryLocalDate();
+ if(!currentUser||!supabaseClient){list.innerHTML='<p class="card-description">Melde dich an, um deine privaten Einträge zu sehen.</p>';return;}
+ const date=dateInput?.value||getMealDiaryLocalDate();list.innerHTML='<p class="card-description">Deine Einträge werden geladen …</p>';
+ try{const {data,error}=await supabaseClient.from("meal_diary_entries").select("id,meal_date,meal_type,meal_name,notes,created_at").eq("user_id",currentUser.id).eq("meal_date",date).order("created_at",{ascending:true});if(error)throw error;
+  if(!data?.length){list.innerHTML='<p class="card-description">Für diesen Tag sind noch keine Mahlzeiten eingetragen.</p>';return;}
+  list.innerHTML=data.map(entry=>'<article class="meal-diary-entry"><div><strong>'+communityEscape(entry.meal_name)+'</strong><small>'+communityEscape(mealDiaryTypeLabel(entry.meal_type))+' · '+communityEscape(new Date(entry.created_at).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}))+'</small>'+(entry.notes?'<p>'+communityEscape(entry.notes)+'</p>':'')+'</div><button type="button" aria-label="Mahlzeit löschen" onclick="deleteMealDiaryEntry(\''+communityEscape(entry.id)+'\')">Löschen</button></article>').join("");
+ }catch(error){console.error("Ernährungstagebuch konnte nicht geladen werden:",error);list.innerHTML='<p class="card-description">Deine Einträge konnten nicht geladen werden. Bitte versuche es erneut.</p>';}
+}
+async function saveMealDiaryEntry(event){
+ event?.preventDefault();if(!currentUser||!supabaseClient){communityStatus("mealDiaryStatus","Bitte melde dich zuerst an.");return;}
+ const date=document.getElementById("mealDiaryDate")?.value||getMealDiaryLocalDate(),type=document.getElementById("mealDiaryType")?.value||"snack",name=document.getElementById("mealDiaryName")?.value.trim()||"",notes=document.getElementById("mealDiaryNotes")?.value.trim()||"",button=document.getElementById("mealDiarySaveButton");
+ if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(date)||!["breakfast","lunch","dinner","snack"].includes(type)||!name||name.length>120||notes.length>500){communityStatus("mealDiaryStatus","Bitte prüfe Datum, Mahlzeit und Beschreibung.");return;}
+ if(button){button.disabled=true;button.textContent="Speichert …";}
+ try{const {error}=await supabaseClient.from("meal_diary_entries").insert({user_id:currentUser.id,meal_date:date,meal_type:type,meal_name:name,notes});if(error)throw error;
+  const form=document.getElementById("mealDiaryForm");form?.reset();const dateInput=document.getElementById("mealDiaryDate");if(dateInput)dateInput.value=date;communityStatus("mealDiaryStatus","Mahlzeit privat gespeichert.",true);await loadMealDiary();
+ }catch(error){console.error("Mahlzeit konnte nicht gespeichert werden:",error);communityStatus("mealDiaryStatus","Mahlzeit konnte nicht gespeichert werden. Bitte versuche es erneut.");}
+ finally{if(button){button.disabled=false;button.textContent="Mahlzeit speichern";}}
+}
+async function deleteMealDiaryEntry(id){
+ if(!currentUser||!supabaseClient||!id)return;if(!confirm("Diesen Eintrag aus deinem Ernährungstagebuch löschen?"))return;
+ const {error}=await supabaseClient.from("meal_diary_entries").delete().eq("id",id).eq("user_id",currentUser.id);
+ if(error){console.error("Mahlzeit konnte nicht gelöscht werden:",error);communityStatus("mealDiaryStatus","Der Eintrag konnte nicht gelöscht werden.");return;}
+ communityStatus("mealDiaryStatus","Eintrag gelöscht.",true);await loadMealDiary();
+}
 
 /* CUSTOM ACTIVITY TIMERS — presets are saved on this device */
 const CUSTOM_TIMERS_KEY = "fitnessAiPro.customTimers.v1";
