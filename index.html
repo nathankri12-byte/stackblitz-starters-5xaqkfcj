@@ -2600,7 +2600,7 @@ body {
             <button onclick="navigateMore('settings')" data-tab="settings"><span class="nav-icon">⚙</span>Einstellungen</button>
             <button onclick="navigateMore('about')" data-tab="about"><span class="nav-icon">ⓘ</span>Über FITNESS AI PRO</button>
             <button id="adminNavButton" class="hidden" onclick="navigateMore('admin')" data-tab="admin"><span class="nav-icon">▤</span>Admin</button>
-            <button id="studioNavButton" class="hidden" onclick="navigateMore('studioAdmin')" data-tab="studioAdmin"><span class="nav-icon">⌂</span>Studio</button>
+            <button id="studioNavButton" class="hidden" onclick="navigateMore('studioAdmin')" data-tab="studioAdmin"><span class="nav-icon">⌂</span>Studioverwaltung</button>
           </div>
         </div>
       </nav>
@@ -3851,11 +3851,11 @@ body {
       ========================== -->
 
       <section id="studioOffersPage" class="page">
-  <div class="topbar"><div><p class="eyebrow">DEINE REGION</p><h2>Studios &amp; Angebote</h2><p>Entdecke freigeschaltete Fitnessstudios und ihre aktuellen Aktionen.</p></div><button type="button" class="secondary-btn" onclick="loadPublicStudioOffers()">Aktualisieren</button></div>
+  <div class="topbar"><div><p class="eyebrow">DEINE REGION</p><h2>Fitnessstudios &amp; Angebote</h2><p>Entdecke Fitnessstudios in deiner Nähe und ihre aktuellen Angebote.</p></div><button type="button" class="secondary-btn" onclick="loadPublicStudioOffers()">Aktualisieren</button></div>
   <div id="publicStudioOffersList" class="grid grid-2"><div class="card"><p class="card-description">Studios und Angebote werden geladen …</p></div></div>
 </section>
 <section id="studioAdmin" class="page">
-  <div class="topbar"><div><p class="eyebrow">STUDIO MANAGEMENT</p><h2>Studio-Center</h2><p>Pflege Studio-Informationen und Angebote selbst. Die Veröffentlichung wird vom FITNESS AI PRO Team freigeschaltet.</p></div><button type="button" class="secondary-btn" onclick="loadStudioPortal()">Aktualisieren</button></div>
+  <div class="topbar"><div><p class="eyebrow">FÜR FITNESSSTUDIOS</p><h2>Studioverwaltung</h2><p>Verwalte die Angaben und Angebote deines Fitnessstudios. Veröffentlichungen werden vom FITNESS AI PRO Team freigeschaltet.</p></div><button type="button" class="secondary-btn" onclick="loadStudioPortal()">Aktualisieren</button></div>
   <div class="card admin-card"><h3>Mein Fitnessstudio</h3><label class="admin-field" for="managedStudioSelect"><span>Studio</span><select id="managedStudioSelect" onchange="selectManagedStudio(this.value)"><option value="">Studios werden geladen …</option></select></label>
     <form id="studioProfileForm" onsubmit="saveStudioProfile(event)" style="margin-top:18px"><div class="grid grid-2">
       <label class="admin-field"><span>Studio-Name</span><input id="studioName" maxlength="120" required></label><label class="admin-field"><span>Stadt</span><input id="studioCity" maxlength="100" required></label>
