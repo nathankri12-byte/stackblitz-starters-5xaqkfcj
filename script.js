@@ -4204,6 +4204,7 @@ async function loadCommunity(){
    if(b&&document.activeElement!==b)b.value=own.bio||"";
    if(a)a.textContent=communityInitials(own.display_name);
   }
+  await processCommunityInvite();
   renderCommunityPeople();renderCommunityFeed();
  }catch(error){
   console.error("Community konnte nicht geladen werden:",error);
@@ -4229,13 +4230,47 @@ function renderCommunityFeed(){
 }
 function renderCommunityPeople(){
  const box=document.getElementById("communityPeople");if(!box)return;
- const people=communityState.profiles.filter(p=>p.user_id!==currentUser?.id),count=document.getElementById("communityMemberCount");
- if(count)count.textContent=String(communityState.profiles.length);
- if(!people.length){box.innerHTML='<p class="community-muted">Noch keine weiteren Kanäle. Sobald andere Nutzer ein Profil angelegt haben, erscheinen ihre echten Kanäle hier.</p>';return;}
+ const query=(document.getElementById("communityPeopleSearch")?.value||"").trim().toLocaleLowerCase("de-DE");
+ const allPeople=communityState.profiles.filter(p=>p.user_id!==currentUser?.id);
+ const people=allPeople.filter(p=>!query||String(p.display_name||"").toLocaleLowerCase("de-DE").includes(query));
+ const count=document.getElementById("communityMemberCount");
+ if(count)count.textContent=String(allPeople.length);
+ if(!allPeople.length){box.innerHTML='<p class="community-muted">Noch keine weiteren Kanäle. Sobald andere Nutzer ein Profil angelegt haben, erscheinen ihre echten Kanäle hier.</p>';return;}
+ if(!people.length){box.innerHTML='<p class="community-muted">Kein Profil mit diesem Namen gefunden. Prüfe die Schreibweise oder lade Freunde mit deinem Link ein.</p>';return;}
  box.innerHTML=people.map(p=>{
   const yes=communityState.following.has(p.user_id),posts=communityState.posts.filter(post=>post.user_id===p.user_id).length;
-  return '<div class="community-person"><div class="community-avatar" style="width:36px;height:36px;flex-basis:36px;font-size:11px">'+communityEscape(communityInitials(p.display_name))+'</div><div class="community-person-info"><button type="button" class="community-channel-name" onclick="viewCommunityChannel(\''+communityEscape(p.user_id)+'\')">'+communityEscape(p.display_name||"Mitglied")+'</button><small>'+communityEscape(p.bio||"Fitness-Kanal")+'</small></div><button type="button" class="community-follow-btn '+(yes?"following":"")+'" onclick="followCommunityUser(\''+communityEscape(p.user_id)+'\')">'+(yes?"Abonniert":"Abonnieren")+'</button><small class="community-channel-post-count">'+posts+" Beiträge</small></div>";
+  return '<div class="community-person"><div class="community-avatar" style="width:36px;height:36px;flex-basis:36px;font-size:11px">'+communityEscape(communityInitials(p.display_name))+'</div><div class="community-person-info"><button type="button" class="community-channel-name" onclick="viewCommunityChannel(\''+communityEscape(p.user_id)+'\')">'+communityEscape(p.display_name||"Mitglied")+'</button><small>'+communityEscape(p.bio||"Fitness-Kanal")+'</small></div><button type="button" class="community-follow-btn '+(yes?"following":"")+'" onclick="followCommunityUser(\''+communityEscape(p.user_id)+'\')">'+(yes?"Verbunden":"Hinzufügen")+'</button><small class="community-channel-post-count">'+posts+" Beiträge</small></div>";
  }).join("");
+}
+async function shareCommunityInvite(){
+ if(!currentUser){communityStatus("communityInviteStatus","Bitte melde dich zuerst an.");return;}
+ const inviteUrl=new URL(window.location.href);
+ inviteUrl.searchParams.set("communityInvite",currentUser.id);
+ inviteUrl.hash="";
+ const text="Verbinde dich mit mir in der FITNESS AI PRO Community!";
+ try{
+  if(navigator.share){await navigator.share({title:"FITNESS AI PRO Community",text,url:inviteUrl.toString()});communityStatus("communityInviteStatus","Einladung geöffnet.",true);return;}
+  if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(inviteUrl.toString());communityStatus("communityInviteStatus","Einladungslink kopiert. Du kannst ihn jetzt verschicken.",true);return;}
+  window.prompt("Kopiere deinen Einladungslink:",inviteUrl.toString());
+  communityStatus("communityInviteStatus","Dein persönlicher Einladungslink ist bereit.",true);
+ }catch(error){
+  if(error?.name!=="AbortError"){console.error("Einladungslink konnte nicht geteilt werden:",error);communityStatus("communityInviteStatus","Teilen war nicht möglich. Bitte versuche es erneut.");}
+ }
+}
+async function processCommunityInvite(){
+ if(!supabaseClient||!currentUser)return;
+ const url=new URL(window.location.href),inviterId=url.searchParams.get("communityInvite");
+ if(!inviterId||inviterId===currentUser.id)return;
+ const key="fitness-ai-community-invite-"+inviterId;
+ if(localStorage.getItem(key)==="done")return;
+ try{
+  const {error}=await supabaseClient.from("community_follows").upsert({follower_id:currentUser.id,following_id:inviterId},{onConflict:"follower_id,following_id",ignoreDuplicates:true});
+  if(error)throw error;
+  localStorage.setItem(key,"done");
+  communityStatus("communityInviteStatus","Du hast dich über den Einladungslink verbunden.",true);
+  url.searchParams.delete("communityInvite");
+  history.replaceState({}, "", url.pathname+url.search+url.hash);
+ }catch(error){console.warn("Community-Einladung konnte nicht verarbeitet werden:",error.message);}
 }
 async function saveCommunityProfile(){
  if(!supabaseClient||!currentUser){communityStatus("communityProfileStatus","Bitte melde dich zuerst an.");return;}
