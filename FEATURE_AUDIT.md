@@ -8,10 +8,10 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 |---:|---|---|---|
 | 1 | Klare USP: persönlicher KI-Gym-Coach für Einsteiger | Verbessern | Positionierung in Dashboard und Onboarding konsistent machen. |
 | 2 | Zielgruppe Einsteiger/Jugendliche klar definieren | Verbessern | Altersgerechte Sprache, Belastungsgrenzen und Privatsphäre klarer sichtbar machen. |
-| 3 | Adaptive Trainingspläne | Fehlt / Kern-MVP | Nächsten Plan anhand abgeschlossener Einheiten und protokollierter Werte anpassen. |
+| 3 | Adaptive Trainingspläne | Grundversion umgesetzt im Folge-Branch | Die Planerstellung lädt bis zu 30 eigene Trainingseinträge und übergibt die neuesten 20 als Kontext an die KI; sichere, kleine Anpassungen statt großer automatischer Steigerungen. E2E offen. |
 | 4 | Trainingspläne passend zu Studio-Geräten | Teilweise vorhanden | Trainingsort wird berücksichtigt; Gerätebestand des konkreten Studios fehlt. |
 | 5 | Geräte per QR-Code scannen | Später | Benötigt zuverlässige Geräte-Datenbank/Studio-Kooperation; kein MVP. |
-| 6 | First Gym Mode | Verbessern | Geführter Ablauf für den ersten Studiobesuch ergänzen. |
+| 6 | First Gym Mode | Grundversion umgesetzt im Folge-Branch | Aufklappbarer Einsteiger-Guide mit Geräteeinweisung, leichter Startlast, Pausen und Sicherheits-Hinweisen. |
 | 7 | Kontextsensitiver KI-Coach | Teilweise vorhanden | Profilkontext und KI-Chat existieren; Trainingstage, Verlauf und letzte Einheit stärker einbeziehen. |
 | 8 | Einfaches Onboarding | Verbessern | Profilfelder und Trainingsort schrittweise statt als lange Form erfassen. |
 | 9 | Geschlecht nur bei echter Relevanz erfassen | Prüfen | Nicht unnötig erfassen; keine geschlechtsbasierten pauschalen Annahmen. |
@@ -67,7 +67,7 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 59 | North-Star-Metrik | Definieren | Vorschlag: wöchentlich abgeschlossene, protokollierte Trainingseinheiten pro aktivem Nutzer. |
 | 60 | MVP-Kernablauf | Teilweise vorhanden | Onboarding → Ort → KI-Plan → Workout/Erklärungen → Logging → adaptive nächste Einheit → Fortschritt. Adaptivität ist die größte funktionale Lücke. |
 
-## Neue Studio-Admin-Funktion (im Feature-Branch vorbereitet und Datenbank angelegt)\n\n- Plattform-Admin kann ein Studio mit Stadt anlegen und eine Manager-E-Mail zuordnen.\n- Studio-Manager kann Studio-Name, Stadt, Adresse, Telefon, Website, Öffnungszeiten, Beschreibung/Ausstattung bearbeiten.\n- Studio-Manager kann Angebote mit Preis/Vorteil, Beschreibung, Start-/Enddatum erstellen, pausieren/aktivieren und löschen.\n- Veröffentlichung bleibt dem Plattform-Admin vorbehalten; ein Datenbank-Trigger blockiert Änderungen am Veröffentlichungsstatus durch Studio-Manager.\n- Neue Tabellen: `fitness_studios`, `studio_admins`, `studio_offers`; RLS aktiviert, Policies: 5/4/5. `anon` kann nur veröffentlichte Studios und gültige aktive Angebote lesen.\n- Browser-End-to-End-Test der Studio-Verwaltung nach Deployment steht noch aus.\n\n## Verifizierte technische Checks
+## Neue Studio-Admin-Funktion (im vorherigen Deploy veröffentlicht)\n\n- Plattform-Admin kann ein Studio mit Stadt anlegen und eine Manager-E-Mail zuordnen.\n- Studio-Manager kann Studio-Name, Stadt, Adresse, Telefon, Website, Öffnungszeiten, Beschreibung/Ausstattung bearbeiten.\n- Studio-Manager kann Angebote mit Preis/Vorteil, Beschreibung, Start-/Enddatum erstellen, pausieren/aktivieren und löschen.\n- Veröffentlichung bleibt dem Plattform-Admin vorbehalten; ein Datenbank-Trigger blockiert Änderungen am Veröffentlichungsstatus durch Studio-Manager.\n- Neue Tabellen: `fitness_studios`, `studio_admins`, `studio_offers`; RLS aktiviert, Policies: 5/4/5. `anon` kann nur veröffentlichte Studios und gültige aktive Angebote lesen.\n- Live-Smoke-Test des App-Shells und des sign-out Zustands bestanden. Browser-End-to-End-Test der Studio-Verwaltung mit angemeldetem Admin steht noch aus.\n\n## Verifizierte technische Checks
 
 - `script.js` und `studio-admin.js` bestehen den JavaScript-Syntaxcheck.
 - `index.html` hat keine doppelten `id`-Attribute; Inline-JavaScript besteht den Syntaxcheck.
@@ -78,6 +78,7 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 - Supabase Security Advisor meldet: veraltete Tabelle `public."Feedback"` ohne RLS-Policies; zwei `SECURITY DEFINER`-Funktionen sind für `anon` ausführbar; Schutz vor kompromittierten Passwörtern ist deaktiviert. Diese Punkte sollten vor breiter Veröffentlichung behoben werden.
 - Supabase Performance Advisor meldet fehlende Indizes auf zwei Fremdschlüsseln und mehrere permissive Feedback-SELECT-Policies; vor Schemaänderungen prüfen.
 - Ein vollständiger End-to-End-Test aller Community-, KI-, Musik- und Trainingsabläufe steht noch aus.
+- Folge-Branch ergänzt adaptive Planerstellung anhand eigener Trainingshistorie, First-Gym-Einsteiger-Guide und öffentliche Seite für freigeschaltete Studios/Angebote. JavaScript-Syntax- und HTML-ID-Prüfungen bestanden; Live-Test nach Deployment offen.
 
 ## Reihenfolge für die Umsetzung
 
