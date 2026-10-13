@@ -22,10 +22,10 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 14 | Fortschritt als positive Geschichten | Grundversion umgesetzt im Folge-Branch | Fortschrittsbereich zeigt abgeschlossene Trainingstage, abgeschlossene Übungen und eigene Bestwerte in wertfreier Sprache. |
 | 15 | Persönliche Rekorde (PRs) | Grundversion umgesetzt im Folge-Branch | Höchste gespeicherte Gewichte je Übung werden im Fortschrittsbereich zusammengefasst; noch kein automatischer PR-Verlauf. |
 | 16 | Nicht-toxische Gamification | Verbessern | Konsistenz und persönliche Bestwerte statt Ranglisten/Druck. |
-| 17 | Community | Vorhanden, nicht E2E getestet | Community-Tab, Profile, Posts, Likes und Kommentare im Code vorhanden. |
+| 17 | Community | Vorhanden, E2E offen | Community-Tab, Profile, Posts, Likes, Kommentare, Freundschaftsanfragen und Challenges vorhanden. Profil-/Beitrags-Sichtbarkeit ist jetzt standardmäßig privat und muss aktiv freigegeben werden. Authentifizierte End-to-End-Tests offen. |
 | 18 | Gemeinsam trainieren | Später | Benötigt Einladungen/Datenschutzregeln und Missbrauchsschutz. |
-| 19 | Teilbare Fortschrittskarten | Später | Nur freiwillig, ohne sensible Profilwerte standardmäßig zu teilen. |
-| 20 | Privacy-by-default für Minderjährige | Kritisch prüfen | Community ist vorhanden; Sichtbarkeit, Altersregeln und Bildfreigaben gründlich prüfen. |
+| 19 | Teilbare Fortschrittskarten | Grundversion umgesetzt | Fortschrittskarte als PNG kann freiwillig erstellt/geteilt werden; sensible Profilwerte werden nicht standardmäßig aufgenommen. E2E offen. |
+| 20 | Privacy-by-default für Minderjährige | Teilweise umgesetzt, weiter kritisch prüfen | Community-Profile sind standardmäßig privat; Freigabe ist explizit per Checkbox erforderlich. RLS beschränkt Profile, Beiträge, Kommentare, Likes, Follows und Challenge-Teilnahmen auf sichtbare Mitglieder bzw. eigene Daten. Storage-Bildrichtlinien, Moderation und authentifizierte E2E-Prüfung bleiben offen. |
 | 21 | Altersmodi 14–15, 16–17, 18+ | Grundversion umgesetzt | KI-Coach schaltet anhand des Profilalters automatisch auf Leitlinien für 14–15, 16–17 oder 18+; bei fehlendem/ungültigem Alter gilt eine konservative Fallback-Regel. UI-Test offen. |
 | 22 | Übungserklärungen/Videos | Vorhanden | Übungsbibliothek mit YouTube-Suche und KI-Erklärungsaktion erkannt. |
 | 23 | Kamera-Formcheck | Später | Hohe Datenschutz-/Fehleranforderungen; nicht im MVP. |
@@ -43,7 +43,7 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 | 35 | Empfehlungsprogramm | Später | Erst nach stabiler Nutzung und Abuse-Schutz. |
 | 36 | Creator-Programm | Später | Kein MVP. |
 | 37 | Coach-Marktplatz | Später | Benötigt Anbieterprüfung, Moderation und rechtliche Klärung. |
-| 38 | Challenges | Verbessern | Kleine private Ziele statt öffentlichem Leistungsdruck. |
+| 38 | Challenges | Grundversion vorhanden, Datenschutz ergänzt | Freiwillige Challenges zählen Einheiten/Minuten/aktive Tage, nicht Körpergewicht. Teilnahme und Fortschritt werden nur für eigene Daten bzw. freigegebene Community-Mitglieder sichtbar; Tonalität und E2E weiter prüfen. |
 | 39 | Fitness-Ausbildung/Erklärinhalte | Verbessern | Kurze, sichere Erklärungen zu Technik, Pausen und Progression ergänzen. |
 | 40 | KI korrigiert Fitness-Mythen | Verbessern | Evidenzorientierte Antworten, Unsicherheit nennen und keine Diagnosen stellen. |
 | 41 | Quellenangaben | Verbessern | Bei wissenschaftlichen/gesundheitlichen Aussagen nachvollziehbare Quellen anzeigen. |
@@ -75,10 +75,10 @@ Stand: 13.10.2026. Diese Liste trennt vorhandene Funktionen von Verbesserungen u
 - Live-Browser: Anmeldung erfolgreich; Profilseite mit Name, Alter, Größe und Ernährungsweise sichtbar.
 - Live-Browser: „Profil speichern“ mit unveränderten Werten zeigte „Profil erfolgreich gespeichert.“
 - Live-Browser: Feedbackformular mit 1–5-Bewertung und Nachricht vorhanden; es wurde kein Testfeedback gesendet.
-- Vorhandene Module im Code: KI-Trainingsplan, AI-Chat, Trainingsprotokoll, Gewichtsverlauf, Tages-Check-in, Community, Übungsbibliothek, eigener Timer, Musikbereich, Schnellzugriffe.
+- Vorhandene Module im Code: KI-Trainingsplan, AI-Chat mit altersabhängigen Sicherheitsleitlinien, Trainingsprotokoll, Gewichtsverlauf, Tages-Check-in, Community mit Opt-in-Sichtbarkeit, Übungsbibliothek, eigener Timer, Musikbereich, Schnellzugriffe und teilbare Fortschrittskarte.
 - Supabase Security Advisor meldet: veraltete Tabelle `public."Feedback"` hat RLS ohne Policies; Tabellenrechte für `PUBLIC`, `anon` und `authenticated` wurden entzogen, da die App die separate Tabelle `public.feedback` nutzt. Drei `SECURITY DEFINER`-Funktionen bleiben für angemeldete Nutzer ausführbar; ihre Verwendung ist vor Änderung sorgfältig zu prüfen, da `is_app_admin`/`is_studio_manager` in RLS genutzt werden und `admin_list_profile_names` intern Admin-Rechte prüft. Schutz vor kompromittierten Passwörtern ist weiterhin deaktiviert und muss in den Supabase-Auth-Einstellungen aktiviert werden.
 - Supabase Performance Advisor: die Studio-Admin-Policy wurde auf `(select auth.jwt() ->> email)` umgestellt und doppelte permissive SELECT-Policies für veröffentlichte Studios/Angebote wurden zusammengeführt, ohne anonymen Zugriff auf unveröffentlichte Daten zu erweitern. Der Advisor meldet weiterhin eine Auth-RLS-Initialplan-Warnung, 17 bisher ungenutzte Indizes (nicht ohne Last-/Nutzungsanalyse entfernen) und weitere Hinweise.
-- Ein vollständiger End-to-End-Test aller Community-, KI-, Musik- und Trainingsabläufe steht noch aus.
+- Ein vollständiger End-to-End-Test aller Community-, KI-, Musik- und Trainingsabläufe steht noch aus. Community-Opt-in und die neuen RLS-Regeln wurden per SQL/Policy-Abfrage sowie JavaScript-/HTML-Syntaxcheck geprüft; ein Test mit echtem angemeldetem Nutzer ist noch offen.
 - Feature-Branch ergänzt adaptive Planerstellung anhand eigener Trainingshistorie, First-Gym-Einsteiger-Guide, öffentliche Seite für freigeschaltete Studios/Angebote, Übungserklärungen direkt aus dem Workout, wertfreie Trainings-Meilensteine, speicherbares Erfahrungslevel und Verbindung zum konfigurierten Studio anhand des Namens. JavaScript-Syntax- und HTML-ID-Prüfungen sowie Live-Tests müssen nach Merge/Deploy erneut bestätigt werden.
 
 ## Reihenfolge für die Umsetzung
