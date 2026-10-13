@@ -4180,16 +4180,18 @@ body {
     }
     function navigateMore(tab){
       showTab(tab);
-      // Beim Wechsel des Bereichs bleibt die Navigation geöffnet, damit
-      // weitere Bereiche direkt erreichbar sind.
+      // Desktop und iPad verwenden ausschließlich die linke Seitenleiste.
       const menu=document.getElementById("moreMenu"),btn=document.getElementById("moreMenuToggle");
       if(menu)menu.hidden=false;
       if(btn)btn.setAttribute("aria-expanded","true");
+
+      // Das zusätzliche Menü gibt es nur auf kleinen Handy-Bildschirmen.
       const mobile=document.getElementById("mobileMoreMenu");
-      if(mobile)mobile.hidden=false;
+      const isPhone=window.matchMedia("(max-width: 760px)").matches;
+      if(mobile)mobile.hidden=!isPhone;
       const mb=document.getElementById("mobileMoreToggle"),nb=document.getElementById("mobileMoreNavButton");
-      if(mb)mb.setAttribute("aria-expanded","true");
-      if(nb)nb.setAttribute("aria-expanded","true");
+      if(mb)mb.setAttribute("aria-expanded",String(isPhone));
+      if(nb)nb.setAttribute("aria-expanded",String(isPhone));
     }
     function saveAppSettings(){
       const old=readUiSettings();const theme=document.getElementById("themeMode")?.value||"dark";
