@@ -2765,6 +2765,15 @@ function swapTrainingExercise(button) {
   card.appendChild(notice);
 }
 
+function toggleFirstGymGuide() {
+  const guide = document.getElementById("firstGymGuide");
+  const button = document.getElementById("firstGymGuideToggle");
+  if (!guide || !button) return;
+  guide.hidden = !guide.hidden;
+  button.setAttribute("aria-expanded", String(!guide.hidden));
+  button.textContent = guide.hidden ? "Einsteiger-Guide öffnen" : "Guide schließen";
+}
+
 function readTrainingNumber(input, label, integer = false) {
   const raw = input?.value?.trim() || "";
   if (!raw) return null;
