@@ -2854,6 +2854,25 @@ body {
               </div>
               <div style="height:7px;background:var(--border);border-radius:999px;overflow:hidden;margin-top:12px"><div id="workoutLiveProgressBar" style="height:100%;width:0%;background:var(--accent);transition:width .2s ease"></div></div>
             </div>
+            <div id="workoutFeedbackPanel" class="card" hidden style="margin-top:12px;padding:16px" aria-live="polite">
+              <span class="eyebrow">KURZES TRAININGSFEEDBACK</span>
+              <h4 style="margin-top:6px">Wie hat sich dein Training heute angefühlt?</h4>
+              <p class="card-description">Deine Rückmeldung hilft, den nächsten Plan vorsichtig anzupassen. Es gibt keine richtige oder falsche Antwort.</p>
+              <div class="field" style="margin-top:12px">
+                <label for="workoutFeedbackRating">Belastung</label>
+                <select id="workoutFeedbackRating">
+                  <option value="right">Genau richtig</option>
+                  <option value="too_easy">Eher zu leicht</option>
+                  <option value="too_hard">Eher zu anstrengend</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="workoutFeedbackNote">Optionaler Hinweis</label>
+                <textarea id="workoutFeedbackNote" maxlength="300" rows="2" placeholder="z. B. mehr Zeit für Pausen nötig"></textarea>
+              </div>
+              <button type="button" class="secondary-btn" id="saveWorkoutFeedbackButton" onclick="saveWorkoutSessionFeedback()">Feedback speichern</button>
+              <p id="workoutFeedbackStatus" class="settings-message" role="status" aria-live="polite"></p>
+            </div>
 
             <div
               id="trainingPlan"
@@ -3662,7 +3681,7 @@ body {
 
 
   <!-- Deine JavaScript-Datei -->
-  <script src="script.js?v=20261013-progress-ai-1"></script>
+  <script src="script.js?v=20261013-microfeedback-1"></script>
   <script src="studio-admin.js?v=20261013-gym-1"></script>
   <script src="music.js?v=20261012-1"></script>
 
