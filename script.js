@@ -2432,6 +2432,12 @@ VERBINDLICHE REGELN:
 - Format pro Tag: „MONTAG | konkreter Schwerpunkt“ oder „MONTAG | RUHETAG“.
 - Jede Übung in einer eigenen Zeile im Format: „ÜBUNG: Name | SÄTZE: 3 | WIEDERHOLUNGEN: 8–12“ oder bei Zeitübungen „ÜBUNG: Name | SÄTZE: 3 | DAUER: 30 Sekunden“.
 - Nenne keine Übungen, die am ausgewählten Trainingsort nicht möglich sind.
+- Verwende ausschließlich eindeutig bekannte, reale Übungen mit gebräuchlichem deutschen oder englischen Namen. Verboten sind Platzhalter, Tätigkeitsbeschreibungen oder Gerätenamen als Übung, z. B. „Kabelnutzung“, „Maschinennutzung“ oder „Hanteltraining“.
+- Wähle bevorzugt aus diesen realen Übungen und passe die Auswahl an den Trainingsort an:
+  Zuhause ohne Geräte: Liegestütze, Knie-Liegestütze, Kniebeugen, Ausfallschritte, Glute Bridge, Wadenheben, Plank, Seitstütz, Dead Bug, Bird Dog, Mountain Climbers, Superman, Sit-to-Stand.
+  Fitnessstudio: Brustpresse, Bankdrücken, Kurzhantel-Bankdrücken, Latzug, assistierte Klimmzüge, Rudermaschine, Kabelrudern, Beinpresse, Goblet Squat, Beinbeuger-Maschine, Beinstrecker-Maschine, Schulterpresse, Seitheben, Bizepscurls mit Kurzhanteln, Trizepsdrücken am Kabel, Plank, Dead Bug.
+- Nenne eine Kabelübung nur, wenn das passende Kabelgerät im Studio verfügbar ist, und beschreibe die konkrete Bewegung (z. B. „Trizepsdrücken am Kabel“ statt „Kabelnutzung“).
+- Zu jeder Übung müssen Name, Sätze und Wiederholungen oder Dauer konkret sein. Erfinde keine Geräte, Übungsnamen oder angeblichen Funktionen.
 - Gib ausschließlich den Wochenplan aus, ohne Einleitung und ohne allgemeine Fitness-Tipps.
 `.trim();
 
