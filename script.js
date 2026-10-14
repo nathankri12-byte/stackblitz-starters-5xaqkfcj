@@ -4284,7 +4284,7 @@ async function reportCommunityPost(postId,reportedUserId){
  if(clean.length>500){communityStatus("communityInviteStatus","Der Meldegrund darf höchstens 500 Zeichen enthalten.");return;}
  const {error}=await supabaseClient.from("community_reports").insert({reporter_id:currentUser.id,reported_user_id:reportedUserId,post_id:postId,reason:"other",details:clean,status:"open"});
  if(error){console.error("Community-Meldung konnte nicht gesendet werden:",error);communityStatus("communityInviteStatus","Meldung konnte nicht gesendet werden. Bitte versuche es erneut.");return;}
- communityStatus("communityInviteStatus","Danke. Deine Meldung wurde vertraulich an die Administration gesendet.",true);
+ communityStatus("communityInviteStatus","Danke. Deine Meldung wurde vertraulich an das Fitness AI Pro Team gesendet.",true);
 }
 async function loadCommunityReports(){
  const list=document.getElementById("communityReportsList");if(!list)return;
