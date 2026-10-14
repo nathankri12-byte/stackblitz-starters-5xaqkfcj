@@ -1370,250 +1370,97 @@ function updateAIUserInfo() {
 ========================================================= */
 
 function renderExercises() {
-  const list =
-    document.getElementById(
-      "exerciseList"
-    );
+  const list = document.getElementById("exerciseList");
+  if (!list) return;
 
-  if (!list) {
+  // Die Erklärungs-/Videoliste wird direkt aus dem aktuell gespeicherten Trainingsplan abgeleitet.
+  // So erscheinen hier keine Beispielübungen, die im persönlichen Plan gar nicht vorkommen.
+  const plan = String(localStorage.getItem("fitness_ai_training_plan") || "").trim();
+  if (!plan) {
+    list.innerHTML = '<p class="card-description">Erstelle zuerst deinen Trainingsplan. Hier werden anschließend nur Übungen angezeigt, die tatsächlich darin vorkommen.</p>';
     return;
   }
 
-  const location =
-    currentProfile
-      ?.training_location ||
-    "Zuhause";
+  const catalog = [
+    { name: "Bankdrücken", description: "Brust, Schulter und Trizeps.", tags: ["Brust", "Schulter", "Trizeps"] },
+    { name: "Latzug", description: "Rücken und Bizeps.", tags: ["Rücken", "Bizeps"] },
+    { name: "Beinpresse", description: "Beine und Gesäß.", tags: ["Beine", "Po"] },
+    { name: "Rudern", description: "Oberer Rücken und Bizeps.", tags: ["Rücken", "Bizeps"] },
+    { name: "Schulterdrücken", description: "Schultern und Trizeps.", tags: ["Schulter", "Trizeps"] },
+    { name: "Kabelzug", description: "Übung am Kabelzug; die genaue Bewegung hängt vom Trainingsplan ab.", tags: ["Krafttraining"] },
+    { name: "Liegestütze", description: "Brust, Schulter und Trizeps.", tags: ["Brust", "Schulter", "Trizeps"] },
+    { name: "Kniebeugen", description: "Beine und Gesäß.", tags: ["Beine", "Po"] },
+    { name: "Plank", description: "Rumpf und Core.", tags: ["Core", "Bauch"] },
+    { name: "Ausfallschritte", description: "Beine und Gesäß.", tags: ["Beine", "Po"] },
+    { name: "Glute Bridge", description: "Gesäß und hintere Oberschenkel.", tags: ["Po", "Beine"] },
+    { name: "Mountain Climbers", description: "Core und Kondition.", tags: ["Core", "Ausdauer"] }
+  ];
 
-  let exercises;
+  const dayNames = "MONTAG|DIENSTAG|MITTWOCH|DONNERSTAG|FREITAG|SAMSTAG|SONNTAG";
+  const dayHeading = new RegExp("^\\s*(?:#{1,6}\\s*)?(?:\\*{1,2})?(" + dayNames + ")(?:\\*{1,2})?\\s*(?:\\||[-–—:]|\\s+)?\\s*(.*?)(?:\\*{1,2})?\\s*$", "i");
+  const names = [];
+  let insideDay = false;
 
-  if (
-    location ===
-    "Fitnessstudio"
-  ) {
+  for (const originalLine of plan.split(/\r?\n/)) {
+    const trimmed = originalLine.trim();
+    if (!trimmed) continue;
+    const line = trimmed.replace(/^[-*•]+\s*/, "").replace(/^\*{1,2}|\*{1,2}$/g, "");
+    if (dayHeading.test(line)) {
+      insideDay = true;
+      continue;
+    }
+    if (!insideDay) continue;
+    if (/^(?:RUHETAG|REST DAY|ERHOLUNG)(?:\b|$)/i.test(line)) continue;
 
-    exercises = [
-      {
-        name: "Bankdrücken",
-        description:
-          "Brust, Schulter und Trizeps.",
-        tags: [
-          "Brust",
-          "Schulter",
-          "Trizeps"
-        ],
-        search:
-          "Bankdrücken richtige Technik"
-      },
+    let exerciseLine = line;
+    if (/^ÜBUNG\s*:/i.test(exerciseLine)) {
+      exerciseLine = exerciseLine.replace(/^ÜBUNG\s*:\s*/i, "");
+    } else if (/^\d+[.)]\s+/.test(exerciseLine)) {
+      exerciseLine = exerciseLine.replace(/^\d+[.)]\s+/, "");
+    } else if (/^[-•*]\s+/.test(trimmed)) {
+      exerciseLine = trimmed.replace(/^[-•*]\s+/, "");
+    } else {
+      continue;
+    }
 
-      {
-        name: "Latzug",
-        description:
-          "Rücken und Bizeps.",
-        tags: [
-          "Rücken",
-          "Bizeps"
-        ],
-        search:
-          "Latzug richtige Technik"
-      },
-
-      {
-        name: "Beinpresse",
-        description:
-          "Beine und Gesäß.",
-        tags: [
-          "Beine",
-          "Po"
-        ],
-        search:
-          "Beinpresse richtige Technik"
-      },
-
-      {
-        name: "Rudern",
-        description:
-          "Oberer Rücken und Bizeps.",
-        tags: [
-          "Rücken",
-          "Bizeps"
-        ],
-        search:
-          "Rudermaschine richtige Technik"
-      },
-
-      {
-        name: "Schulterdrücken",
-        description:
-          "Schultern und Trizeps.",
-        tags: [
-          "Schulter",
-          "Trizeps"
-        ],
-        search:
-          "Schulterdrücken richtige Technik"
-      },
-
-      {
-        name: "Kabelzug",
-        description:
-          "Vielseitige Übung für verschiedene Muskelgruppen.",
-        tags: [
-          "Ganzkörper"
-        ],
-        search:
-          "Kabelzug Fitness richtige Technik"
-      }
-
-    ];
-
-  } else {
-
-    exercises = [
-      {
-        name: "Liegestütze",
-        description:
-          "Brust, Schulter und Trizeps.",
-        tags: [
-          "Brust",
-          "Schulter",
-          "Trizeps"
-        ],
-        search:
-          "Liegestütze richtige Technik"
-      },
-
-      {
-        name: "Kniebeugen",
-        description:
-          "Beine und Gesäß.",
-        tags: [
-          "Beine",
-          "Po"
-        ],
-        search:
-          "Kniebeugen richtige Technik"
-      },
-
-      {
-        name: "Plank",
-        description:
-          "Rumpf und Core.",
-        tags: [
-          "Core",
-          "Bauch"
-        ],
-        search:
-          "Plank richtige Technik"
-      },
-
-      {
-        name: "Ausfallschritte",
-        description:
-          "Beine und Gesäß.",
-        tags: [
-          "Beine",
-          "Po"
-        ],
-        search:
-          "Ausfallschritte richtige Technik"
-      },
-
-      {
-        name: "Glute Bridge",
-        description:
-          "Gesäß und hintere Oberschenkel.",
-        tags: [
-          "Po",
-          "Beine"
-        ],
-        search:
-          "Glute Bridge richtige Technik"
-      },
-
-      {
-        name: "Mountain Climbers",
-        description:
-          "Core und Kondition.",
-        tags: [
-          "Core",
-          "Ausdauer"
-        ],
-        search:
-          "Mountain Climbers richtige Technik"
-      }
-    ];
+    const name = (exerciseLine.split("|")[0] || "").replace(/\*{1,2}/g, "").trim();
+    if (name && !/^(?:RUHETAG|REST DAY|ERHOLUNG)$/i.test(name) &&
+        !names.some(existing => existing.toLocaleLowerCase("de") === name.toLocaleLowerCase("de"))) {
+      names.push(name);
+    }
   }
 
-  list.innerHTML =
-    exercises
-      .map(
-        (
-          exercise,
-          index
-        ) => {
+  if (!names.length) {
+    list.innerHTML = '<p class="card-description">Im aktuellen Trainingsplan wurden noch keine einzelnen Übungen erkannt. Erstelle den Plan erneut, damit hier passende Erklärungen angezeigt werden.</p>';
+    return;
+  }
 
-          const tags =
-            exercise.tags
-              .map(
-                tag =>
-                  `<span class="tag">${escapeHTML(tag)}</span>`
-              )
-              .join("");
+  const normalize = value => String(value || "").toLocaleLowerCase("de").normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+  const exercises = names.map(name => {
+    const match = catalog.find(item => normalize(name) === normalize(item.name) ||
+      normalize(name).startsWith(normalize(item.name) + " ") ||
+      normalize(item.name).startsWith(normalize(name) + " "));
+    return match
+      ? { ...match, name }
+      : { name, description: "Diese Übung steht in deinem Trainingsplan.", tags: [] };
+  });
 
-          const youtube =
-            "https://www.youtube.com/results?search_query=" +
-            encodeURIComponent(
-              exercise.search
-            );
-
-          return `
-            <div class="card exercise-card">
-
-              <div class="exercise-number">
-                ${String(index + 1).padStart(2, "0")}
-              </div>
-
-              <h3>
-                ${escapeHTML(
-                  exercise.name
-                )}
-              </h3>
-
-              <p class="card-description">
-                ${escapeHTML(
-                  exercise.description
-                )}
-              </p>
-
-              <div class="exercise-tags">
-                ${tags}
-              </div>
-
-              <div class="exercise-actions">
-
-                <a
-                  href="${youtube}"
-                  target="_blank"
-                  rel="noopener"
-                >
-                   Video
-                </a>
-
-                <button
-                  onclick="useAIQuickPrompt('Erkläre mir die richtige Technik für ${escapeHTML(exercise.name)}.')"
-                >
-                   KI
-                </button>
-
-              </div>
-
-            </div>
-          `;
-        }
-      )
-      .join("");
+  list.innerHTML = exercises.map((exercise, index) => {
+    const tags = exercise.tags.map(tag => '<span class="tag">' + escapeHTML(tag) + '</span>').join("");
+    const youtube = "https://www.youtube.com/results?search_query=" + encodeURIComponent(exercise.name + " richtige Technik");
+    return `
+      <div class="card exercise-card">
+        <div class="exercise-number">${String(index + 1).padStart(2, "0")}</div>
+        <h3>${escapeHTML(exercise.name)}</h3>
+        <p class="card-description">${escapeHTML(exercise.description)}</p>
+        <div class="exercise-tags">${tags}</div>
+        <div class="exercise-actions">
+          <a href="${youtube}" target="_blank" rel="noopener">Video</a>
+          <button type="button" onclick="useAIQuickPrompt('Erkläre mir die richtige Technik für ${escapeHTML(exercise.name).replace(/'/g, "\\'")}.')">KI</button>
+        </div>
+      </div>`;
+  }).join("");
 }
-
 
 /* =========================================================
    AI QUICK PROMPT
