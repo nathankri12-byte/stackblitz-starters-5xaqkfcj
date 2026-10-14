@@ -128,10 +128,10 @@ function setAuthMessage(
 
   element.textContent = message || "";
 
-  element.style.color =
-    success
-      ? "#35d07f"
-      : "#8d9aaa";
+  const text = String(message || "").toLowerCase();
+  const isError = /fehlgeschlagen|fehler|ungültig|nicht möglich|konnte nicht|abgelaufen|falsch|error/.test(text);
+  element.style.color = success ? "#35d07f" : isError ? "var(--red)" : "var(--blue)";
+  element.style.fontWeight = message ? "600" : "400";
 }
 
 
